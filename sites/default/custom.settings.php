@@ -183,10 +183,10 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'beeldgeluid',
-      'username' => 'root',
-      'password' => 'kro4pa$$',
-      'host' => 'mysql.totalactivemedia.nl',
+      'database' => '',
+      'username' => '',
+      'password' => '',
+      'host' => '',
       'port' => '',
       'driver' => 'mysql',
       'prefix' => '',
