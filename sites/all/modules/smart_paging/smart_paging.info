@@ -1,0 +1,15 @@
+; $Id: smart_paging.info,v 1.1.2.1 2010/12/08 22:42:42 arpeggio Exp $
+name = Smart Paging
+description = Provides long Drupal content splitting up into sub pages.
+core = 7.x
+files[] = smart_paging.install
+files[] = smart_paging.module
+files[] = includes/smart_paging.admin.inc
+dependencies[] = filter
+configure = admin/config/content/smart_paging
+; Information added by drupal.org packaging script on 2011-03-18
+version = "7.x-1.1-alpha3"
+core = "7.x"
+project = "smart_paging"
+datestamp = "1300412768"
+
