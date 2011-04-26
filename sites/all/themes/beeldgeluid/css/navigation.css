@@ -56,5 +56,63 @@ li a.active {
  * Drupal core has limited ways in which it can display its menus. To get around
  * these limitations, see http://drupal.org/project/menu_block
  */
-.block-menu-block {
+#header #block-menu-block-1 {
+  margin: 0;
+  float: left;
+}
+
+#header #block-menu-block-1 ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  list-style-image: none;
+}
+
+#header #block-menu-block-1 ul {
+  margin-top: 16px;
+}
+
+#header #block-menu-block-1 ul li {
+  display: inline;
+  list-style: none;
+  list-style-image: none;
+  font-family: 'BebasNeue';
+  text-transform: uppercase;
+  font-size: 36px;
+  margin-right: 22px;
+}
+
+#header #block-menu-block-1 ul li a {
+  color: #C7C2BA;
+  text-decoration: none;
+}
+
+#header #block-menu-block-1 ul li a:hover,
+#header #block-menu-block-1 ul li a.active-trail {
+  color: #fff;
+}
+
+#header #block-menu-block-3 {
+  float: right;
+  margin: 0;
+  line-height: 10px;
+}
+
+#header #block-menu-block-3 ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  list-style-image: none;
+}
+
+#header #block-menu-block-3 ul li {
+  display: inline;
+  list-style: none;
+  list-style-image: none;
+}
+
+#header #block-menu-block-3 ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 10px;
 }

@@ -26,6 +26,12 @@
  */
 body {
   font-size: 100%; /* Fixes exaggerated text resizing in IE6 and IE7 */
+  color: #4A4A4A;
+  overflow-x: hidden;
+}
+
+html body.admin-menu {
+    margin-top: 34px !important;
 }
 
 #skip-to-nav,
@@ -35,13 +41,9 @@ body {
    * to use a 14px font size on the page, delete the 12px declarations.
    */
 
-  /* Use a 12px base font size with a 18px line height */
+  /* Use a 12px base font size with a 20px line height */
   font-size: 0.75em; /* 16px x .75 = 12px */
-  line-height: 1.5em; /* 12px x 1.5 = 18px */
-
-  /* Use a 14px base font size with a 21px line height */
-  font-size: 0.875em; /* 16px x .875 = 14px */
-  line-height: 1.5em; /* 14px x 1.5 = 21px */
+  line-height: 1.67em; /* 12px x 1.67 = 20px */
 }
 
 /*

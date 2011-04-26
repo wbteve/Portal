@@ -61,9 +61,24 @@
 /*
  * Search (search-block-form.tpl.php)
  */
-#block-search-form /* Wrapper for the search form */ {
+#header #block-search-form /* Wrapper for the search form */ {
+  position: absolute;
+  right: 0;
+  top: 18px;
 }
 
+#header #block-search-form #edit-submit {
+  display: none;
+}
+
+#header #block-search-form .form-text {
+  color: #3D3D3C;
+  font-size: 12px;
+  width: 170px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid #fff;
+}
 
 /*
  * Drupal's default login form block

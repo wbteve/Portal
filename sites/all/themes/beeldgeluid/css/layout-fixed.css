@@ -29,9 +29,7 @@ body {
    * this is the standards-compliant way to do that. See also the ie6.css file
    * for the necessary IE5/IE6quirks hack to center a div.
    */
-  margin-left: auto;
-  margin-right: auto;
-  width: 960px;
+  
 }
 
 #page {
@@ -41,12 +39,23 @@ body {
  * Header
  */
 #header {
+  height: 80px;
+  background: #1d1d1b url('../images/bg_header.jpg') left top no-repeat;
 }
 
 #header .section {
+  margin-left: auto;
+  margin-right: auto;
+  width: 940px;
+  padding: 12px 0 0 0;
 }
 
-.region-header {
+#header .region-header {
+  float: right;
+  clear: none;
+  margin: 0;
+  width: 720px;
+  position: relative;
 }
 
 /*
@@ -57,6 +66,9 @@ body {
 }
 
 #main {
+  margin-left: auto;
+  margin-right: auto;
+  width: 960px;
 }
 
 /*
