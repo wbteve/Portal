@@ -9,10 +9,10 @@
  */
 function bg_blog_taxonomy_default_vocabularies() {
   return array(
-    'blog' => array(
-      'name' => 'Blog',
-      'machine_name' => 'blog',
-      'description' => 'Choose in which blog a blog post will be published.',
+    'context' => array(
+      'name' => 'Context',
+      'machine_name' => 'context',
+      'description' => 'The context indicates which part of the site where the content belongs.',
       'hierarchy' => '0',
       'module' => 'taxonomy',
       'weight' => '0',

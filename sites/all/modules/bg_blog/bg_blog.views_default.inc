@@ -27,11 +27,12 @@ function bg_blog_views_default_views() {
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['options']['reset_button_label'] = 'Opnieuw instellen';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '10';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'node';
-  /* Field: Content: Title */
+  /* Veld: Inhoud: Titel */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
@@ -47,12 +48,12 @@ function bg_blog_views_default_views() {
   $handler->display->display_options['fields']['title']['hide_empty'] = 0;
   $handler->display->display_options['fields']['title']['empty_zero'] = 0;
   $handler->display->display_options['fields']['title']['link_to_node'] = 1;
-  /* Sort criterion: Content: Post date */
+  /* Sort criterion: Inhoud: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Contextual filter: Taxonomy: Term */
+  /* Contextual filter: Taxonomie: Term */
   $handler->display->display_options['arguments']['name']['id'] = 'name';
   $handler->display->display_options['arguments']['name']['table'] = 'taxonomy_term_data';
   $handler->display->display_options['arguments']['name']['field'] = 'name';
@@ -70,14 +71,14 @@ function bg_blog_views_default_views() {
   $handler->display->display_options['arguments']['name']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['name']['add_table'] = 0;
   $handler->display->display_options['arguments']['name']['require_value'] = 0;
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Inhoud: Gepubliceerd */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = 1;
   $handler->display->display_options['filters']['status']['group'] = 0;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
-  /* Filter criterion: Content: Type */
+  /* Filter criterion: Inhoud: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
@@ -93,14 +94,14 @@ function bg_blog_views_default_views() {
     t('Blog'),
     t('more'),
     t('Apply'),
-    t('Reset'),
+    t('Opnieuw instellen'),
     t('Sort by'),
     t('Asc'),
     t('Desc'),
     t('Items per page'),
     t('- All -'),
     t('Offset'),
-    t('All'),
+    t('Alle'),
     t('%1 blog'),
     t('Page'),
   );

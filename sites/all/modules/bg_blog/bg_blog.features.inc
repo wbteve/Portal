@@ -30,7 +30,7 @@ function bg_blog_views_api() {
 function bg_blog_node_info() {
   $items = array(
     'blog' => array(
-      'name' => t('blog'),
+      'name' => t('Blog'),
       'base' => 'node_content',
       'description' => t('Blog post'),
       'has_title' => '1',

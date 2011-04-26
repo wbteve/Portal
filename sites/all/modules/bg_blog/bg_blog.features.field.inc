@@ -83,14 +83,14 @@ function bg_blog_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-blog-field_blog'
-  $fields['node-blog-field_blog'] = array(
+  // Exported field: 'node-blog-field_context'
+  $fields['node-blog-field_context'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
       'deleted' => '0',
       'entity_types' => array(),
-      'field_name' => 'field_blog',
+      'field_name' => 'field_context',
       'foreign keys' => array(
         'tid' => array(
           'columns' => array(
@@ -109,9 +109,10 @@ function bg_blog_field_default_fields() {
         'allowed_values' => array(
           0 => array(
             'parent' => '0',
-            'vocabulary' => 'blog',
+            'vocabulary' => 'context',
           ),
         ),
+        'profile2_private' => FALSE,
       ),
       'translatable' => '1',
       'type' => 'taxonomy_term_reference',
@@ -137,9 +138,9 @@ function bg_blog_field_default_fields() {
         ),
       ),
       'entity_type' => 'node',
-      'field_name' => 'field_blog',
-      'label' => 'Blog',
-      'required' => 1,
+      'field_name' => 'field_context',
+      'label' => 'Context',
+      'required' => 0,
       'settings' => array(
         'user_register_form' => FALSE,
       ),
@@ -228,8 +229,8 @@ function bg_blog_field_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Blog');
   t('Body');
+  t('Context');
   t('Tags');
 
   return $fields;
