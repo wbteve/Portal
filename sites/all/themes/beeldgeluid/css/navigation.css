@@ -116,3 +116,51 @@ li a.active {
   text-decoration: none;
   font-size: 10px;
 }
+
+.region-sidebar-first .block-menu-block {
+  margin-top: 8px;
+}
+
+.region-sidebar-first .block-menu-block ul {
+  margin: 7px 0 0 0;
+  padding: 0;
+  list-style: none;
+  list-style-image: none;
+}
+
+.region-sidebar-first .block-menu-block ul  li {
+  list-style: none;
+  list-style-image: none;
+  margin: 0 0 7px 0;
+}
+
+.region-sidebar-first .block-menu-block ul  li a {
+  color: #4A4A4A;
+  text-decoration: none;
+  padding: 0 0 0 10px;
+  display: block;
+  line-height: 14px;
+}
+
+.region-sidebar-first .block-menu-block ul  li a.active {
+  font-weight: bold;
+  background: transparent url('../images/arrow_right.png') left 3px no-repeat!important;
+}
+
+.region-sidebar-first .block-menu-block ul  li  ul {
+  display: none;
+}
+
+.region-sidebar-first .block-menu-block ul  li.active ul,
+.region-sidebar-first .block-menu-block ul  li.expanded ul {
+  display: block;
+}
+
+.region-sidebar-first .block-menu-block ul  li  ul li {
+  margin-left: 10px;
+}
+
+.region-sidebar-first .block-menu-block ul  li.expanded a.active-trail {
+  font-weight: bold;
+  background: transparent url('../images/arrow_down.png') left 4px no-repeat;
+}

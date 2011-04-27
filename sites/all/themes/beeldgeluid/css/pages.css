@@ -14,6 +14,7 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: #f8f6f5;
 }
 
 #page-wrapper {
@@ -49,6 +50,7 @@ body {
   float: left; /* LTR */
   margin: 0;
   padding: 0;
+  text-decoration: none;
 }
 
 #logo img {
@@ -110,6 +112,19 @@ div#site-name /* The name of the website */ {
 
 .breadcrumb /* The path to the current page in the form of a list of links */ {
   padding-bottom: 0; /* Undo system.css */
+  font-size: 10px;
+  color: #a4a4a4;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: #a4a4a4;
+  padding: 0 5px;
+}
+
+.breadcrumb a:hover,
+.breadcrumb a:active {
+  color: #4a4a4a;
 }
 
 h1.title, /* The title of the page */
@@ -119,6 +134,19 @@ h2.title, /* Comment section heading */
 h2.comment-form, /* Comment form heading */
 h3.title /* Comment title */ {
   margin: 0;
+}
+
+h1.title {
+  font-family: 'BebasNeue';
+  font-size: 44px;
+  line-height: 50px;
+  color: #C7C2BA;
+}
+
+.node-article span.heading {
+  font-family: 'BebasNeue';
+  font-size: 25px;
+  text-transform: uppercase;
 }
 
 tr.even /* Some tables have rows marked even or odd. */ {
