@@ -46,6 +46,10 @@ html body.admin-menu {
   line-height: 1.67em; /* 12px x 1.67 = 20px */
 }
 
+#admin-menu {
+  font-size: 0.7em;
+}
+
 /*
  * Instead of relying on the fonts that are available on a user's computer, you
  * can use web fonts which, like images, are resources downloaded to the user's
