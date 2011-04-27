@@ -17,6 +17,10 @@ body {
   background-color: #f8f6f5;
 }
 
+body.front {
+  background-color: #4A4A4A;
+}
+
 #page-wrapper {
 }
 
@@ -141,6 +145,14 @@ h1.title {
   font-size: 44px;
   line-height: 50px;
   color: #C7C2BA;
+}
+
+.node-type-blog h1.title {
+  margin-left: 190px;
+}
+
+.front h1.title {
+  display: none;
 }
 
 .node-article span.heading {

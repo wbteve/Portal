@@ -139,12 +139,12 @@ li a.active {
   text-decoration: none;
   padding: 0 0 0 10px;
   display: block;
-  line-height: 14px;
+  line-height: 16px;
 }
 
 .region-sidebar-first .block-menu-block ul  li a.active {
   font-weight: bold;
-  background: transparent url('../images/arrow_right.png') left 3px no-repeat!important;
+  background: transparent url('../images/arrow_right.png') left 4px no-repeat!important;
 }
 
 .region-sidebar-first .block-menu-block ul  li  ul {
@@ -162,5 +162,5 @@ li a.active {
 
 .region-sidebar-first .block-menu-block ul  li.expanded a.active-trail {
   font-weight: bold;
-  background: transparent url('../images/arrow_down.png') left 4px no-repeat;
+  background: transparent url('../images/arrow_down.png') left 5px no-repeat;
 }
