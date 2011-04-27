@@ -69,9 +69,8 @@
  */
 
 function beeldgeluid_preprocess_html(&$variables, $hook) {
-  dsm($variables);
   if (isset($variables['page']['content']['system_main']['nodes'][3]['body']['#bundle']) && $variables['page']['content']['system_main']['nodes'][3]['body']['#bundle'] == 'blog') {
-    $variables['head_title'] = implode(' | ', array(ucfirst($variables['page']['content']['system_main']['nodes'][3]['field_context'][0]['#title']), variable_get('site_name', ''), variable_get('site_slogan', '')));
+    $variables['head_title'] = implode(' | ', array('Blog - ' .ucfirst($variables['page']['content']['system_main']['nodes'][3]['field_context'][0]['#title']). ' - ' .drupal_get_title(), variable_get('site_name', ''), variable_get('site_slogan', '')));
   }
   // The body tag's classes are controlled by the $classes_array variable. To
   // remove a class from $classes_array, use array_diff().
