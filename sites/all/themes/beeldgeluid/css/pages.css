@@ -161,6 +161,17 @@ h1.title {
   text-transform: uppercase;
 }
 
+h2.node-title {
+  font-family: 'BebasNeue';
+  font-size: 35px;
+  line-height: 36px;
+}
+
+h2.node-title a {
+  text-decoration: none;
+  color: #4A4A4A;
+}
+
 tr.even /* Some tables have rows marked even or odd. */ {
   /* background-color: #eee; */ /* Drupal core uses a #eee background */
 }
@@ -215,6 +226,10 @@ ul.links /* List of links */ {
 
 ul.links.inline {
   display: block; /* Let the links be inline, but the container be a block. */
+}
+
+.front ul.links.inline {
+  display: none;
 }
 
 ul.links li {

@@ -30,10 +30,6 @@ body {
   overflow-x: hidden;
 }
 
-html body.admin-menu {
-    margin-top: 34px !important;
-}
-
 #skip-to-nav,
 #page {
   /*

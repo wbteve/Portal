@@ -67,10 +67,12 @@
  * @param $hook
  *   The name of the template being rendered ("html" in this case.)
  */
-/* -- Delete this line if you want to use this function
-function beeldgeluid_preprocess_html(&$variables, $hook) {
-  $variables['sample_variable'] = t('Lorem ipsum.');
 
+function beeldgeluid_preprocess_html(&$variables, $hook) {
+  dsm($variables);
+  if (isset($variables['page']['content']['system_main']['nodes'][3]['body']['#bundle']) && $variables['page']['content']['system_main']['nodes'][3]['body']['#bundle'] == 'blog') {
+    $variables['head_title'] = implode(' | ', array(ucfirst($variables['page']['content']['system_main']['nodes'][3]['field_context'][0]['#title']), variable_get('site_name', ''), variable_get('site_slogan', '')));
+  }
   // The body tag's classes are controlled by the $classes_array variable. To
   // remove a class from $classes_array, use array_diff().
   //$variables['classes_array'] = array_diff($variables['classes_array'], array('class-to-remove'));
@@ -85,9 +87,13 @@ function beeldgeluid_preprocess_html(&$variables, $hook) {
  * @param $hook
  *   The name of the template being rendered ("page" in this case.)
  */
-/* -- Delete this line if you want to use this function
+
 function beeldgeluid_preprocess_page(&$variables, $hook) {
-  $variables['sample_variable'] = t('Lorem ipsum.');
+  // $variables['theme_hook_suggestions'][] = 'page__'. $variables['node']->type;
+  if (isset($variables['node']->type) && $variables['node']->type == 'blog') {
+   $variables['title'] = $variables['node']->field_context['und'][0]['taxonomy_term']->name;
+   $variables['$head_title_array'][0] = $variables['node']->field_context['und'][0]['taxonomy_term']->name;
+  }
 }
 // */
 
