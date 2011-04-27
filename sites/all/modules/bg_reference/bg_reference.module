@@ -1,0 +1,209 @@
+<?php
+define('CONTENT_TYPE_MEDIA', 'media');
+define('CONTENT_TYPE_TEXT', 'text');
+define('CONTENT_TYPE_SEARCH_RESULT', 'search_result');
+define('CONTENT_TYPE_QUOTE', 'quote');
+define('CONTENT_TYPE_BANNER', 'banner');
+
+/***************************************************************
+ * Field Type API hooks
+ ***************************************************************/
+ 
+/**
+ * Implement hook_field_info().
+ */
+function bg_reference_field_info() {
+  return array(
+    'bg_reference' => array(
+      'label'             => t('Referenced content'),
+      'description'       => t('Stores a reference to content.'),
+      'default_widget'    => 'bg_referencefield',
+      'default_formatter' => 'bg_referenceformat',
+    ),
+  );
+}
+
+/**
+ * Implement hook_field_schema().
+ */
+function bg_reference_field_schema($field) {
+  $columns = array(
+    'bg_reference_type' => array(
+      'type'      => 'varchar',
+      'length'    => 32,
+      'not null'  => TRUE
+    ),
+    'bg_reference_content' => array(
+      'type'      => 'text',
+      'not null'  => TRUE
+    ),
+    'bg_reference_pos_x' => array(
+      'type' => 'int', 
+      'unsigned' => FALSE, 
+      'not null' => TRUE, 
+      'default' => 0,
+    ),
+    'bg_reference_pos_y' => array(
+      'type' => 'int', 
+      'unsigned' => FALSE, 
+      'not null' => TRUE, 
+      'default' => 0,
+    ),
+    'bg_reference_width' => array(
+      'type' => 'int', 
+      'unsigned' => TRUE, 
+      'not null' => TRUE, 
+      'default' => 1,
+    ),
+    'bg_reference_height' => array(
+      'type' => 'int', 
+      'unsigned' => TRUE, 
+      'not null' => TRUE, 
+      'default' => 1,
+    ),
+  );
+  
+  return array('columns' => $columns);
+}
+
+/**
+ * Implement hook_field_validate().
+ */
+function bg_reference_field_validate($obj_type, $object, $field, $instance, $langcode, &$items, &$errors) {
+  /*foreach($items as $delta => $item) {
+    if(isset($item['bg_reference'])) {
+      if(! preg_match('@^#[0-9a-f]{6}$@', $item['rgb'])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'bg_reference_invalid',
+          'message' => t('Color must be an HTML spec'),
+        );
+      }
+    }
+  }*/
+}
+
+/**
+ * Implement hoo_field_is_empty().
+ */
+function bg_reference_field_is_empty($item, $field) {
+  return empty($item['bg_reference']);
+}
+
+/***********************************************************************
+ *  Field Type API: Formatter
+ **********************************************************************/
+ 
+/**
+ * Implement hook_field_formatter_info().
+ */
+function bg_reference_field_formatter_info() {
+  /*return array(
+    'colorpicker_helloworld' => array(
+      'label' => t('"Hello ,World" In color'),
+      'field types' => array('colorpicker_rgb'),
+    ),
+  );*/
+}
+ 
+/**
+ * Implements hook_field_formatter_view().
+ */
+function bg_reference_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  
+  /*if($display['type']=='colorpicker_helloworld') {
+      foreach ($items as $delta => $item) {
+        $element[$delta] = '<p style="color: ' . $items[0]['rgb']. '">Hello, World</p>';
+      }
+  }*/
+  
+  return $element;
+}
+/**************************************************************************
+ * Field Type API: Widget
+ **************************************************************************/
+ 
+/**
+ * Implement hook_field_widget_info().
+ */
+function bg_reference_field_widget_info() {
+  return array(
+    'bg_referencefield' => array(
+      'label'       => t('Referenced content'),
+      'field types' => array('bg_reference'),
+    )
+  );
+}
+
+/**
+ * Implement hook_field_widget().
+ *
+ * This widget displayed three text fields\, one each for red, green,
+ * and blue. However, the field type defines a single text column,
+ * rgb, which needs an HTML color spec. Define an element validate 
+ * handler that converts our r, g, and b fields into a simulaed single
+ * 'rgb' form element.
+ */
+function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
+  $element = array(
+    'type' => array(
+      '#type'     => 'select',
+      '#title'    => t('Content type'),
+      '#options'  => array(
+        CONTENT_TYPE_MEDIA          => t('Media'),
+        CONTENT_TYPE_TEXT           => t('Text'),
+        CONTENT_TYPE_SEARCH_RESULT  => t('Search result'),
+        CONTENT_TYPE_QUOTE          => t('Quote'),
+        CONTENT_TYPE_BANNER         => t('Banner')
+      )
+    ),
+    'content' => array(
+      '#type'   => 'textarea',
+      '#title'  => t('Content'),
+    ),
+    'pos_x' => array(
+      '#type'   => 'textfield',
+      '#title'  => t('X position'),
+    ),
+    'pos_y' => array(
+      '#type'   => 'textfield',
+      '#title'  => t('Y position'),
+    ),
+    'width' => array(
+      '#type'   => 'textfield',
+      '#title'  => t('Width'),
+    ),
+    'height' => array(
+      '#type'   => 'textfield',
+      '#title'  => t('Height'),
+    ),
+  );
+  
+  return $element;
+}
+
+/**
+ * Convert form elements r, g, and b into a single rgb HTML spec. We
+ * should also perform widget-level validation here to get per-color
+ * error reporting, but field-level validation is good enough for now.
+ */
+/*function _colorpicker_3text_validate($element, &$form_state) {
+  $field_name = substr($element['r']['#name'],0,strpos($element['r']['#name'],'['));
+  if (isset($form_state['values'][$field_name][$element['#langcode']][0])) {
+    $values = $form_state['values'][$field_name][$element['#langcode']][0];
+  $value = sprintf('#%02x%02x%02x', $values['r'], $values['g'], $values['b']);
+  form_set_value($element, array('rgb' => $value), $form_state);
+  }
+}
+
+/**
+ * Implement hook_field_error().
+ */
+/*function colorpicker_field_widget_error($element, $error) {
+  switch ($error['error']) {
+    case 'colorpicker_invalid':
+      form_error($element, $error['message']);
+    break;
+  }
+}
+*/
