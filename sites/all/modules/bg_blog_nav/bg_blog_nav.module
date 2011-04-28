@@ -106,6 +106,7 @@ function bg_blog_nav_navigation_content($delta) {
         ORDER BY created_year DESC, created_month DESC", array(':type' => $type,':termname' => strtolower(arg(1))));
       foreach ($result as $record) {
         $list['items'][$record->created_year]['data'] = l($record->created_year, $type .'/'.arg(1).'/'. $record->created_year);
+        if(!isset($list['items'][$record->created_year]['children'])) $list['items'][$record->created_year]['children'] = array();
         $list['items'][$record->created_year]['children'][] .= l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $type .'/'.arg(1).'/'. $record->created_year .'/'. $record->created_month);
       }
       break;
