@@ -70,16 +70,7 @@ function bg_reference_field_schema($field) {
  * Implement hook_field_validate().
  */
 function bg_reference_field_validate($obj_type, $object, $field, $instance, $langcode, &$items, &$errors) {
-  /*foreach($items as $delta => $item) {
-    if(isset($item['bg_reference'])) {
-      if(! preg_match('@^#[0-9a-f]{6}$@', $item['rgb'])) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'bg_reference_invalid',
-          'message' => t('Color must be an HTML spec'),
-        );
-      }
-    }
-  }*/
+  
 }
 
 /**
@@ -90,7 +81,8 @@ function bg_reference_field_validate($obj_type, $object, $field, $instance, $lan
  * Implement hoo_field_is_empty().
  */
 function bg_reference_field_is_empty($item, $field) {
-  //return empty($item['bg_reference']);
+  // Field is empty when content is empty
+  return empty($item['content']);
 }
 
 /***********************************************************************
@@ -198,28 +190,40 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
 }
 
 /**
- * Convert form elements r, g, and b into a single rgb HTML spec. We
- * should also perform widget-level validation here to get per-color
- * error reporting, but field-level validation is good enough for now.
+ * Do validation and set form values
  */
 function _bg_reference_validate($element, &$form_state) {
-  if(preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<id>\d+)\]/', $element['type']['#name'], $field)) {
-    if (isset($form_state['values'][$field['name']][$field['langcode']][$field['id']])) {
-      $values = $form_state['values'][$field['name']][$field['langcode']][$field['id']];
+  if(preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]/', $element['type']['#name'], $field)) {
+    if (isset($form_state['values'][$field['name']][$field['langcode']][$field['delta']])) {
+      $values = $form_state['values'][$field['name']][$field['langcode']][$field['delta']];
+      
+      if(!empty($values['content'])) {
+        // Validate x position
+        if(!_bg_reference_is_int($values['pos_x'])) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_x", t('X position should be an integer value'));
+        }
+        
+        // Validate y position
+        if(!_bg_reference_is_int($values['pos_y'])) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_y", t('Y position should be an integer value'));
+        }
+        
+        // Validate width
+        if(!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && $values['width'] <= 0)) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][width", t('Width should be a positive integer value larger than zero'));
+        }
+        
+        // Validate height
+        if(!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && $values['height'] <= 0)) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a positive integer value larger than zero'));
+        }
+      }
       
       form_set_value($element, $values, $form_state);
     }
   }
 }
 
-/**
- * Implement hook_field_error().
- */
-/*function colorpicker_field_widget_error($element, $error) {
-  switch ($error['error']) {
-    case 'colorpicker_invalid':
-      form_error($element, $error['message']);
-    break;
-  }
+function _bg_reference_is_int($value) {
+  return ((string) $value) === ((string)(int) $value);
 }
-*/
