@@ -3,29 +3,58 @@
  * Form Styling
  */
 
+.webform-client-form {
+  width: 360px;
+}
 
 .form-item /* Wrapper for a form element (or group of form elements) and its label */ {
   margin: 1.5em 0;
 }
 
+.form-item input.form-text {
+  border: 0;
+  background: #E3E0DC;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 10px;
+  color: #4c4c4c;
+  width: 340px;  
+}
+
+.form-item textarea {
+  border: 0;
+  background: #E3E0DC;
+  line-height: 20px;
+  padding: 5px 10px;
+  font-size: 1em;
+  color: #4c4c4c;
+  width: 360px;
+}
+
 .form-item input.error,
 .form-item textarea.error,
 .form-item select.error /* Highlight the form elements that caused a form submission error */ {
-  border: 1px solid #c00;
+  border: 1px solid #e00034;
 }
 
 .form-item label /* The label for a form element */ {
   display: block;
-  font-weight: bold;
+  font-family: 'BebasNeue';
+  font-size: 25px;
+  line-height: 25px;
+  font-weight: normal;
 }
 
 .form-item label.option /* The label for a radio button or checkbox */ {
   display: inline;
   font-weight: normal;
+  font-size: 12px;
+  line-height: 12px;
+  font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;  
 }
 
 .form-required /* The part of the label that indicates a required field */ {
-  color: #c00;
+  color: #e00034;
 }
 
 .form-item .description /* The descriptive help text (separate from the label) */ {
@@ -38,6 +67,16 @@
 }
 
 .form-submit /* The submit button */ {
+  background: url('../images/submit.png') no-repeat 0 0;
+  font-family: 'BebasNeue';
+  font-size: 20px;
+  line-height: 30px;
+  width: 125px;
+  height: 30px;
+  border: 0;
+  color: #FFF;
+  float: right;
+
 }
 
 .container-inline div,
