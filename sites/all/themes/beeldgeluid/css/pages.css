@@ -145,6 +145,7 @@ h1.title {
   font-size: 44px;
   line-height: 50px;
   color: #C7C2BA;
+  text-align: center;
 }
 
 .node-type-blog h2#page-title {
@@ -152,7 +153,7 @@ h1.title {
   font-size: 44px;
   line-height: 50px;
   color: #C7C2BA;
-  margin-left: 190px;
+  text-align: center;
 }
 
 .front h1.title {

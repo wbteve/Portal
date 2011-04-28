@@ -61,18 +61,18 @@ li a.active {
   float: left;
 }
 
-#header #block-menu-block-1 ul {
+#header #block-menu-block-1 .content ul {
   margin: 0;
   padding: 0;
   list-style: none;
   list-style-image: none;
 }
 
-#header #block-menu-block-1 ul {
+#header #block-menu-block-1 .content ul {
   margin-top: 16px;
 }
 
-#header #block-menu-block-1 ul li {
+#header #block-menu-block-1 .content ul li {
   display: inline;
   list-style: none;
   list-style-image: none;
@@ -82,13 +82,13 @@ li a.active {
   margin-right: 22px;
 }
 
-#header #block-menu-block-1 ul li a {
+#header #block-menu-block-1 .content ul li a {
   color: #C7C2BA;
   text-decoration: none;
 }
 
-#header #block-menu-block-1 ul li a:hover,
-#header #block-menu-block-1 ul li a.active-trail {
+#header #block-menu-block-1 .content ul li a:hover,
+#header #block-menu-block-1 .content ul li a.active-trail {
   color: #fff;
 }
 
@@ -98,20 +98,20 @@ li a.active {
   line-height: 10px;
 }
 
-#header #block-menu-block-3 ul {
+#header #block-menu-block-3 .content ul {
   margin: 0;
   padding: 0;
   list-style: none;
   list-style-image: none;
 }
 
-#header #block-menu-block-3 ul li {
+#header #block-menu-block-3 .content ul li {
   display: inline;
   list-style: none;
   list-style-image: none;
 }
 
-#header #block-menu-block-3 ul li a {
+#header #block-menu-block-3 .content ul li a {
   color: #fff;
   text-decoration: none;
   font-size: 10px;
@@ -121,20 +121,20 @@ li a.active {
   margin-top: 8px;
 }
 
-.region-sidebar-first .block-menu-block ul {
+.region-sidebar-first .block-menu-block .content ul {
   margin: 7px 0 0 0;
   padding: 0;
   list-style: none;
   list-style-image: none;
 }
 
-.region-sidebar-first .block-menu-block ul  li {
+.region-sidebar-first .block-menu-block .content ul  li {
   list-style: none;
   list-style-image: none;
   margin: 0 0 7px 0;
 }
 
-.region-sidebar-first .block-menu-block ul  li a {
+.region-sidebar-first .block-menu-block .content ul  li a {
   color: #4A4A4A;
   text-decoration: none;
   padding: 0 0 0 10px;
@@ -142,25 +142,25 @@ li a.active {
   line-height: 16px;
 }
 
-.region-sidebar-first .block-menu-block ul  li a.active {
+.region-sidebar-first .block-menu-block .content ul  li a.active {
   font-weight: bold;
   background: transparent url('../images/arrow_right.png') left 4px no-repeat!important;
 }
 
-.region-sidebar-first .block-menu-block ul  li  ul {
+.region-sidebar-first .block-menu-block .content ul  li  ul {
   display: none;
 }
 
-.region-sidebar-first .block-menu-block ul  li.active ul,
-.region-sidebar-first .block-menu-block ul  li.expanded ul {
+.region-sidebar-first .block-menu-block .content ul  li.active ul,
+.region-sidebar-first .block-menu-block .content ul  li.expanded ul {
   display: block;
 }
 
-.region-sidebar-first .block-menu-block ul  li  ul li {
+.region-sidebar-first .block-menu-block .content ul  li  ul li {
   margin-left: 10px;
 }
 
-.region-sidebar-first .block-menu-block ul  li.expanded a.active-trail {
+.region-sidebar-first .block-menu-block .content ul  li.expanded a.active-trail {
   font-weight: bold;
   background: transparent url('../images/arrow_down.png') left 5px no-repeat;
 }
