@@ -28,34 +28,34 @@ function bg_reference_field_info() {
  */
 function bg_reference_field_schema($field) {
   $columns = array(
-    'bg_reference_type' => array(
+    'type' => array(
       'type'      => 'varchar',
       'length'    => 32,
       'not null'  => TRUE
     ),
-    'bg_reference_content' => array(
+    'content' => array(
       'type'      => 'text',
       'not null'  => TRUE
     ),
-    'bg_reference_pos_x' => array(
+    'pos_x' => array(
       'type' => 'int', 
       'unsigned' => FALSE, 
       'not null' => TRUE, 
       'default' => 0,
     ),
-    'bg_reference_pos_y' => array(
+    'pos_y' => array(
       'type' => 'int', 
       'unsigned' => FALSE, 
       'not null' => TRUE, 
       'default' => 0,
     ),
-    'bg_reference_width' => array(
+    'width' => array(
       'type' => 'int', 
       'unsigned' => TRUE, 
       'not null' => TRUE, 
       'default' => 1,
     ),
-    'bg_reference_height' => array(
+    'height' => array(
       'type' => 'int', 
       'unsigned' => TRUE, 
       'not null' => TRUE, 
@@ -83,10 +83,14 @@ function bg_reference_field_validate($obj_type, $object, $field, $instance, $lan
 }
 
 /**
+ * Implement hook_field_validate().
+ */
+
+/**
  * Implement hoo_field_is_empty().
  */
 function bg_reference_field_is_empty($item, $field) {
-  return empty($item['bg_reference']);
+  //return empty($item['bg_reference']);
 }
 
 /***********************************************************************
@@ -146,6 +150,11 @@ function bg_reference_field_widget_info() {
  */
 function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
   $element = array(
+    '#type' => 'fieldset',
+    // Cinvert during validation.
+    '#element_validate' => array('_bg_reference_validate'),
+    // TODO: This should not be necessary.
+    '#langcode' => $langcode,
     'type' => array(
       '#type'     => 'select',
       '#title'    => t('Content type'),
@@ -155,27 +164,33 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
         CONTENT_TYPE_SEARCH_RESULT  => t('Search result'),
         CONTENT_TYPE_QUOTE          => t('Quote'),
         CONTENT_TYPE_BANNER         => t('Banner')
-      )
+      ),
+      '#default_value' => isset($items[$delta]['type']) ? $items[$delta]['type'] : CONTENT_TYPE_TEXT,
     ),
     'content' => array(
       '#type'   => 'textarea',
       '#title'  => t('Content'),
+      '#default_value' => isset($items[$delta]['content']) ? $items[$delta]['content'] : '',
     ),
     'pos_x' => array(
       '#type'   => 'textfield',
       '#title'  => t('X position'),
+      '#default_value' => isset($items[$delta]['pos_x']) ? $items[$delta]['pos_x'] : 0,
     ),
     'pos_y' => array(
       '#type'   => 'textfield',
       '#title'  => t('Y position'),
+      '#default_value' => isset($items[$delta]['pos_y']) ? $items[$delta]['pos_y'] : 0,
     ),
     'width' => array(
       '#type'   => 'textfield',
       '#title'  => t('Width'),
+      '#default_value' => isset($items[$delta]['width']) ? $items[$delta]['width'] : 1,
     ),
     'height' => array(
       '#type'   => 'textfield',
       '#title'  => t('Height'),
+      '#default_value' => isset($items[$delta]['height']) ? $items[$delta]['height'] : 1,
     ),
   );
   
@@ -187,12 +202,13 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
  * should also perform widget-level validation here to get per-color
  * error reporting, but field-level validation is good enough for now.
  */
-/*function _colorpicker_3text_validate($element, &$form_state) {
-  $field_name = substr($element['r']['#name'],0,strpos($element['r']['#name'],'['));
-  if (isset($form_state['values'][$field_name][$element['#langcode']][0])) {
-    $values = $form_state['values'][$field_name][$element['#langcode']][0];
-  $value = sprintf('#%02x%02x%02x', $values['r'], $values['g'], $values['b']);
-  form_set_value($element, array('rgb' => $value), $form_state);
+function _bg_reference_validate($element, &$form_state) {
+  if(preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<id>\d+)\]/', $element['type']['#name'], $field)) {
+    if (isset($form_state['values'][$field['name']][$field['langcode']][$field['id']])) {
+      $values = $form_state['values'][$field['name']][$field['langcode']][$field['id']];
+      
+      form_set_value($element, $values, $form_state);
+    }
   }
 }
 
