@@ -84,8 +84,10 @@
 
   <?php // print $user_picture; ?>
   <?php print render($title_prefix); ?>
-  <?php if ($title): ?>
+  <?php if ($title && (arg(0) == 'node' && arg(1) == $node->nid)): ?>
     <h1<?php print $title_attributes; ?>><?php print $title; ?></h1>
+  <?php elseif ($title): ?>
+    <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
   <?php endif; ?>
   <?php print render($title_suffix); ?>
 
