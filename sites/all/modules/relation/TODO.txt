@@ -1,0 +1,23 @@
+- implement directionality properly
+- figure out what to do with relations that are too big to load.
+
+- Field API creation and editing?
+  - display with natural language formatters..
+
+- The relation module should be able to ask the relation bundle provider things
+  like:
+  - what is your subject type + predicate + object type?
+  - what relations of your type exist, given a set of subject or object ids?
+    -> what relations of your type exist for subject id *?
+    -> what relations of your type exist for object id (123, 456, 78, 9)?
+
+- We will be able to ask relations' relation API about what relations exist,
+  like "given entity type X, find all relation bundles where X is the subject
+  (or object, or either)".
+
+- The relation API will find the shortest path between entities:
+  - get_relation('subject_type', 'object_type')
+  - get_relation(user, node)  ~~~> user --> node
+  - get_relation(user, term) ~~~> user --> node --> term
+  - get_relation(user, file, term) ~~~> user --> file --> node --> term
+

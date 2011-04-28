@@ -1,0 +1,101 @@
+<?php
+
+/**
+ * @file
+ * A field storing arbitrary relations between entities.
+ */
+
+/**
+ * Implements hook_field_info().
+ */
+function relation_dummy_field_field_info() {
+  return array(
+    'relation' => array(
+      'label' => t('Relation'),
+      'description' => t('Stores relationships between entities.'),
+      'settings' => array(),
+      'default_widget' => 'relation_default',
+      'default_formatter' => 'relation_default',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function relation_dummy_field_field_is_empty($item, $field) {
+  return FALSE;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function relation_dummy_field_field_widget_info() {
+  return array(
+    'relation_default' => array(
+      'label' => t('Relation dummy widget'),
+      'field types' => array('relation'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function relation_dummy_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function relation_dummy_field_field_formatter_info() {
+  return array(
+    'relation_default' => array(
+      'label' => t('Default'),
+      'field types' => array('relation'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function relation_dummy_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  list($entity_id) = entity_extract_ids($entity_type, $entity);
+  foreach ($items as $delta => $item) {
+    $links = array();
+    foreach ($item->entity_keys as $r_index => $entity_key) {
+      $related_entities = entity_load($entity_key['entity_type'], array($entity_key['entity_id']));
+      $related_entity = reset($related_entities);
+      if ($entity_key['entity_type'] == $entity_type && $entity_key['entity_id'] == $entity_id) {
+        $link = array();
+      }
+      else {
+        $link = entity_uri($entity_key['entity_type'], $related_entity);
+        $link['href'] = $link['path'];
+      }
+      $link['title'] = entity_label($entity_key['entity_type'], $related_entity);
+      $links[] = $link;
+    }
+    $uri = entity_uri('relation', $item);
+    $relation_link = l(t('Relation @rid', array('@rid' => $item->rid)), $uri['path'], $uri['options']);
+    // Can't use #heading as it's mercilessly check_plain'd.
+    $element[$delta]['relation']['heading']['#markup'] = t('<h4>Part of !link</h4>', array('!link' => $relation_link));
+    $element[$delta]['relation']['links'] = array(
+      '#theme' => 'links',
+      '#links' => $links,
+    );
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_prepare_view().
+ */
+function relation_dummy_field_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
+  foreach ($entities as $id => $entity) {
+    $items[$id] = array_values(relation_query($entity_type, $id)->execute());;
+  }
+}

@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * @file
+ * Tests for Relation Dummy Field module.
+ */
+
+/**
+ * Test relation.
+ */
+class RelationDummyFieldTestCase extends RelationTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Relation Dummy Field test',
+      'description' => 'Test the relation dummy field.',
+      'group' => 'Relation',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('relation', 'relation_dummy_field');
+    $web_user = $this->drupalCreateUser(array('create article content', 'create page content'));
+    $this->drupalLogin($web_user);
+  }
+
+  /**
+   * Create some nodes, create a relation field on the Article node type, and
+   * check if it displays the relations correctly on the node page.
+   */
+  function testDummyFieldDisplayed() {
+    $node1 = $this->drupalCreateNode(array('type' => 'article', 'promote' => 1));
+    $node2 = $this->drupalCreateNode(array('type' => 'page', 'promote' => 0));
+
+    $this->createRelationTypes();
+    $errors = array();
+
+    // create a symmetric relation
+    $entity_keys = array(
+      array(
+        'entity_type' => 'node',
+        'entity_id' => $node1->nid,
+      ),
+      array(
+        'entity_type' => 'node',
+        'entity_id' => $node2->nid,
+      )
+    );
+    $predicate_symmetric = $this->relation_types['symmetric']['predicate'];
+    $this->RelationSaveHelper($predicate_symmetric, $entity_keys);
+    $this->drupalGet("node/$node1->nid");
+    $this->assertNoRaw($node2->title, 'Node 2 title is not found');
+    $this->field_name = strtolower($this->randomName()) . '_field_name';
+    $field = array(
+      'field_name' => $this->field_name,
+      'type' => 'relation',
+      'entity_types' => array('node'),
+    );
+    field_create_field($field);
+    $instance = array(
+      'field_name' => $this->field_name,
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => $this->randomString(),
+      'widget_type' => 'relation_default',
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'relation_default',
+        ),
+        'teaser' => array(
+          'label' => 'hidden',
+          'type' => 'hidden',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+    $this->drupalGet("node/$node1->nid");
+    // As we have asserted node2 title not being on the page the only way this
+    // click can succeed if the field formatter put it there.
+    $this->clickLink($node2->title);
+  }
+}

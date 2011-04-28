@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Tests for Relation Dropzone module.
+ */
+
+/**
+ * Test relation.
+ */
+class RelationDropzoneTestCase extends RelationTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Relation Dropzone test',
+      'description' => 'Test the relation dropzone.',
+      'group' => 'Relation',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('relation', 'relation_dropzone');
+    $admin_user = $this->drupalCreateUser(array('administer blocks'));
+    $this->drupalLogin($admin_user);
+    $edit = array('blocks[relation_dropzone_dropzone][region]' => 'sidebar_second');
+    $this->drupalPost('admin/structure/block', $edit, t('Save blocks'));
+    $web_user = $this->drupalCreateUser(array('create article content', 'create page content'));
+    $this->drupalLogin($web_user);
+  }
+
+  /**
+   * Create some nodes, add some relations and check they are related.
+   */
+  function testDropzonePickCreate() {
+    $node1 = $this->drupalCreateNode(array('type' => 'article', 'promote' => 1));
+    $node2 = $this->drupalCreateNode(array('type' => 'article', 'promote' => 1));
+    $node3 = $this->drupalCreateNode(array('type' => 'page', 'promote' => 1));
+    $node4 = $this->drupalCreateNode(array('type' => 'page', 'promote' => 1));
+    $node1key = 'node:' . $node1->nid;
+    $node2key = 'node:' . $node2->nid;
+    $node3key = 'node:' . $node3->nid;
+    $node4key = 'node:' . $node4->nid;
+
+    $this->createRelationTypes();
+
+    $predicate = $this->relation_types['symmetric']['predicate'];
+    $edit = array(
+      "predicate" => $predicate,
+      "entity_key" => $node1key,
+    );
+    $this->drupalPost('node', $edit, t('Pick'));
+    $edit = array(
+      "predicate" => $predicate,
+      "entity_key" => $node2key,
+    );
+    $this->drupalPost('node', $edit, t('Pick'));
+    $this->drupalPost('node', array(), t('Create relation'));
+    // Now figure out the new rid.
+    $result = relation_query('node', $node1->nid)->predicates($predicate)->execute();
+    $relation = reset($result);
+    $path = "relation/$relation->rid";
+    $link = l($predicate, $path);
+    // Rebuild the message. Use the known node labels to make sure the message
+    // contains those.
+    $node1_label = entity_label('node', $node1);
+    $node2_label = entity_label('node', $node2);
+    $items = array(
+      "article: " . $node1_label,
+      "article: " . $node2_label,
+    );
+    $item_list = array(
+      '#theme' => 'item_list',
+      '#items' => $items,
+    );
+    $list = drupal_render($item_list);
+    $message = t('Created new !link from !list', array('!link' => $link, '!list' => $list));
+    $this->assertRaw($message, 'Created a new relation.');
+    $this->drupalGet($path);
+    $node1_uri = entity_uri('node', $node1);
+    $node2_uri = entity_uri('node', $node2);
+    $this->assertRaw(l($node1_label, $node1_uri['path'], $node1_uri['options']), 'Node1 link found');
+    $this->assertRaw(l($node2_label, $node2_uri['path'], $node2_uri['options']), 'Node1 link found');
+  }
+}
