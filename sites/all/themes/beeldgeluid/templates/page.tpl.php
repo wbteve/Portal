@@ -117,7 +117,7 @@
   <div id="main-wrapper"><div id="main" class="clearfix<?php if ($main_menu || $page['navigation']) { print ' with-navigation'; } ?>">
     <?php print $breadcrumb; ?>
     <?php print render($title_prefix); ?>
-    <?php if ($title && $node->type == 'blog'): ?>
+    <?php if ($title && isset($node) && $node->type == 'blog'): ?>
       <h2 class="title" id="page-title"><?php print $title; ?></h2>
     <?php elseif ($title): ?>
       <h1 class="title" id="page-title"><?php print $title; ?></h1>
