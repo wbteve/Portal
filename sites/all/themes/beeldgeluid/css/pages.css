@@ -147,7 +147,7 @@ h1.title {
   color: #C7C2BA;
 }
 
-.node-type-blog h2.title {
+.node-type-blog h2#page-title {
   font-family: 'BebasNeue';
   font-size: 44px;
   line-height: 50px;
