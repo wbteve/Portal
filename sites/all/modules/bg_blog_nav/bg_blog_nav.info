@@ -1,0 +1,5 @@
+name = Beeld en Geluid Blog Navigatie
+description = Custom blocks for blog navigation
+package = "Beeld en Geluid"
+core = 7.x
+

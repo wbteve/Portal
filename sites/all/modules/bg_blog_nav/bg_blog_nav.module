@@ -1,0 +1,110 @@
+<?php
+
+/**
+ * Define the available blocks.
+ */
+function bg_blog_nav_get_navblocks() {
+  return array(
+    'blog_dragnav' => array(
+      'title' => 'Blog',
+      'type' => 'blog',
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function bg_blog_nav_block_info() {
+  $blocks = bg_blog_nav_get_navblocks();
+
+  foreach ($blocks as $name => $info) {
+    $blocks[$name] = array(
+      'info' => t('!name navigation', array('!name' => $info['title'])),
+      'cache' => DRUPAL_CACHE_PER_ROLE,
+    );
+  }
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function bg_blog_nav_block_configure($delta = '') {
+  $form = array();
+  $form['granularity'] = array(
+    '#type' => 'radios',
+    '#title' => t('Granularity'),
+    '#default_value' => variable_get("${delta}_granularity", 'month'),
+    '#options' => array('month' => t('Month'), 'year' => t('Year')),
+  );
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function bg_blog_nav_block_save($delta = '', $edit = array()) {
+  variable_set("${delta}_granularity", $edit['granularity']);
+  return;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function bg_blog_nav_block_view($delta = '') {
+  $blocks = bg_blog_nav_get_navblocks();
+
+  $block['subject'] = t('Navigation for !name', array('!name', $blocks[$delta]['title']));
+  $block['content'] = bg_blog_nav_navigation_content($delta);
+  return $block;
+}
+
+/**
+ * A module-defined block content function.
+ */
+function bg_blog_nav_navigation_content($delta) {
+  $blocks = bg_blog_nav_get_navblocks();
+  $type = $blocks[$delta]['type'];
+
+  $list = array(
+    'type' => 'ul',
+    'items' => array(),
+    'attributes' => array('class' => 'menu'),
+  );
+  
+  $list['items'][] = l('- ' . t('all') . ' -', $type);
+  /*
+  $result = db_query("SELECT DISTINCT taxonomy_term_data.name AS taxonomy_term_data_name, taxonomy_term_data.vid AS taxonomy_term_data_vid, taxonomy_term_data.tid AS tid, taxonomy_vocabulary.machine_name AS taxonomy_vocabulary_machine_name
+                        FROM {taxonomy_term_data} taxonomy_term_data
+                        LEFT JOIN {taxonomy_index} taxonomy_index ON taxonomy_term_data.tid = taxonomy_index.tid
+                        INNER JOIN {node} node_taxonomy_index ON taxonomy_index.nid = node_taxonomy_index.nid
+                        LEFT JOIN {taxonomy_vocabulary} taxonomy_vocabulary ON taxonomy_term_data.vid = taxonomy_vocabulary.vid
+                        WHERE (( (taxonomy_vocabulary.machine_name IN  ('tags')) AND (node_taxonomy_index.type IN  (:type)) ))", array(':type' => $type));
+  foreach ($result as $record) {
+    $list['items'][] .= l($record->taxonomy_term_data_name, $type .'/'. $record->taxonomy_term_data_name);
+  }
+  */
+  switch (variable_get("${delta}_granularity", 'month')) {
+    case 'month':
+      $result = db_query("SELECT DISTINCT YEAR(FROM_UNIXTIME(n.created)) AS created_year,
+        MONTH(FROM_UNIXTIME(n.created)) AS created_month
+        FROM {node} n WHERE n.status = 1 AND n.type = :type
+        ORDER BY created_year ASC, created_month ASC", array(':type' => $type));
+      foreach ($result as $record) {
+        $list['items'][] .= l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $type .'/all/'. $record->created_year .'/'. $record->created_month);
+      }
+      break;
+    case 'year':
+      $result = db_query("SELECT DISTINCT YEAR(FROM_UNIXTIME(n.created)) AS created_year
+        FROM {node} n WHERE n.status = 1 AND n.type = :type
+        ORDER BY created_year ASC", array(':type' => $type));
+      foreach ($result as $record) {
+        $list['items'][] .= l($record->created_year, $type .'/all/'. $record->created_year);
+      }
+      break;
+  }
+
+  return theme('item_list', $list);
+}
