@@ -5,7 +5,7 @@
  */
 function bg_blog_nav_get_navblocks() {
   return array(
-    'blog_dragnav' => array(
+    'blog_nav' => array(
       'title' => 'Blog',
       'type' => 'blog',
     ),
@@ -55,8 +55,8 @@ function bg_blog_nav_block_save($delta = '', $edit = array()) {
  */
 function bg_blog_nav_block_view($delta = '') {
   $blocks = bg_blog_nav_get_navblocks();
-
-  $block['subject'] = t('Navigation for !name', array('!name', $blocks[$delta]['title']));
+  
+  $block['subject'] = t('Navigation for !name', array('!name' => $blocks[$delta]['title']));
   $block['content'] = bg_blog_nav_navigation_content($delta);
   return $block;
 }
@@ -74,8 +74,10 @@ function bg_blog_nav_navigation_content($delta) {
     'attributes' => array('class' => 'menu'),
   );
   
-  $list['items'][] = l('- ' . t('all') . ' -', $type);
+  $list['items'][] = l('- ' . t('all') . ' -', $type.'/'.arg(1));
+  
   /*
+  SB: Tagging filters
   $result = db_query("SELECT DISTINCT taxonomy_term_data.name AS taxonomy_term_data_name, taxonomy_term_data.vid AS taxonomy_term_data_vid, taxonomy_term_data.tid AS tid, taxonomy_vocabulary.machine_name AS taxonomy_vocabulary_machine_name
                         FROM {taxonomy_term_data} taxonomy_term_data
                         LEFT JOIN {taxonomy_index} taxonomy_index ON taxonomy_term_data.tid = taxonomy_index.tid
@@ -86,22 +88,33 @@ function bg_blog_nav_navigation_content($delta) {
     $list['items'][] .= l($record->taxonomy_term_data_name, $type .'/'. $record->taxonomy_term_data_name);
   }
   */
+  
   switch (variable_get("${delta}_granularity", 'month')) {
     case 'month':
+      /* SB: No all blogs of all terms page
       $result = db_query("SELECT DISTINCT YEAR(FROM_UNIXTIME(n.created)) AS created_year,
         MONTH(FROM_UNIXTIME(n.created)) AS created_month
         FROM {node} n WHERE n.status = 1 AND n.type = :type
         ORDER BY created_year ASC, created_month ASC", array(':type' => $type));
+      */
+      $result = db_query("SELECT DISTINCT YEAR(FROM_UNIXTIME(n.created)) AS created_year,
+        MONTH(FROM_UNIXTIME(n.created)) AS created_month
+        FROM {taxonomy_term_data} taxonomy_term_data
+        LEFT JOIN {taxonomy_index} taxonomy_index ON taxonomy_term_data.tid = taxonomy_index.tid
+        INNER JOIN {node} n ON taxonomy_index.nid = n.nid
+        WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname
+        ORDER BY created_year DESC, created_month DESC", array(':type' => $type,':termname' => strtolower(arg(1))));
       foreach ($result as $record) {
-        $list['items'][] .= l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $type .'/all/'. $record->created_year .'/'. $record->created_month);
+        $list['items'][$record->created_year]['data'] = l($record->created_year, $type .'/'.arg(1).'/'. $record->created_year);
+        $list['items'][$record->created_year]['children'][] .= l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $type .'/'.arg(1).'/'. $record->created_year .'/'. $record->created_month);
       }
       break;
     case 'year':
       $result = db_query("SELECT DISTINCT YEAR(FROM_UNIXTIME(n.created)) AS created_year
         FROM {node} n WHERE n.status = 1 AND n.type = :type
-        ORDER BY created_year ASC", array(':type' => $type));
+        ORDER BY created_year DESC", array(':type' => $type));
       foreach ($result as $record) {
-        $list['items'][] .= l($record->created_year, $type .'/all/'. $record->created_year);
+        $list['items'][] .= l($record->created_year, $type .'/'.arg(1).'/'. $record->created_year);
       }
       break;
   }
