@@ -67,11 +67,8 @@
  * @param $hook
  *   The name of the template being rendered ("html" in this case.)
  */
-
+/* -- Delete this line if you want to use this function
 function beeldgeluid_preprocess_html(&$variables, $hook) {
-  if (isset($variables['page']['content']['system_main']['nodes'][3]['body']['#bundle']) && $variables['page']['content']['system_main']['nodes'][3]['body']['#bundle'] == 'blog') {
-    $variables['head_title'] = implode(' | ', array('Blog - ' .ucfirst($variables['page']['content']['system_main']['nodes'][3]['field_context'][0]['#title']). ' - ' .drupal_get_title(), variable_get('site_name', ''), variable_get('site_slogan', '')));
-  }
   // The body tag's classes are controlled by the $classes_array variable. To
   // remove a class from $classes_array, use array_diff().
   //$variables['classes_array'] = array_diff($variables['classes_array'], array('class-to-remove'));
