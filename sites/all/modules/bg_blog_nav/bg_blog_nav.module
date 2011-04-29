@@ -76,7 +76,7 @@ function bg_blog_nav_navigation_content($delta) {
     'attributes' => array('class' => 'menu'),
   );
   
-  $list['items'][] = l('- ' . t('all') . ' -', $type.'/'.arg(1));
+  $list['items'][] = l('- ' . t('all') . ' -', $path.'/'.arg(1));
   
   /*
   SB: Tagging filters
