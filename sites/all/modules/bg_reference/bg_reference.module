@@ -2,17 +2,28 @@
 define('CONTENT_TYPE_MEDIA', 'media');
 define('CONTENT_TYPE_TEXT', 'text');
 define('CONTENT_TYPE_SEARCH_RESULT', 'search_result');
-define('CONTENT_TYPE_QUOTE', 'quote');
 define('CONTENT_TYPE_BANNER', 'banner');
+define('CONTENT_TYPE_EVENT', 'event');
+
+define('UNIT_SIZE_WIDTH', 100);
+define('UNIT_SIZE_HEIGHT', 200);
 
 function bg_reference_menu() {
   $items = array();
   
   $items['bg-reference/autocomplete'] = array(
     'page callback'     => '_bg_reference_autocomplete',
+    'page arguments'    => array(2, 3),
+    'access callback'   => TRUE,
+    'file'              => 'bg_reference_ajax.inc.php',
+    'type' => MENU_CALLBACK,
+  );
+  
+  $items['bg-reference/ajax'] = array(
+    'page callback'     => '_bg_reference_ajax',
     'page arguments'    => array(2),
     'access callback'   => TRUE,
-    'file'              => 'bg_reference_autocomplete.inc.php',
+    'file'              => 'bg_reference_ajax.inc.php',
     'type' => MENU_CALLBACK,
   );
   
@@ -172,22 +183,19 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
         CONTENT_TYPE_MEDIA          => t('Media'),
         CONTENT_TYPE_TEXT           => t('Text'),
         CONTENT_TYPE_SEARCH_RESULT  => t('Search result'),
-        CONTENT_TYPE_QUOTE          => t('Quote'),
         CONTENT_TYPE_BANNER         => t('Banner')
+      ),
+      '#ajax' => array(
+        'event'     => 'change',
+        'callback'  => 'bg-reference/ajax',
+        'wrapper'   => 'content',
       ),
       '#default_value' => isset($items[$delta]['type']) ? $items[$delta]['type'] : CONTENT_TYPE_TEXT,
     ),
-    // Define content fields - content is the master content field
     'content' => array(
-      '#type'       => 'textarea',
-      '#title'      => t('Content'),
+      '#type'       => 'hidden',
       '#attributes' => array('class' => array('bg_reference_content')),
       '#default_value' => isset($items[$delta]['content']) ? $items[$delta]['content'] : '',
-    ),
-    'ref_banner' => array(
-      '#type'               => 'textfield',
-      '#title'              => t('Banner'),
-      '#autocomplete_path'  => 'bg-reference/autocomplete/' . CONTENT_TYPE_BANNER,
     ),
     'pos_x' => array(
       '#type'       => 'textfield',
