@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Implements hook_form_alter(&$form, &$form_state, $form_id).
+ */
+function bg_custom_form_alter(&$form, &$form_state, $form_id) {
+  // Remove name from comment form
+  if ($form_id == 'comment_form') {
+    dsm($form);
+    unset($form['preview']);
+    unset($form['_author']);
+    unset($form['comment_filter']['comment']['#title']);
+  }
+}
+
+
