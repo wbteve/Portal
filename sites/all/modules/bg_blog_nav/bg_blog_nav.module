@@ -8,6 +8,7 @@ function bg_blog_nav_get_navblocks() {
     'blog_nav' => array(
       'title' => 'Blog',
       'type' => 'blog',
+      'path' => 'blogs',
     ),
   );
 }
@@ -67,6 +68,7 @@ function bg_blog_nav_block_view($delta = '') {
 function bg_blog_nav_navigation_content($delta) {
   $blocks = bg_blog_nav_get_navblocks();
   $type = $blocks[$delta]['type'];
+  $path = $blocks[$delta]['path'];
 
   $list = array(
     'type' => 'ul',
@@ -102,12 +104,17 @@ function bg_blog_nav_navigation_content($delta) {
         FROM {taxonomy_term_data} taxonomy_term_data
         LEFT JOIN {taxonomy_index} taxonomy_index ON taxonomy_term_data.tid = taxonomy_index.tid
         INNER JOIN {node} n ON taxonomy_index.nid = n.nid
-        WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname
+        WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname AND taxonomy_term_data.vid = 3
         ORDER BY created_year DESC, created_month DESC", array(':type' => $type,':termname' => strtolower(arg(1))));
       foreach ($result as $record) {
-        $list['items'][$record->created_year]['data'] = l($record->created_year, $type .'/'.arg(1).'/'. $record->created_year);
+        $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.arg(1).'/'. $record->created_year);
+        if(arg(2) == $record->created_year) $list['items'][$record->created_year]['class'][] = 'active';
         if(!isset($list['items'][$record->created_year]['children'])) $list['items'][$record->created_year]['children'] = array();
-        $list['items'][$record->created_year]['children'][] .= l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $type .'/'.arg(1).'/'. $record->created_year .'/'. $record->created_month);
+        // Add children
+        $listitem = array();
+        $listitem['data'] = l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $path .'/'.arg(1).'/'. $record->created_year .'/'. $record->created_month);
+        if(arg(3) == $record->created_month) $listitem['class'][] = 'active';
+        $list['items'][$record->created_year]['children'][] = $listitem;
       }
       break;
     case 'year':
@@ -115,7 +122,7 @@ function bg_blog_nav_navigation_content($delta) {
         FROM {node} n WHERE n.status = 1 AND n.type = :type
         ORDER BY created_year DESC", array(':type' => $type));
       foreach ($result as $record) {
-        $list['items'][] .= l($record->created_year, $type .'/'.arg(1).'/'. $record->created_year);
+        $list['items'][] .= l($record->created_year, $path .'/'.arg(1).'/'. $record->created_year);
       }
       break;
   }
