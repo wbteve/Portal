@@ -120,6 +120,7 @@ div#site-name /* The name of the website */ {
   padding-bottom: 0; /* Undo system.css */
   font-size: 10px;
   color: #a4a4a4;
+  margin: 0 0 10px 0;
 }
 
 .breadcrumb a {
@@ -144,11 +145,14 @@ h3.title /* Comment title */ {
 
 h1.title {
   font-family: 'BebasNeue';
-  font-size: 44px;
-  line-height: 50px;
+  font-size: 48px;
+  line-height: 40px;
+  height: 40px;
+  overflow: hidden;
   color: #C7C2BA;
   text-align: center;
   text-transform: uppercase;
+  margin: 0 0 20px 0;
 }
 
 .node-type-blog h2#page-title {
@@ -169,19 +173,28 @@ h2.title {
   font-weight: bold;
 }
 
+h1.node-title,
 .node-article span.heading {
   font-family: 'BebasNeue';
-  font-size: 25px;
   text-transform: uppercase;
 }
 
-.page-blogs h2.node-title,
-h1.node-title,
-h2.node-title {
-  font-family: 'BebasNeue';
-  font-size: 35px;
-  line-height: 36px;
+.node-article span.heading {
+  font-size: 25px;
+}
+
+h1.node-title {
+  font-size: 36px;
+  line-height: 30px;
+  height: 30px;
+  overflow: hidden;
   margin: 0;
+}
+
+.page-blogs h2.node-title,
+h2.node-title {
+  font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;
+  font-size: 13px;
 }
 
 h1.node-title a,
@@ -307,9 +320,11 @@ ul.links li {
 /*
  * Page Taxonomie (list) Page Blog (list)
  */
- 
+
+ span.date-display-single,
 .page-taxonomy .submitted {
   color: #a5a5a5;
+  font-size: 13px;
 }
 
 .page-blogs .node-teaser,
@@ -321,7 +336,13 @@ ul.links li {
 
 .page-blogs  ul.links,
 .page-taxonomy  ul.links {
-  margin: 0.5em 0 1.0em 0;
+  margin: 0 0 1.0em 0;
+   color: #A5A5A5;
+}
+
+.page-blogs p,
+.page-taxonomy p {
+  margin: 0;
 }
 
 /*

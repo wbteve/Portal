@@ -26,6 +26,7 @@ li.comment-add a.active:hover {
 }
 
 .comment /* Wrapper for a single comment */ {
+margin-bottom: 1.5em;
 }
 
 .comment-preview /* Preview of the comment before submitting new or updated comment */ {

@@ -119,12 +119,12 @@ li a.active {
 
 .region-sidebar-first .block-bg-blog-nav,
 .region-sidebar-first .block-menu-block {
-  margin-top: 8px;
+  margin-top: 2px;
 }
 
 .region-sidebar-first .block-bg-blog-nav .content ul,
 .region-sidebar-first .block-menu-block .content ul {
-  margin: 7px 0 0 0;
+  margin: 0 0 0 0;
   padding: 0;
   list-style: none;
   list-style-image: none;
