@@ -4,12 +4,12 @@
  * Implements hook_form_alter(&$form, &$form_state, $form_id).
  */
 function bg_custom_form_alter(&$form, &$form_state, $form_id) {
+  global $language;
+  
   // Remove name from comment form
-  if ($form_id == 'comment_form') {
-    dsm($form);
-    unset($form['preview']);
-    unset($form['_author']);
-    unset($form['comment_filter']['comment']['#title']);
+  if ($form_id == 'comment_node_blog_form') {
+    unset($form['author']);
+    unset($form['comment_body'][$form['language']['#value']][0]['value']['#title']);
   }
 }
 
