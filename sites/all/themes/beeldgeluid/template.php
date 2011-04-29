@@ -89,9 +89,10 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   
   // $variables['theme_hook_suggestions'][] = 'page__'. $variables['node']->type;
   if (isset($variables['node']->type) && $variables['node']->type == 'blog') {
-    if(!empty($variables['node']->field_blog[$language->language])){
-      $variables['title'] = $variables['node']->field_blog[$language->language][0]['taxonomy_term']->name. ' blog';
-      $variables['$head_title_array'][0] = $variables['node']->field_blog[$language->language][0]['taxonomy_term']->name. ' blog';
+    if(!empty($variables['node']->field_blog[$language->language][0]['tid'])){
+      $term = taxonomy_term_load($variables['node']->field_blog[$language->language][0]['tid']);
+      $variables['title'] = $term->name. ' blog';
+      $variables['$head_title_array'][0] = $term->name. ' blog';
     }else{
       $variables['title'] = '';
       $variables['$head_title_array'][0] = '';
