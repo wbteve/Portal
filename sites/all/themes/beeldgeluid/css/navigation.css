@@ -109,6 +109,7 @@ li a.active {
   display: inline;
   list-style: none;
   list-style-image: none;
+  margin: 0 0 0 8px;
 }
 
 #header #block-menu-block-3 .content ul li a {
