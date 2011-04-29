@@ -11,6 +11,10 @@
   margin: 1.5em 0;
 }
 
+input.form-checkbox, input.form-radio {
+  vertical-align: top;
+}
+
 .form-item input.form-text {
   border: 0;
   background: #E3E0DC;
@@ -28,6 +32,9 @@
   padding: 5px 10px;
   font-size: 1em;
   color: #4c4c4c;
+}
+
+.node-type-webform .form-item {
   width: 360px;
 }
 
@@ -66,7 +73,7 @@
   margin: 0; /* Drupal core uses "0.4em 0" */
 }
 
-.webform-client-form .form-submit /* The submit button */ {
+#edit-submit /* The submit button */ {
   background: url('../images/submit.png') no-repeat 0 0;
   font-family: 'BebasNeue';
   font-size: 20px;
@@ -76,7 +83,17 @@
   border: 0;
   color: #FFF;
   float: right;
+}
 
+#edit-preview /* The preview button */ {
+  background: url('../images/preview.png') no-repeat 0 0;
+  font-family: 'BebasNeue';
+  font-size: 20px;
+  line-height: 30px;
+  width: 225px;
+  height: 30px;
+  border: 0;
+  color: #FFF;
 }
 
 .container-inline div,
@@ -117,6 +134,11 @@
   height: 18px;
   padding: 0 4px;
   border: 1px solid #fff;
+  background-color: #fff;
+}
+
+#header #block-search-form .form-actions {
+  display: none;
 }
 
 /*

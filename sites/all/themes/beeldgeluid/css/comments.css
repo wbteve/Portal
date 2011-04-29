@@ -9,9 +9,20 @@
 }
 
 #comments h2.title /* Heading for the list of comments */ {
+  text-align: center;
+  margin: 0 0 1em 0;
 }
 
 #comments h2.comment-form /* Heading for the comment form */ {
+}
+
+li.comment-add a.active {
+  color: #009FDA;
+  text-decoration: none;
+}
+
+li.comment-add a.active:hover {
+  text-decoration: underline;
 }
 
 .comment /* Wrapper for a single comment */ {
@@ -62,7 +73,9 @@ h3.comment-title /* Comment title */ {
 .comment .user-picture /* The picture of the comment author */ {
 }
 
+.node .submitted,
 .comment .submitted /* The "posted by" information */ {
+  color: #a5a5a5;
 }
 
 .comment .content /* Comment's content wrapper */ {
@@ -72,8 +85,15 @@ h3.comment-title /* Comment title */ {
 }
 
 .comment ul.links /* Comment links. See also the ul.links declaration in the pages.css. */ {
+  margin: 0.5em 0 1em 0;
 }
 
 .indented /* Nested comments are indented */ {
   /* margin-left: 25px; */ /* Drupal core uses a 25px left margin */
+}
+
+#comment-form .form-item label {
+  font-size: 14px;
+  font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;
+  font-weight: bold;
 }

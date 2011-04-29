@@ -332,15 +332,19 @@ button {
  * The order of link states are based on Eric Meyer's article:
  * http://meyerweb.com/eric/thoughts/2007/06/11/who-ordered-the-link-states
  */
-a:link {
+a {
   outline: none;
+  text-decoration: none;
+  color: #009fda;
 }
 
 a:visited {
+  color: #00add4;
 }
 
 a:hover,
 a:focus {
+  text-decoration: underline;
 }
 
 a:active {

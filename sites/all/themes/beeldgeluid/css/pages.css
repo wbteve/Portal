@@ -17,8 +17,10 @@ body {
   background-color: #f8f6f5;
 }
 
-body.front {
+body.front,
+body.page-search {
   background-color: #4A4A4A;
+  color: #fff;
 }
 
 #page-wrapper {
@@ -146,6 +148,7 @@ h1.title {
   line-height: 50px;
   color: #C7C2BA;
   text-align: center;
+  text-transform: uppercase;
 }
 
 .node-type-blog h2#page-title {
@@ -160,20 +163,29 @@ h1.title {
   display: none;
 }
 
+h2.title {
+  font-size: 14px;
+  font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;
+  font-weight: bold;
+}
+
 .node-article span.heading {
   font-family: 'BebasNeue';
   font-size: 25px;
   text-transform: uppercase;
 }
 
-h1.node-title {
+.page-blogs h2.node-title,
+h1.node-title,
+h2.node-title {
   font-family: 'BebasNeue';
   font-size: 35px;
   line-height: 36px;
   margin: 0;
 }
 
-h1.node-title a {
+h1.node-title a,
+h2.node-title a {
   text-decoration: none;
   color: #4A4A4A;
 }
@@ -250,6 +262,15 @@ ul.links li {
   padding: 0 0.5em;
 }
 
+.item-list .pager li a {
+  color: #C7C2BA;
+  text-decoration: none;
+}
+
+.item-list .pager li a:hover {
+  color: #4A4A4A;
+}
+
 .feed-icon /* The link to the RSS or Atom feed for the current list of content */ {
 }
 
@@ -281,6 +302,26 @@ ul.links li {
 }
 
 .region-sidebar-second .section {
+}
+
+/*
+ * Page Taxonomie (list) Page Blog (list)
+ */
+ 
+.page-taxonomy .submitted {
+  color: #a5a5a5;
+}
+
+.page-blogs .node-teaser,
+.page-blogs .node-blog,
+.page-taxonomy .node-teaser,
+.page-taxonomy .node-blog {
+  margin: 0 0 1.5em 0;
+}
+
+.page-blogs  ul.links,
+.page-taxonomy  ul.links {
+  margin: 0.5em 0 1.0em 0;
 }
 
 /*
