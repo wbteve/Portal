@@ -1,0 +1,5 @@
+; $Id$
+name = Footer menu
+description = Display the footer menu
+package = "Beeld en Geluid"
+core = 7.x

@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * Define the available blocks.
+ */
+function bg_footermenu_get_blocks() {
+  return array(
+    'blog_nav' => array(
+      'title' => 'footer-menu',
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function bg_footermenu_block_info() {
+  $blocks = bg_footermenu_get_blocks();
+
+  foreach ($blocks as $name => $info) {
+    $blocks[$name] = array(
+      'info' => $info['title'],
+      'cache' => DRUPAL_CACHE_PER_ROLE,
+    );
+  }
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function bg_blog_nav_block_view($delta = '') {
+  $blocks = bg_footermenu_get_blocks();
+  
+  $block['subject'] = $info['title'];
+  $block['content'] = render_footer_menu();
+  return $block;
+}
+
+/**
+ * Custom function to render the footer menu.
+ */
+function render_footer_menu($menu_name = 'footer-menu') {
+  $footer = '';
+  $tree = menu_tree_all_data($menu_name);
+  foreach($tree as $branch) {
+    $footer .= '<div id="column-' . $i . '" class="footer-column">';
+    if(is_array($branch) && is_array($branch['below'])){
+      $footer .= '<h2 class="title">' . $branch['link']['title'] . '</h2>';
+      $footer .= (!empty($branch['below']) ? menu_tree_output($branch['below']) : '&nbsp;');
+      $footer .= '</div>';
+    }
+  }
+  return $footer;
+}
