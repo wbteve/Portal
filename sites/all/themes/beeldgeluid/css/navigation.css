@@ -110,13 +110,22 @@ li a.active {
     progid:DXImageTransform.Microsoft.Shadow(color='#a6a6a6', Direction=270, Strength=10);  
 }
 
+#header #block-nice-menus-1 .content ul ul li.first {
+  margin-top: 25px;
+}
+
+#header #block-nice-menus-1 .content ul ul li.last {
+  margin-bottom: 10px;
+}
+
 #header #block-nice-menus-1 .content ul ul li {
   background: white;
-  margin-top: 20px;
   font-size: 12px;
   line-height: 20px;
-  width: 179px;
+  width: 149px;
+  padding: 0 15px;
   font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;
+  text-transform: none;
 }
 
 #header #block-nice-menus-1 .content ul ul li a,
@@ -139,7 +148,7 @@ li a.active {
 }
 
 #header #block-nice-menus-1 .menu-420 ul {
-  left: -55px;
+  left: -34px;
 }
 
 #header #block-menu-block-3 {
@@ -229,4 +238,41 @@ li a.active {
 .region-sidebar-first .block-bg-blog-nav .content ul  li.active li a {
   font-weight: normal;
   background-image: none;
+}
+
+/* FOOTER MENU */
+
+.region-footer {
+  background-color: #e00034;
+  color: #FFF;  
+}
+
+#block-bg-footermenu-footer-menu{ 
+  overflow: hidden;
+  width: 740px;
+  margin: 0 auto;
+  padding: 16px 0 0 0;
+}
+
+#block-bg-footermenu-footer-menu a{ 
+  color: #FFF;
+}
+
+#block-bg-footermenu-footer-menu .footer-column {
+  float: left;
+  width: 240px;
+}
+
+#block-bg-footermenu-footer-menu .footer-column h2{
+  font-size: 16px;
+  line-height: 23px;
+}
+
+#block-bg-footermenu-footer-menu .footer-column ul,
+#block-bg-footermenu-footer-menu .footer-column ul li{
+  padding: 0;
+  margin: 0;
+  list-style-image: none;
+  list-style: none;
+  line-height: 20px;
 }
