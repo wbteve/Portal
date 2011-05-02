@@ -48,7 +48,6 @@ function render_footer_menu($menu_name = 'menu-footer-menu') {
   foreach($tree as $branch) {
     if(is_array($branch) && is_array($branch['below'])){
       $i++;
-      dsm(menu_tree_output($branch['below']));
       $footer .= '<div id="column-' . $i . '" class="footer-column">';
       $footer .= '<h2 class="title">' . $branch['link']['title'] . '</h2>';
       $footer .= (!empty($branch['below']) ? drupal_render(menu_tree_output($branch['below'])) : '&nbsp;');
