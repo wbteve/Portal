@@ -111,7 +111,7 @@
     ?>
   </div>
 
-  <?php print render($content['links']); ?>
+  <?php if($view_mode != 'teaser') print render($content['links']); ?>
 
   <?php print render($content['comments']); ?>
 
