@@ -207,6 +207,7 @@ li a.active {
 }
 
 .region-sidebar-first .block-bg-blog-nav .content ul li a.active,
+.region-sidebar-first .block-bg-blog-nav .content ul li ul li.active a,
 .region-sidebar-first .block-menu-block .content ul  li a.active {
   font-weight: bold;
   background: transparent url('../images/arrow_right.png') left 4px no-repeat!important;
