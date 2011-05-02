@@ -40,6 +40,17 @@ function bg_blog_nav_block_configure($delta = '') {
     '#default_value' => variable_get("${delta}_granularity", 'month'),
     '#options' => array('month' => t('Month'), 'year' => t('Year')),
   );
+  // Get vocabularies
+  $vocabs = array();
+  foreach(taxonomy_vocabulary_get_names() as $vocab){
+    $vocabs[$vocab->vid] = $vocab->name;
+  }
+  $form['vid'] = array(
+    '#type' => 'select',
+    '#title' => t('Vocabulary'),
+    '#default_value' => variable_get("${delta}_vid", ''),
+    '#options' => $vocabs,
+  );
   return $form;
 }
 
@@ -48,6 +59,7 @@ function bg_blog_nav_block_configure($delta = '') {
  */
 function bg_blog_nav_block_save($delta = '', $edit = array()) {
   variable_set("${delta}_granularity", $edit['granularity']);
+  variable_set("${delta}_vid", $edit['vid']);
   return;
 }
 
@@ -78,6 +90,18 @@ function bg_blog_nav_navigation_content($delta) {
   
   $list['items'][] = l('- ' . t('all') . ' -', $path.'/'.arg(1));
   
+  // Get blog termname
+  if(arg(0) == 'node'){
+    $node = node_load(arg(1));
+    $year = date('Y',$node->created);
+    $month = date('n',$node->created);
+    $termname = taxonomy_term_load($node->field_blog[$node->language][0]['tid'])->name;
+  }else{
+    $year = arg(2);
+    $month = arg(3);
+    $termname = arg(1);
+  }
+  
   /*
   SB: Tagging filters
   $result = db_query("SELECT DISTINCT taxonomy_term_data.name AS taxonomy_term_data_name, taxonomy_term_data.vid AS taxonomy_term_data_vid, taxonomy_term_data.tid AS tid, taxonomy_vocabulary.machine_name AS taxonomy_vocabulary_machine_name
@@ -104,25 +128,34 @@ function bg_blog_nav_navigation_content($delta) {
         FROM {taxonomy_term_data} taxonomy_term_data
         LEFT JOIN {taxonomy_index} taxonomy_index ON taxonomy_term_data.tid = taxonomy_index.tid
         INNER JOIN {node} n ON taxonomy_index.nid = n.nid
-        WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname AND taxonomy_term_data.vid = 3
-        ORDER BY created_year DESC, created_month DESC", array(':type' => $type,':termname' => strtolower(arg(1))));
+        WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname AND taxonomy_term_data.vid = :vid
+        ORDER BY created_year DESC, created_month DESC", array(':type' => $type,':termname' => strtolower($termname),':vid' => variable_get("${delta}_vid", '')));
       foreach ($result as $record) {
-        $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.arg(1).'/'. $record->created_year);
-        if(arg(2) == $record->created_year) $list['items'][$record->created_year]['class'][] = 'active';
+        $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termname.'/'. $record->created_year);
+        if($year == $record->created_year) $list['items'][$record->created_year]['class'][] = 'active';
         if(!isset($list['items'][$record->created_year]['children'])) $list['items'][$record->created_year]['children'] = array();
         // Add children
         $listitem = array();
-        $listitem['data'] = l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $path .'/'.arg(1).'/'. $record->created_year .'/'. $record->created_month);
-        if(arg(3) == $record->created_month) $listitem['class'][] = 'active';
+        $listitem['data'] = l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $path .'/'.$termname.'/'. $record->created_year .'/'. $record->created_month);
+        if($month == $record->created_month) $listitem['class'][] = 'active';
         $list['items'][$record->created_year]['children'][] = $listitem;
       }
       break;
     case 'year':
+      /* SB: No all blogs of all terms page
       $result = db_query("SELECT DISTINCT YEAR(FROM_UNIXTIME(n.created)) AS created_year
         FROM {node} n WHERE n.status = 1 AND n.type = :type
         ORDER BY created_year DESC", array(':type' => $type));
+      */
+      $result = db_query("SELECT DISTINCT YEAR(FROM_UNIXTIME(n.created)) AS created_year
+        FROM {taxonomy_term_data} taxonomy_term_data
+        LEFT JOIN {taxonomy_index} taxonomy_index ON taxonomy_term_data.tid = taxonomy_index.tid
+        INNER JOIN {node} n ON taxonomy_index.nid = n.nid
+        WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname AND taxonomy_term_data.vid = :vid
+        ORDER BY created_year DESC", array(':type' => $type,':termname' => strtolower($termname),':vid' => variable_get("${delta}_vid", '')));
       foreach ($result as $record) {
-        $list['items'][] .= l($record->created_year, $path .'/'.arg(1).'/'. $record->created_year);
+        $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termname.'/'. $record->created_year);
+        if($year == $record->created_year) $list['items'][$record->created_year]['class'][] = 'active';
       }
       break;
   }
