@@ -12,14 +12,58 @@ function bg_reference_menu() {
   $items = array();
   
   $items['bg-reference/autocomplete'] = array(
-    'page callback'     => '_bg_reference_autocomplete',
-    'page arguments'    => array(2, 3),
-    'access callback'   => TRUE,
-    'file'              => 'bg_reference_ajax.inc.php',
-    'type' => MENU_CALLBACK,
+    'page callback'   => '_bg_reference_autocomplete',
+    'page arguments'  => array(2, 3),
+    'access callback' => TRUE,
+    'type'            => MENU_CALLBACK,
   );
   
   return $items;
+}
+
+function bg_reference_theme() {
+  return array(
+    'bg_reference' => array(
+      'render element' => 'element'
+    ),
+  );
+}
+
+function theme_bg_reference($variables) {
+  extract($variables);
+  
+  switch($element['#data']['type']) {
+    case CONTENT_TYPE_BANNER:
+      $class_name = CONTENT_TYPE_BANNER;
+    
+    case CONTENT_TYPE_EVENT:
+      preg_match('/\[nid:(?P<nid>\d+)\] \[vid:(?P<vid>\d+)\]/', $element['#data']['content'], $match);
+      $node = node_load($match['nid'], $match['vid']);
+      $content = drupal_render(node_view($node));
+      
+      $class_name = isset($class_name) ? $class_name : CONTENT_TYPE_EVENT;
+      break;
+    
+    case CONTENT_TYPE_MEDIA:
+      break;
+    
+    case CONTENT_TYPE_SEARCH_RESULT:
+      
+      break;
+    
+    case CONTENT_TYPE_TEXT:
+      $content = $element['#data']['content'];
+      break;
+  }
+  
+  // Set style
+  $left_position  = $element['#data']['pos_x'] * UNIT_SIZE_WIDTH;
+  $top_position   = $element['#data']['pos_y'] * UNIT_SIZE_HEIGHT;
+  $width          = $element['#data']['width'] * UNIT_SIZE_WIDTH;
+  $height         = $element['#data']['height'] * UNIT_SIZE_HEIGHT;
+  $style          = "position: absolute; overflow: hidden; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px;";
+
+  return '<div class="dossier-element ' . $class_name . '" style="' . $style . '">' . $content . '</div>';
 }
 
 /***************************************************************
@@ -91,10 +135,6 @@ function bg_reference_field_validate($obj_type, $object, $field, $instance, $lan
 }
 
 /**
- * Implement hook_field_validate().
- */
-
-/**
  * Implement hoo_field_is_empty().
  */
 function bg_reference_field_is_empty($item, $field) {
@@ -110,25 +150,28 @@ function bg_reference_field_is_empty($item, $field) {
  * Implement hook_field_formatter_info().
  */
 function bg_reference_field_formatter_info() {
-  /*return array(
-    'colorpicker_helloworld' => array(
-      'label' => t('"Hello ,World" In color'),
-      'field types' => array('colorpicker_rgb'),
+  return array(
+    'bg_reference_default' => array(
+      'label' => t('Default display'),
+      'field types' => array('bg_reference'),
     ),
-  );*/
+  );
 }
- 
+
 /**
  * Implements hook_field_formatter_view().
  */
 function bg_reference_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
   $element = array();
   
-  /*if($display['type']=='colorpicker_helloworld') {
-      foreach ($items as $delta => $item) {
-        $element[$delta] = '<p style="color: ' . $items[0]['rgb']. '">Hello, World</p>';
-      }
-  }*/
+  if($display['type'] == 'bg_reference_default') {
+    foreach ($items as $delta => $item) {
+      $element[$delta] = array(
+        '#theme'  => 'bg_reference',
+        '#data'   => $item
+      );
+    }
+  }
   
   return $element;
 }
@@ -235,44 +278,10 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
 }
 
 /**
- * Do validation and set form values
+ * Get form element depending on type of element
+ * @param $type
+ * @param $value
  */
-function _bg_reference_validate($element, &$form_state) {
-  if(preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]/', $element['type']['#name'], $field)) {
-    if (isset($form_state['values'][$field['name']][$field['langcode']][$field['delta']])) {
-      $values = $form_state['values'][$field['name']][$field['langcode']][$field['delta']];
-      
-      if(!empty($values['content'])) {
-        // Validate x position
-        if(!_bg_reference_is_int($values['pos_x'])) {
-          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_x", t('X position should be an integer value'));
-        }
-        
-        // Validate y position
-        if(!_bg_reference_is_int($values['pos_y'])) {
-          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_y", t('Y position should be an integer value'));
-        }
-        
-        // Validate width
-        if(!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && $values['width'] <= 0)) {
-          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][width", t('Width should be a positive integer value larger than zero'));
-        }
-        
-        // Validate height
-        if(!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && $values['height'] <= 0)) {
-          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a positive integer value larger than zero'));
-        }
-      }
-      
-      form_set_value($element, $values, $form_state);
-    }
-  }
-}
-
-function _bg_reference_is_int($value) {
-  return ((string) $value) === ((string)(int) $value);
-}
-
 function _bg_reference_get_form($type, $value) {
   $element = array();
   
@@ -323,6 +332,51 @@ function _bg_reference_get_form($type, $value) {
   return $element;
 }
 
+/**
+ * Do validation and set form values
+ */
+function _bg_reference_validate($element, &$form_state) {
+  if(preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]/', $element['type']['#name'], $field)) {
+    if (isset($form_state['values'][$field['name']][$field['langcode']][$field['delta']])) {
+      $values = $form_state['values'][$field['name']][$field['langcode']][$field['delta']];
+      
+      if(!empty($values['content'])) {
+        // Validate x position
+        if(!_bg_reference_is_int($values['pos_x'])) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_x", t('X position should be an integer value'));
+        }
+        
+        // Validate y position
+        if(!_bg_reference_is_int($values['pos_y'])) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_y", t('Y position should be an integer value'));
+        }
+        
+        // Validate width
+        if(!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && $values['width'] <= 0)) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][width", t('Width should be a positive integer value larger than zero'));
+        }
+        
+        // Validate height
+        if(!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && $values['height'] <= 0)) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a positive integer value larger than zero'));
+        }
+      }
+      
+      form_set_value($element, $values, $form_state);
+    }
+  }
+}
+
+/**************************************************************************
+ * Utilities
+ **************************************************************************/
+function _bg_reference_is_int($value) {
+  return ((string) $value) === ((string)(int) $value);
+}
+
+/**************************************************************************
+ * AJAX callbacks
+ **************************************************************************/
 function bg_reference_ajax_callback($form, $form_state) {
   if (!empty($form_state['triggering_element']) && preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]\[(?P<subfield>\w+)\]/', $form_state['triggering_element']['#name'], $field)) {
     $type     = $form_state['values'][$field['name']][$field['langcode']][$field['delta']][$field['subfield']];
@@ -344,4 +398,21 @@ function bg_reference_ajax_callback($form, $form_state) {
     // Return element
     return $wrapper['ref_' . $type];
   }
+}
+
+function _bg_reference_autocomplete($bundle, $string = '') {
+  $matches = array();
+  if ($string) {
+    $result = db_select('node')
+      ->fields('node', array('nid', 'vid', 'title'))
+      ->condition('type', $bundle)
+      ->condition('title', db_like($string) . '%', 'LIKE')
+      ->range(0, 10)
+      ->execute();
+    foreach ($result as $node) {
+      $matches["{$node->title} [nid:{$node->nid}] [vid:{$node->vid}]"] = check_plain($node->title);
+    }
+  }
+
+  drupal_json_output($matches);
 }
