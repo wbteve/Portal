@@ -104,10 +104,6 @@ li a.active {
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
   box-shadow:  0 0 10px rgba(0, 0, 0, 0.35);
-  zoom: 1;
-  filter:
-    progid:DXImageTransform.Microsoft.Shadow(color='#a6a6a6', Direction=90, Strength=10)
-    progid:DXImageTransform.Microsoft.Shadow(color='#a6a6a6', Direction=270, Strength=10);  
 }
 
 #header #block-nice-menus-1 .content ul ul li.first {
@@ -123,6 +119,7 @@ li a.active {
   font-size: 12px;
   line-height: 20px;
   width: 149px;
+  margin-right: 0;
   padding: 0 15px;
   font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;
   text-transform: none;

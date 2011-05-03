@@ -41,6 +41,8 @@ body {
 #header {
   height: 80px;
   background: #1d1d1b url('../images/bg_header.jpg') left top no-repeat;
+  position: relative;
+  z-index: 6;
 }
 
 #header .section {
