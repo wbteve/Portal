@@ -1,7 +1,23 @@
 (function($) {
   Drupal.behaviors.bgReference = {
     attach: function(context) {
+      // Handle input from text input/textarea
+      $('.input-wrapper input[type="text"]', context)
+        .bind('blur', handleInput)
+        .trigger('blur');
       
+      // Handle input from tinyMCE
+      tinyMCE.onAddEditor.add(function(sender, editor) {
+        $('.input-wrapper textarea', context).each(function(){
+          var _self = this;
+          
+          if(editor.editorId == $(_self).attr('id')) {
+            editor.onSaveContent.add(function(editor){
+              $('input.bg_reference_content', $(_self).closest('fieldset')).val( editor.getContent() );
+            });
+          }
+        });
+      });
     }
   }
   
@@ -24,5 +40,9 @@
       this.selected = false;
       $(this.ariaLive).empty();
     };
+  }
+  
+  function handleInput(evt) {
+    $('input.bg_reference_content', $(this).closest('fieldset')).val( $(this).val() );
   }
 })(jQuery);

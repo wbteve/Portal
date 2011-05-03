@@ -3,7 +3,7 @@ define('CONTENT_TYPE_MEDIA', 'media');
 define('CONTENT_TYPE_TEXT', 'text');
 define('CONTENT_TYPE_SEARCH_RESULT', 'search_result');
 define('CONTENT_TYPE_BANNER', 'banner');
-define('CONTENT_TYPE_EVENT', 'event');
+define('CONTENT_TYPE_EVENT', 'agenda');
 
 define('UNIT_SIZE_WIDTH', 100);
 define('UNIT_SIZE_HEIGHT', 200);
@@ -14,14 +14,6 @@ function bg_reference_menu() {
   $items['bg-reference/autocomplete'] = array(
     'page callback'     => '_bg_reference_autocomplete',
     'page arguments'    => array(2, 3),
-    'access callback'   => TRUE,
-    'file'              => 'bg_reference_ajax.inc.php',
-    'type' => MENU_CALLBACK,
-  );
-  
-  $items['bg-reference/ajax'] = array(
-    'page callback'     => '_bg_reference_ajax',
-    'page arguments'    => array(2),
     'access callback'   => TRUE,
     'file'              => 'bg_reference_ajax.inc.php',
     'type' => MENU_CALLBACK,
@@ -166,6 +158,17 @@ function bg_reference_field_widget_info() {
  * 'rgb' form element.
  */
 function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
+  $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
+  $type       = isset($items[$delta]['type']) ? $items[$delta]['type'] : CONTENT_TYPE_TEXT;
+  $value      = isset($items[$delta]['content']) ? $items[$delta]['content'] : '';
+  
+  $ajax_settings = array(
+    'event'     => 'change',
+    'method'    => 'html',
+    'callback'  => 'bg_reference_ajax_callback',
+    'wrapper'   => $wrapper_id,
+  );
+  
   $element = array(
     '#type' => 'fieldset',
     // Cinvert during validation.
@@ -178,24 +181,25 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
     'type' => array(
       '#type'       => 'select',
       '#title'      => t('Content type'),
+      '#ajax'       => $ajax_settings,
       '#attributes' => array('class' => array('bg_reference_type')),
       '#options'    => array(
         CONTENT_TYPE_MEDIA          => t('Media'),
         CONTENT_TYPE_TEXT           => t('Text'),
         CONTENT_TYPE_SEARCH_RESULT  => t('Search result'),
-        CONTENT_TYPE_BANNER         => t('Banner')
+        CONTENT_TYPE_BANNER         => t('Banner'),
+        CONTENT_TYPE_EVENT          => t('Event'),
       ),
-      '#ajax' => array(
-        'event'     => 'change',
-        'callback'  => 'bg-reference/ajax',
-        'wrapper'   => 'content',
-      ),
-      '#default_value' => isset($items[$delta]['type']) ? $items[$delta]['type'] : CONTENT_TYPE_TEXT,
+      '#default_value' => $type,
+    ),
+    'wrapper' => array(
+      '#prefix' => '<div id="' . $wrapper_id . '" class="input-wrapper">',
+      '#suffix' => '</div>',
     ),
     'content' => array(
       '#type'       => 'hidden',
       '#attributes' => array('class' => array('bg_reference_content')),
-      '#default_value' => isset($items[$delta]['content']) ? $items[$delta]['content'] : '',
+      '#default_value' => $value,
     ),
     'pos_x' => array(
       '#type'       => 'textfield',
@@ -222,6 +226,10 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
       '#default_value' => isset($items[$delta]['height']) ? $items[$delta]['height'] : 1,
     ),
   );
+  
+  $element['wrapper'] = array_merge($element['wrapper'], _bg_reference_get_form($type, $value));
+  
+  asort($element['type']['#options']);
   
   return $element;
 }
@@ -263,4 +271,77 @@ function _bg_reference_validate($element, &$form_state) {
 
 function _bg_reference_is_int($value) {
   return ((string) $value) === ((string)(int) $value);
+}
+
+function _bg_reference_get_form($type, $value) {
+  $element = array();
+  
+  switch($type) {
+    case CONTENT_TYPE_BANNER:
+      $element['ref_' .CONTENT_TYPE_BANNER] = array(
+        '#type'               => 'textfield',
+        '#title'              => t('Banner'),
+        '#attributes'         => array('class' => array('bg_reference_banner')),
+        '#autocomplete_path'  => 'bg-reference/autocomplete/' . CONTENT_TYPE_BANNER,
+        '#default_value'      => check_plain($value),
+      );
+      break;
+    
+    case CONTENT_TYPE_EVENT:
+      $element['ref_' . CONTENT_TYPE_EVENT] = array(
+        '#type'               => 'textfield',
+        '#title'              => t('Event'),
+        '#attributes'         => array('class' => array('bg_reference_event')),
+        '#autocomplete_path'  => 'bg-reference/autocomplete/' . CONTENT_TYPE_EVENT,
+        '#default_value'      => check_plain($value),
+      );
+      break;
+    
+    case CONTENT_TYPE_MEDIA:
+      break;
+    
+    case CONTENT_TYPE_SEARCH_RESULT:
+      $element['ref_' . CONTENT_TYPE_SEARCH_RESULT] = array(
+        '#type'               => 'textfield',
+        '#title'              => t('Search result'),
+        '#attributes'         => array('class' => array('bg_reference_search_result')),
+        '#default_value'      => check_plain($value),
+      );
+      break;
+    
+    case CONTENT_TYPE_TEXT:
+      $element['ref_' . CONTENT_TYPE_TEXT] = array(
+        '#type'               => 'text_format',
+        '#title'              => t('Text'),
+        '#attributes'         => array('class' => array('bg_reference_text')),
+        '#format'             => filter_default_format(),
+        '#default_value'      => $value,
+      );
+      break;
+  }
+  
+  return $element;
+}
+
+function bg_reference_ajax_callback($form, $form_state) {
+  if (!empty($form_state['triggering_element']) && preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]\[(?P<subfield>\w+)\]/', $form_state['triggering_element']['#name'], $field)) {
+    $type     = $form_state['values'][$field['name']][$field['langcode']][$field['delta']][$field['subfield']];
+    
+    $value    = $form_state['values'][$field['name']][$field['langcode']][$field['delta']]['content'];
+    $wrapper  = &$form[$field['name']][$field['langcode']][$field['delta']]['wrapper'];
+    
+    foreach($wrapper as $key => $value) {
+      if(preg_match('/^ref_.*/', $key)) {
+        unset($wrapper[$key]);
+      }
+    }
+    
+    $wrapper = array_merge($wrapper, _bg_reference_get_form($type, ''));
+    
+    // Rebuild form
+    form_builder($form['#form_id'], $form, $form_state);
+    
+    // Return element
+    return $wrapper['ref_' . $type];
+  }
 }
