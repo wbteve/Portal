@@ -32,19 +32,18 @@ function bg_reference_theme() {
 function theme_bg_reference($variables) {
   extract($variables);
   
+  $classes = array($element['#data']['type']);
+  
   switch($element['#data']['type']) {
     case CONTENT_TYPE_BANNER:
-      $class_name = CONTENT_TYPE_BANNER;
-    
     case CONTENT_TYPE_EVENT:
       preg_match('/\[nid:(?P<nid>\d+)\] \[vid:(?P<vid>\d+)\]/', $element['#data']['content'], $match);
       $node = node_load($match['nid'], $match['vid']);
       $content = drupal_render(node_view($node));
-      
-      $class_name = isset($class_name) ? $class_name : CONTENT_TYPE_EVENT;
       break;
     
     case CONTENT_TYPE_MEDIA:
+      
       break;
     
     case CONTENT_TYPE_SEARCH_RESULT:
@@ -63,7 +62,7 @@ function theme_bg_reference($variables) {
   $height         = $element['#data']['height'] * UNIT_SIZE_HEIGHT;
   $style          = "position: absolute; overflow: hidden; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px;";
 
-  return '<div class="dossier-element ' . $class_name . '" style="' . $style . '">' . $content . '</div>';
+  return '<div class="dossier-element ' . implode(' ', $classes) . '" style="' . $style . '">' . $content . '</div>';
 }
 
 /***************************************************************
