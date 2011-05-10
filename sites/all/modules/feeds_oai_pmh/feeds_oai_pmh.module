@@ -46,53 +46,25 @@ function feeds_oai_pmh_sets_options($sets) {
   return $options;
 }
 
-/**
- * Implementation of hook_menu()
- */
-function feeds_oai_pmh_menu() {
-  $items = array();
-  $items['feeds_oai_pmh/set_ahah'] = array(
-    'title' => 'Javascript Choice Form',
-    'page callback' => 'feeds_oai_pmh_set_ahah',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-  );
-  return $items;
-}
-
-function feeds_oai_pmh_set_ahah() {
-  if ($form = form_get_cache($_POST['form_build_id'], $form_state)) {
-
-    # TODO: Remove this debug code.
-    #$output = "<pre>" . var_export($form, TRUE) . "</pre>";
-    #drupal_json(array('status' => TRUE, 'data' => $output));
-    #exit;
-
-    // Validate the repository.
-    $oai_source_url = $_POST['feeds']['FeedsOAIHTTPFetcher']['source'];
-    require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
-    $result = feeds_oai_pmh_identify($oai_source_url);
-    if ($result['status'] == 0) {
-      // OAI-PMH Identify verb returned OK.
-      // Change the form's set element.
-      $form['feeds']['FeedsOAIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options($result['repository']['sets']);      }
-    else {
-      // Empty sets.
-      $form['feeds']['FeedsOAIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options(array());
-      drupal_set_message($result['output'], 'error');
-    }
-    
-    // Cache the form.
-    form_set_cache($_POST['form_build_id'], $form, $form_state);
-
-    // Build and render the new select element, then return it in JSON format.
-    $form_state = array();
-    $form['#post'] = array();
-    $form = form_builder($form['form_id']['#value'] , $form, $form_state);
-
-    $output = theme('status_messages') . drupal_render($form['feeds']['FeedsOAIHTTPFetcher']['set']);
-    drupal_json(array('status' => FALSE, 'data' => $output));
+function feeds_oai_pmh_ajax_callback($form, $form_state) {
+  require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
+  
+  // Validate the repository.
+  $oai_source_url = $form_state['values']['feeds']['FeedsOAIHTTPFetcher']['source'];
+  
+  $result = feeds_oai_pmh_identify($oai_source_url);
+  
+  if ($result['status'] == 0) {
+    // OAI-PMH Identify verb returned OK.
+    // Change the form's set element.
+    $form['feeds']['FeedsOAIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options($result['repository']['sets']);
   }
-  exit();
+  else {
+    // Empty sets.
+    $form['feeds']['FeedsOAIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options(array());
+    drupal_set_message($result['output'], 'error');
+  }
+  
+  return $form['feeds']['FeedsOAIHTTPFetcher']['set'];
 }
 

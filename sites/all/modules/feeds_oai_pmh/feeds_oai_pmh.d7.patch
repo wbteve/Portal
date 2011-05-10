@@ -1,0 +1,384 @@
+Index: FeedsOAIHTTPFetcher.inc
+===================================================================
+--- FeedsOAIHTTPFetcher.inc	(revision 17176)
++++ FeedsOAIHTTPFetcher.inc	(working copy)
+@@ -5,7 +5,7 @@
+  * Definition of the import batch object created on the fetching stage by
+  * FeedsOAIHTTPFetcher.
+  */
+-class FeedsOAIHTTPBatch extends FeedsImportBatch {
++class FeedsOAIHTTPFetcherResult extends FeedsFetcherResult {
+   protected $oai_endpoint_url;
+   protected $from_timestamp;
+   protected $until_timestamp;
+@@ -21,11 +21,11 @@
+     $this->granularity = $granularity;
+     $this->set = $set;
+     $this->resumption_token = $resumption_token;
+-    parent::__construct();
++    parent::__construct('');
+   }
+-  
++
+   /**
+-   * Implementation of FeedsImportBatch::getRaw();
++   * Implementation of FeedsResult::getRaw();
+    */
+   public function getRaw() {
+     // TODO: Move the URL building and data fetching to feeds_oai_pmh.inc
+@@ -43,13 +43,13 @@
+         $url .= '&from=' . rawurlencode($this->formatDate($this->from_timestamp));
+       }
+       if ($this->until_timestamp > 0) {
+-          $url .= '&until=' . rawurlencode($this->formatDate($this->until_timestamp));
+-        }
++        $url .= '&until=' . rawurlencode($this->formatDate($this->until_timestamp));
++      }
+       if ($this->set) {
+         $url .= '&set=' . rawurlencode($this->set);
+       }
+     }
+-    
++
+     #dsm("URL for OAI request: $url");
+ 
+     // Fetch the feed's contents
+@@ -103,7 +103,7 @@
+   }
+ }
+ 
+- 
++
+ /**
+  * Fetcher class for OAI-PMH repository webservices.
+  */
+@@ -113,12 +113,12 @@
+    */
+   public function fetch(FeedsSource $source) {
+     global $conf;
+-    
++
+     $source_config = $source->getConfigFor($this);
+ 
+     $from_timestamp = FALSE;
+     $until_timestamp = FALSE;
+-    
++
+     $resumption_token = variable_get('feeds_oai:resumptionToken:' . $source_config['set'] . ':' . $source_config['source'], '');
+     if (!$resumption_token) {
+       $from_timestamp = (int)variable_get('feeds_oai:from:' . $source_config['set'] . ':' . $source_config['source'], FALSE);
+@@ -133,13 +133,13 @@
+     // The setSpec to harvest from.
+     $set = $source_config['set'];
+ 
+-    return new FeedsOAIHTTPBatch(
+-      $source_config['source'],
+-      $from_timestamp,
+-      $until_timestamp,
+-      $source_config['granularity'],
+-      $resumption_token,
+-      $set
++    return new FeedsOAIHTTPFetcherResult(
++    $source_config['source'],
++    $from_timestamp,
++    $until_timestamp,
++    $source_config['granularity'],
++    $resumption_token,
++    $set
+     );
+   }
+ 
+@@ -149,13 +149,15 @@
+   public function configDefaults() {
+     // TODO: is this needed?
+     return array(
++      'auto_detect_feeds' => FALSE,
++      'use_pubsubhubbub'  => FALSE,
+       'last_fetched_timestamp' => '',
+       'earliest_timestamp' => '',
+       'granularity' => '',
+     );
+ 
+   }
+- 
++
+   /**
+    * Add form options.
+    */
+@@ -173,7 +175,7 @@
+ 
+     // If earliest_timestamp is not set, and source is, then get info from
+     // repository to populate settings.
+-    if ($source_config['source']) {
++    if (isset($source_config['source']) && !empty($source_config['source'])) {
+       require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
+       $result = feeds_oai_pmh_identify($source_config['source']);
+       #dpm($result);
+@@ -186,20 +188,22 @@
+       }
+     }
+ 
+-    // Build options array for sets available in repository.
+-    $sets_options = feeds_oai_pmh_sets_options($result['repository']['sets']);
++    if(isset($result)) {
++      // Build options array for sets available in repository.
++      $sets_options = feeds_oai_pmh_sets_options($result['repository']['sets']);
++    }
+ 
+     // Override the default "source" element provided by Feeds.
+     // Clearer label and description.
+     $form['source']['#title'] = t('URL of OAI-PMH endpoint');
+     $form['source']['#description'] = t('You can use services like http://www.opendoar.org/ to get a list of repository OAI-PMH endpoints.');
+-    // Add AHAH event handler.
+-    $form['source']['#ahah'] = array(
+-      'path' => 'feeds_oai_pmh/set_ahah',
+-      'wrapper' => 'set-choices',  // ID of div element to update.
+-      'method' => 'replace',
+-      'effect' => 'fade',
+-      'event' => 'change',
++    // Add AJAX event handler.
++    $form['source']['#ajax'] = array(
++      'callback'  => 'feeds_oai_pmh_ajax_callback',
++      'wrapper'   => 'set-choices',  // ID of div element to update.
++      'method'    => 'replace',
++      'effect'    => 'fade',
++      'event'     => 'change',
+     );
+ 
+     if ($form['source']['#default_value']) {
+@@ -216,51 +220,58 @@
+     $form['set'] = array(
+       '#type' => 'select',
+       '#title' => t('Set to fetch'),
+-      '#default_value' => $source_config['set'],
+-      '#options' => $sets_options,
+-      // A set wrapper to handle replacement by AHAH callback
++      '#default_value' => isset($source_config['set']) ? $source_config['set'] : NULL,
++      '#options' => isset($sets_options) ? $sets_options : array(),
++    // A set wrapper to handle replacement by AJAX callback
+       '#prefix' => '<div class="clear-block" id="set-choices">',
+       '#suffix' => '</div>',
+     );
+     /*$form['last_fetched_timestamp'] = array(
+-      '#type' => 'textfield',
+-      '#title' => t('Timestamp of last fetched record'),
+-      '#default_value' => $source_config['last_fetched_timestamp'],
+-    );
++     '#type' => 'textfield',
++     '#title' => t('Timestamp of last fetched record'),
++     '#default_value' => $source_config['last_fetched_timestamp'],
++     );
+      * */
+     // TODO: The next information should go into a table, as it's just informative and can't be changed.
+     $form['earliest_timestamp'] = array(
+       '#type' => 'textfield',
+       '#title' => t('Timestamp of earliest record, as reported by the repository'),
+-      '#default_value' => $source_config['earliest_timestamp'],
++      '#default_value' => isset($source_config['earliest_timestamp']) ? $source_config['earliest_timestamp'] : NULL,
+       '#disabled' => TRUE,
+     );
+     $form['granularity'] = array(
+       '#type' => 'radios',
+       '#title' => t('Granularity ("days" or "seconds") reported by repository'),
+-      '#default_value' => $source_config['granularity'],
++      '#default_value' => isset($source_config['granularity']) ? $source_config['granularity'] : NULL,
+       '#options' => drupal_map_assoc(array('days', 'seconds')),
+       '#disabled' => TRUE,
+     );
+     $form['deleted_record'] = array(
+       '#type' => 'textfield',
+       '#title' => t('Repository support for deletedRecord'),
+-      '#default_value' => $source_config['deleted_record'],
++      '#default_value' => isset($source_config['deleted_record']) ? $source_config['deleted_record'] : NULL,
+       '#disabled' => TRUE,
+     );
+     $form['compression_gzip'] = array(
+       '#type' => 'checkbox',
+       '#title' => t('Repository supports gzip compression'),
+-      '#default_value' => $source_config['compression_gzip'],
++      '#default_value' => isset($source_config['compression_gzip']) ? $source_config['compression_gzip'] : NULL,
+       '#disabled' => TRUE,
+     );
+     $form['compression_deflate'] = array(
+       '#type' => 'checkbox',
+       '#title' => t('Repository supports deflate compression'),
+-      '#default_value' => $source_config['compression_deflate'],
++      '#default_value' => isset($source_config['compression_deflate']) ? $source_config['compression_deflate'] : NULL,
+       '#disabled' => TRUE,
+     );
+ 
+     return $form;
+   }
++
++  /**
++   * Override parent::sourceFormValidate().
++   */
++  public function sourceFormValidate(&$values) {
++
++  }
+ }
+Index: FeedsOAIParser.inc
+===================================================================
+--- FeedsOAIParser.inc	(revision 17176)
++++ FeedsOAIParser.inc	(working copy)
+@@ -16,36 +16,40 @@
+   /**
+    * Implementation of FeedsParser::parse().
+    */
+-  public function parse(FeedsImportBatch $batch, FeedsSource $source) {
++  public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
+     require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
+-    $result = feeds_oai_pmh_parse($batch->getRaw());
++    $feed = feeds_oai_pmh_parse($fetcher_result->getRaw());
+     // TODO: are these needed?
+     #$batch->setTitle($result['title']);
+     #$batch->setDescription($result['description']);
+     #$batch->setLink($result['link']);
+-    if (!$result) {
++    if (!$feed) {
+       // No items, return
+       return;
+     }
++    
++    $result = new FeedsParserResult();
+ 
+     // Check for items.
+-    if (is_array($result['items'])) {
++    if (is_array($feed['items'])) {
+       
+       // Add set name element to each of the items.
+       $oai_endpoint_url = $source->config['FeedsOAIHTTPFetcher']['source'];
+       $identify_response = feeds_oai_pmh_identify($oai_endpoint_url);
+       if ($identify_response['repository']['sets']) {
+-        foreach ($result['items'] as $index => $item) {
++        foreach ($feed['items'] as $index => $item) {
+           foreach ($item['setspec_raw'] as $setspec) {
+             $set_name = $identify_response['repository']['sets'][$setspec]['name'];
+-            $result['items'][$index]['setspec_name'][] = $set_name;
++            $feed['items'][$index]['setspec_name'][] = $set_name;
+           }
++          
++          // Return the items found in feed.
++          $result->items[] = $item;
+         }
+       }
+-      
+-      // Return the items found in feed.
+-      $batch->setItems($result['items']);
+     }
++    
++    return $result;
+   }
+ 
+   /**
+Index: feeds_oai_pmh.inc
+===================================================================
+--- feeds_oai_pmh.inc	(revision 17176)
++++ feeds_oai_pmh.inc	(working copy)
+@@ -11,7 +11,7 @@
+  */
+ function feeds_oai_pmh_identify($baseurl) {
+   static $cache = array();
+-  if ($cache[$baseurl]) {
++  if (isset($cache[$baseurl])) {
+     return $cache[$baseurl];
+   }
+   $output = array();
+Index: feeds_oai_pmh.info
+===================================================================
+--- feeds_oai_pmh.info	(revision 17176)
++++ feeds_oai_pmh.info	(working copy)
+@@ -2,13 +2,13 @@
+ description = Retrieves and parses items from OAI-PMH repositories.
+ dependencies[] = feeds
+ package = Feeds
+-core = 6.x
++core = 7.x
+ 
+ 
+ 
+ ; Information added by drupal.org packaging script on 2011-04-07
+-version = "6.x-1.x-dev"
+-core = "6.x"
++version = "7.x-1.x-dev"
++core = "7.x"
+ project = "feeds_oai_pmh"
+ datestamp = "1302135056"
+ 
+Index: feeds_oai_pmh.module
+===================================================================
+--- feeds_oai_pmh.module	(revision 17176)
++++ feeds_oai_pmh.module	(working copy)
+@@ -46,53 +46,25 @@
+   return $options;
+ }
+ 
+-/**
+- * Implementation of hook_menu()
+- */
+-function feeds_oai_pmh_menu() {
+-  $items = array();
+-  $items['feeds_oai_pmh/set_ahah'] = array(
+-    'title' => 'Javascript Choice Form',
+-    'page callback' => 'feeds_oai_pmh_set_ahah',
+-    'access arguments' => array('access content'),
+-    'type' => MENU_CALLBACK,
+-  );
+-  return $items;
+-}
+-
+-function feeds_oai_pmh_set_ahah() {
+-  if ($form = form_get_cache($_POST['form_build_id'], $form_state)) {
+-
+-    # TODO: Remove this debug code.
+-    #$output = "<pre>" . var_export($form, TRUE) . "</pre>";
+-    #drupal_json(array('status' => TRUE, 'data' => $output));
+-    #exit;
+-
+-    // Validate the repository.
+-    $oai_source_url = $_POST['feeds']['FeedsOAIHTTPFetcher']['source'];
+-    require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
+-    $result = feeds_oai_pmh_identify($oai_source_url);
+-    if ($result['status'] == 0) {
+-      // OAI-PMH Identify verb returned OK.
+-      // Change the form's set element.
+-      $form['feeds']['FeedsOAIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options($result['repository']['sets']);      }
+-    else {
+-      // Empty sets.
+-      $form['feeds']['FeedsOAIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options(array());
+-      drupal_set_message($result['output'], 'error');
+-    }
+-    
+-    // Cache the form.
+-    form_set_cache($_POST['form_build_id'], $form, $form_state);
+-
+-    // Build and render the new select element, then return it in JSON format.
+-    $form_state = array();
+-    $form['#post'] = array();
+-    $form = form_builder($form['form_id']['#value'] , $form, $form_state);
+-
+-    $output = theme('status_messages') . drupal_render($form['feeds']['FeedsOAIHTTPFetcher']['set']);
+-    drupal_json(array('status' => FALSE, 'data' => $output));
++function feeds_oai_pmh_ajax_callback($form, $form_state) {
++  require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
++  
++  // Validate the repository.
++  $oai_source_url = $form_state['values']['feeds']['FeedsOAIHTTPFetcher']['source'];
++  
++  $result = feeds_oai_pmh_identify($oai_source_url);
++  
++  if ($result['status'] == 0) {
++    // OAI-PMH Identify verb returned OK.
++    // Change the form's set element.
++    $form['feeds']['FeedsOAIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options($result['repository']['sets']);
+   }
+-  exit();
++  else {
++    // Empty sets.
++    $form['feeds']['FeedsOAIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options(array());
++    drupal_set_message($result['output'], 'error');
++  }
++  
++  return $form['feeds']['FeedsOAIHTTPFetcher']['set'];
+ }
+ 

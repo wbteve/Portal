@@ -16,36 +16,40 @@ class FeedsOAIParser extends FeedsParser {
   /**
    * Implementation of FeedsParser::parse().
    */
-  public function parse(FeedsImportBatch $batch, FeedsSource $source) {
+  public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
-    $result = feeds_oai_pmh_parse($batch->getRaw());
+    $feed = feeds_oai_pmh_parse($fetcher_result->getRaw());
     // TODO: are these needed?
     #$batch->setTitle($result['title']);
     #$batch->setDescription($result['description']);
     #$batch->setLink($result['link']);
-    if (!$result) {
+    if (!$feed) {
       // No items, return
       return;
     }
+    
+    $result = new FeedsParserResult();
 
     // Check for items.
-    if (is_array($result['items'])) {
+    if (is_array($feed['items'])) {
       
       // Add set name element to each of the items.
       $oai_endpoint_url = $source->config['FeedsOAIHTTPFetcher']['source'];
       $identify_response = feeds_oai_pmh_identify($oai_endpoint_url);
       if ($identify_response['repository']['sets']) {
-        foreach ($result['items'] as $index => $item) {
+        foreach ($feed['items'] as $index => $item) {
           foreach ($item['setspec_raw'] as $setspec) {
             $set_name = $identify_response['repository']['sets'][$setspec]['name'];
-            $result['items'][$index]['setspec_name'][] = $set_name;
+            $feed['items'][$index]['setspec_name'][] = $set_name;
           }
+          
+          // Return the items found in feed.
+          $result->items[] = $item;
         }
       }
-      
-      // Return the items found in feed.
-      $batch->setItems($result['items']);
     }
+    
+    return $result;
   }
 
   /**

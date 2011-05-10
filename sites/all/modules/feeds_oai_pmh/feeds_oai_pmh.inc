@@ -11,7 +11,7 @@
  */
 function feeds_oai_pmh_identify($baseurl) {
   static $cache = array();
-  if ($cache[$baseurl]) {
+  if (isset($cache[$baseurl])) {
     return $cache[$baseurl];
   }
   $output = array();
