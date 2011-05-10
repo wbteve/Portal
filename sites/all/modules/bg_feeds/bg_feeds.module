@@ -30,16 +30,28 @@ function bg_feeds_feeds_plugins() {
   return $info;
 }
 
+/**
+ * Implementation of hook_file_insert
+ * @param stdClass $file
+ */
 function bg_feeds_file_insert($file) {
   // File produced by source.
   feeds_item_info_insert($file, $file->fid);
 }
 
+/**
+ * Implementation of hook_file_update
+ * @param stdClass $file
+ */
 function bg_feeds_file_update($file) {
   // File produced by source.
   feeds_item_info_save($file, $file->fid);
 }
 
+/**
+ * Implementation of hook_file_delete
+ * @param stdClass $file
+ */
 function bg_feeds_file_delete($file) {
   // File produced by source.
   db_delete('feeds_item')

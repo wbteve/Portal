@@ -42,13 +42,19 @@ class OIFeedsOAIParser extends FeedsOAIParser {
             $set_name = $identify_response['repository']['sets'][$setspec]['name'];
             $feed['items'][$index]['setspec_name'][] = $set_name;
           }
-
-          $item['format'] = $item['format'][0];
-          $item['identifier'] = $item['guid'];
-
+          
+          // Set media file preview
+          $item['oi_preview'] = $item['format'][5];
+          
+          // Set media file source
+          $file_media = parse_url($item['format'][0]);
+          $item['oi_source'] = 'openbeelden:/' . $file_media['path'];
+          
+          // Set (MIME) type
           switch($item['type'][0]) {
             case 'Moving Image':
-              $item['type'] = 'video/openbeelden';
+              $item['oi_source_mime'] = 'video/openbeelden';
+              $item['oi_source_type'] = 'video';
               break;
           }
 
@@ -62,63 +68,32 @@ class OIFeedsOAIParser extends FeedsOAIParser {
   }
 
   /**
-   * Implementation of FeedsParser::clear().
-   *
-   * Delete variables containing resumptionToken and from used in last fetch.
-   */
-  public function clear(FeedsSource $source) {
-    // Only if FeedsOAIHTTPFetcher was used as the fetcher.
-    if ($source->config['FeedsOAIHTTPFetcher']) {
-      $oai_endpoint_url = $source->config['FeedsOAIHTTPFetcher']['source'];
-      $set = $source->config['FeedsOAIHTTPFetcher']['set'];
-      variable_del('feeds_oai:resumptionToken:' . $set . ':' . $oai_endpoint_url);
-      variable_del('feeds_oai:from:' . $set . ':' . $oai_endpoint_url);
-    }
-    parent::clear($source);
-  }
-
-  /**
    * Return mapping sources.
    */
   public function getMappingSources() {
-    self::loadMappers();
-    $sources = array();
-    drupal_alter('feeds_parser_sources', $sources, feeds_importer($this->id)->config['content_type']);
-    $sources += array(
-      'guid' => array(
-        'name' => t('Repository Record identifier'),
-        'description' => t('A unique string per each metadata record, defined by the repository.'),
-    ),
-      'timestamp' => array(
-        'name' => t('Record publication date'),
-        'description' => t("Date this metadata record was published on the repository. Different from the described item's publication date."),
-    ),
-      'url' => array(
-        'name' => t('URL to resource'),
-        'description' => t('All valid URLs detected in dc:identifier elements.'),
-    ),
-      'setspec_raw' => array(
-        'name' => t('Set: setSpec (raw value)'),
-        'description' => t("The set/setSpec from the record's header."),
-    ),
-      'setspec_name' => array(
-        'name' => t('Set: name'),
-        'description' => t("The set name for this record, taken from the repository's identify response."),
-    ),
+    $sources = parent::getMappingSources() + array(
+      'oi_preview' => array(
+        'name' => t('Open Images: preview'),
+        'callback' => 'oi_feeds_set_preview',
+        'description' => t('Media preview file URI.'),
+      ),
+      'oi_source' => array(
+        'name' => t('Open Images: source file URI'),
+        'description' => t('Media source file URI.'),
+      ),
+      'oi_source_mime' => array(
+        'name' => t('Open Images: source MIME type'),
+        'description' => t('Media source MIME type.'),
+      ),
+      'oi_source_type' => array(
+        'name' => t('Open Images: source type'),
+        'description' => t('Media source type.'),
+      )
     );
-
-    // Add dublin core field to mapping sources
-    $elements = array(
-      'title', 'type', 'subject', 'contributor', 'creator', 'description', 'publisher',
-      'date',  'format', 'identifier', 'source', 'language', 'relation',
-      'coverage', 'rights');
-    foreach ($elements as $element) {
-      $sources[$element] = array(
-        'name' => t('Metadata: dc:@element', array('@element' => $element)),
-        'description' => t('From the metadata record.'),
-      );
-    }
-
     return $sources;
   }
+}
+
+function oi_feeds_set_preview(FeedsSource $source, FeedsParserResult $result, $key) {
+  
 }
