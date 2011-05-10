@@ -4,12 +4,3 @@ dependencies[] = feeds
 dependencies[] = feeds_oai_pmh
 package = Beeld en Geluid
 core = 7.x
-
-
-
-; Information added by drupal.org packaging script on 2011-04-07
-version = "7.x-1.x-dev"
-core = "7.x"
-project = "feeds_oai_pmh"
-datestamp = "1302135056"
-
