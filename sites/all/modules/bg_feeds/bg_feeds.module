@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * Implementation of hook_feed_plugins().
+ */
+function bg_feeds_feeds_plugins() {
+  $plugin_path = drupal_get_path('module', 'bg_feeds') . '/plugins';
+  $info = array();
+  $info['OIFeedsOAIParser'] = array(
+    'name' => 'Open Images OAI parser',
+    'description' => 'Parse Dublin Core (oai_dc) metadata from Open Images OAI-PMH repository.',
+    'handler' => array(
+      'parent' => 'FeedsOAIParser',
+      'class' => 'OIFeedsOAIParser',
+      'file' => 'OIFeedsOAIParser.inc',
+      'path' => $plugin_path,
+    ),
+  );
+  $info['FeedsFileProcessor'] = array(
+    'name' => 'File processor',
+    'description' => 'Create and update files.',
+    'help' => 'Create and update files from parsed content.',
+    'handler' => array(
+      'parent' => 'FeedsProcessor',
+      'class' => 'FeedsFileProcessor',
+      'file' => 'FeedsFileProcessor.inc',
+      'path' => $plugin_path,
+    ),
+  );
+  return $info;
+}
+
+function bg_feeds_file_insert($file) {
+  // File produced by source.
+  feeds_item_info_insert($file, $file->fid);
+}
+
+function bg_feeds_file_update($file) {
+  // File produced by source.
+  feeds_item_info_save($file, $file->fid);
+}
+
+function bg_feeds_file_delete($file) {
+  // File produced by source.
+  db_delete('feeds_item')
+    ->condition('entity_type', 'file')
+    ->condition('entity_id', $file->fid)
+    ->execute();
+}
