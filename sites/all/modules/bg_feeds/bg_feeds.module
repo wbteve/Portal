@@ -6,16 +6,31 @@
 function bg_feeds_feeds_plugins() {
   $plugin_path = drupal_get_path('module', 'bg_feeds') . '/plugins';
   $info = array();
-  $info['OIFeedsOAIParser'] = array(
-    'name' => 'Open Images OAI parser',
-    'description' => 'Parse Dublin Core (oai_dc) metadata from Open Images OAI-PMH repository.',
+  
+  // Define OAI Open Images HTTP fetcher plugin for Feeds
+  $info['FeedsOAIOIHTTPParser'] = array(
+    'name' => 'HTTP OAI-PMH Open Images Fetcher',
+    'description' => 'Download content from Open Images OAI-PMH repository.',
     'handler' => array(
-      'parent' => 'FeedsOAIParser',
-      'class' => 'OIFeedsOAIParser',
-      'file' => 'OIFeedsOAIParser.inc',
+      'parent' => 'FeedsOAIHTTPFetcher',
+      'class' => 'FeedsOAIOIHTTPFetcher',
+      'file' => 'FeedsOAIOIHTTPFetcher.inc',
       'path' => $plugin_path,
     ),
   );
+  // Define OAI Open Images parser plugin for Feeds
+  $info['FeedsOAIOIParser'] = array(
+    'name' => 'OAI Open Images parser',
+    'description' => 'Parse Open Images (oai_oi) metadata from Open Images OAI-PMH repository.',
+    'handler' => array(
+      'parent' => 'FeedsOAIParser',
+      'class' => 'FeedsOAIOIParser',
+      'file' => 'FeedsOAIOIParser.inc',
+      'path' => $plugin_path,
+    ),
+  );
+  
+  // Define file processor plugin for Feeds
   $info['FeedsFileProcessor'] = array(
     'name' => 'File processor',
     'description' => 'Create and update files.',
@@ -27,7 +42,30 @@ function bg_feeds_feeds_plugins() {
       'path' => $plugin_path,
     ),
   );
+  
   return $info;
+}
+
+function feeds_oai_oi_ajax_callback($form, $form_state) {
+  require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
+  
+  // Validate the repository.
+  $oai_source_url = $form_state['values']['feeds']['FeedsOAIOIHTTPFetcher']['source'];
+  
+  $result = feeds_oai_pmh_identify($oai_source_url);
+  
+  if ($result['status'] == 0) {
+    // OAI-PMH Identify verb returned OK.
+    // Change the form's set element.
+    $form['feeds']['FeedsOAIOIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options($result['repository']['sets']);
+  }
+  else {
+    // Empty sets.
+    $form['feeds']['FeedsOAIOIHTTPFetcher']['set']['#options'] = feeds_oai_pmh_sets_options(array());
+    drupal_set_message($result['output'], 'error');
+  }
+  
+  return $form['feeds']['FeedsOAIOIHTTPFetcher']['set'];
 }
 
 /**
