@@ -1,5 +1,4 @@
 <?php
-// $Id: media_youtube.styles.inc,v 1.1.2.6 2011/01/11 19:37:33 aaron Exp $
 
 /**
  * @file media_youtube/includes/media_youtube.styles.inc

@@ -1,4 +1,3 @@
-// $Id: media_youtube.js,v 1.1.2.2 2009/11/26 12:46:55 aaron Exp $
 
 /**
  *  @file

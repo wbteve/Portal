@@ -1,5 +1,4 @@
 <?php
-// $Id: media_youtube.admin.inc,v 1.1.2.7 2010/04/21 14:59:59 aaron Exp $
 
 /**
  *  @file

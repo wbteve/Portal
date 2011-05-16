@@ -1,5 +1,4 @@
 <?php
-// $Id: MediaYouTubeStreamWrapper.inc,v 1.1.2.4 2010/10/28 20:34:55 aaron Exp $
 
 /**
  *  @file

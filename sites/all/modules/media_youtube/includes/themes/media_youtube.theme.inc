@@ -1,5 +1,4 @@
 <?php
-// $Id: media_youtube.theme.inc,v 1.1.2.4 2011/01/11 18:40:39 aaron Exp $
 
 /**
  * @file media_youtube/includes/themes/media_youtube.theme.inc
@@ -28,19 +27,12 @@ function media_youtube_preprocess_media_youtube_video(&$variables) {
 
   // For users with JavaScript, these object and embed tags will be replaced
   // by an iframe, so that we can support users without Flash.
-  $variables['output'] = '<object width="' . $variables['width'] . '" height="' . $variables['height'] . '">';
-  $variables['output'] .= '<param name="movie" value="http://www.youtube.com/v/' . $variables['video_id'] . '&autoplay=' . $variables['autoplay'] . '"></param>';
-  $variables['output'] .= '<param name="allowFullScreen" value="' . $variables['fullscreen'] . '"></param>';
-  $variables['output'] .= '<param name="wmode" value="transparent" />';
-  $variables['output'] .= '<embed src="http://www.youtube.com/v/' . $variables['video_id'] .'" type="application/x-shockwave-flash" width="' . $variables['width'] . '" height="' . $variables['height'] . '" allowfullscreen="' . $variables['fullscreen'] . '"></embed>';
-  $variables['output'] .= '</object>';
-
   $variables['output'] = <<<OUTPUT
     <object width="{$variables['width']}" height="{$variables['height']}">
       <param name="movie" value="http://www.youtube.com/v/{$variables['video_id']}"></param>
       <param name="allowFullScreen" value="{$variables['fullscreen']}"></param>
       <param name="wmode" value="transparent" />
-      <embed src="http://www.youtube.com/v/{$variables['video_id']}" type="application/x-shockwave-flash" width="{$variables['width']}" height="{$variables['height']}" allowfullscreen="{$variables['fullscreen']}"></embed>';
+      <embed src="http://www.youtube.com/v/{$variables['video_id']}" type="application/x-shockwave-flash" width="{$variables['width']}" height="{$variables['height']}" allowfullscreen="{$variables['fullscreen']}"></embed>
     </object>
 OUTPUT;
 

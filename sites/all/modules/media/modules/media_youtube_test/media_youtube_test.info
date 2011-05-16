@@ -5,11 +5,11 @@ package = Testing
 core = 7.x
 php = 5.2
 dependencies[] = media_youtube
-;hidden=TRUE
+hidden = TRUE
 
-; Information added by drupal.org packaging script on 2011-04-28
+; Information added by drupal.org packaging script on 2011-05-11
 version = "7.x-1.x-dev"
 core = "7.x"
 project = "media"
-datestamp = "1303992627"
+datestamp = "1305073549"
 
