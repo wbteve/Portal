@@ -240,6 +240,7 @@ li a.active {
 
 /* FOOTER MENU */
 
+.region-bottom,
 .region-footer {
   background-color: #e00034;
   color: #FFF;  

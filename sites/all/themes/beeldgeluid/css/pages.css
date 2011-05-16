@@ -14,14 +14,10 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #f8f6f5;
+  background-color: #e00034;
+
 }
 
-body.front,
-body.page-search {
-  background-color: #4A4A4A;
-  color: #fff;
-}
 
 #page-wrapper {
 }
@@ -96,6 +92,14 @@ div#site-name /* The name of the website */ {
  * Main (container for everything else)
  */
 #main-wrapper {
+  background-color: #f8f6f5;
+}
+
+
+body.front #main-wrapper ,
+body.page-search #main-wrapper {
+  background-color: #4A4A4A;
+  color: #fff;
 }
 
 #main {

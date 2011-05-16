@@ -19,7 +19,8 @@
 /*
  * Body
  */
-body {
+html, body {
+
 }
 
 #page-wrapper,
@@ -30,6 +31,10 @@ body {
    * for the necessary IE5/IE6quirks hack to center a div.
    */
   
+}
+
+#page-wrapper {
+
 }
 
 #page {
@@ -90,6 +95,7 @@ body {
   margin-left: 0; /* LTR */
   margin-right: -740px; /* LTR */ /* Negative value of #content's width + left margin. */
   padding: 0; /* DO NOT CHANGE. Add padding or margin to #content .section. */
+  margin-bottom: 5em; 
 }
 
 .front #content,
