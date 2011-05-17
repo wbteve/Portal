@@ -32,7 +32,7 @@ class FeedsOAIOIHTTPFetcherResult extends FeedsOAIHTTPFetcherResult {
       }
     }
 
-    #dsm("URL for OAI request: $url");
+    // dsm("URL for OAI request: $url");
 
     // Fetch the feed's contents
     $result = drupal_http_request($url);
@@ -45,21 +45,22 @@ class FeedsOAIOIHTTPFetcherResult extends FeedsOAIHTTPFetcherResult {
       if ($ok) {
         $resumption_token = array_pop($matches[1]);
         #dsm("Resumption token: $resumption_token");
-        $this->setLastDate(0);
+        //$this->setLastDate(0);
       }
       else {
         // No resumption token in response. Store current system timestamp
         // so next request limits items returned.
         $resumption_token = "";
-        $this->setLastDate(time());
+        //$this->setLastDate(time());
       }
-      $this->setResumptionToken($resumption_token);
+      //$this->setResumptionToken($resumption_token);
     }
     else {
       // OAI fetch failed
       #dsm("OAI fetch failed with error : " . $result->error);
       // TODO: Log via watchdog?
     }
+    
     // Return the feed's contents
     return $result->data;
   }
@@ -70,6 +71,41 @@ class FeedsOAIOIHTTPFetcherResult extends FeedsOAIHTTPFetcherResult {
  * Fetcher class for OAI-PMH Open Image repository webservices.
  */
 class FeedsOAIOIHTTPFetcher extends FeedsOAIHTTPFetcher {
+  /**
+   * Fetch content from feed.
+   */
+  public function fetch(FeedsSource $source) {
+    global $conf;
+
+    $source_config = $source->getConfigFor($this);
+
+    $from_timestamp = FALSE;
+    $until_timestamp = FALSE;
+
+    $resumption_token = variable_get('feeds_oai:resumptionToken:' . $source_config['set'] . ':' . $source_config['source'], '');
+    if (!$resumption_token) {
+      $from_timestamp = (int)variable_get('feeds_oai:from:' . $source_config['set'] . ':' . $source_config['source'], FALSE);
+      #dsm("from_timestamp = $from_timestamp");
+      if ($from_timestamp > 0) {
+        $from_timestamp = $from_timestamp + 1;
+        // Set ending date for query to 60 days from last-fetched document
+        #$until_timestamp = $from_timestamp + (60 * 24 * 3600);
+      }
+    }
+
+    // The setSpec to harvest from.
+    $set = $source_config['set'];
+
+    return new FeedsOAIOIHTTPFetcherResult(
+    $source_config['source'],
+    $from_timestamp,
+    $until_timestamp,
+    $source_config['granularity'],
+    $resumption_token,
+    $set
+    );
+  }
+  
   /**
    * Override parent::sourceForm
    */
