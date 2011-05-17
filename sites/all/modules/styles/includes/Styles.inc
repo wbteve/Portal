@@ -1,5 +1,4 @@
 <?php
-// $Id: Styles.inc,v 1.1.4.6 2011/01/11 19:28:41 aaron Exp $
 
 /**
  * @file Styles.inc

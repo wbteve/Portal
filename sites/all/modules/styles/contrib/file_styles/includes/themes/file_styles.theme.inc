@@ -1,5 +1,4 @@
 <?php
-// $Id: file_styles.theme.inc,v 1.1.2.3 2011/01/14 20:39:54 aaron Exp $
 
 /**
  * @file file_styles/includes/themes/file_styles.theme.inc

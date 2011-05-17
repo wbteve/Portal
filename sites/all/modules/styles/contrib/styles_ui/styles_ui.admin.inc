@@ -1,5 +1,4 @@
 <?php
-// $Id: styles_ui.admin.inc,v 1.1.2.8.2.18 2011/01/18 22:50:33 aaron Exp $
 
 /**
  *  @file

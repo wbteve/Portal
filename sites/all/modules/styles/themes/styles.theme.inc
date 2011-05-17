@@ -1,5 +1,4 @@
 <?php
-// $Id: styles.theme.inc,v 1.1.4.5 2011/01/11 19:28:41 aaron Exp $
 
 /**
  * @file styles.theme.inc

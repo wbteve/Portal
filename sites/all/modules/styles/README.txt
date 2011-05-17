@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.1.2.2 2009/11/13 22:15:25 aaron Exp $
 
 Styles are containers to group similar field display formatters. For example, a
 style on a Filefield may contain several formatters based on the mimetype or

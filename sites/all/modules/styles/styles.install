@@ -1,5 +1,4 @@
 <?php
-// $Id: styles.install,v 1.1.2.2.2.16 2011/01/18 22:25:36 aaron Exp $
 
 /**
  * @file
@@ -330,8 +329,12 @@ function styles_update_7212() {
     ),
   );
 
-  db_create_table('styles_presets', $schema['styles_presets']);
-  db_create_table('styles_preset_instances', $schema['styles_preset_instances']);
+  if (!db_table_exists('styles_presets')) {
+    db_create_table('styles_presets', $schema['styles_presets']);
+  }
+  if (!db_table_exists('styles_preset_instances')) {
+    db_create_table('styles_preset_instances', $schema['styles_preset_instances']);
+  }
 }
 
 /**
@@ -339,4 +342,29 @@ function styles_update_7212() {
  */
 function styles_update_7213() {
   db_drop_field('styles_presets', 'description');
+}
+
+/**
+ * Update old File Style formatters on Image fields to the Image formatter.
+ */
+function styles_update_7214() {
+  $instances = array();
+  $fields = field_read_fields(array('type' => 'image'), array('include_inactive' => TRUE));
+  foreach ($fields as $field) {
+    $instances = array_merge($instances, field_read_instances(array('field_id' => $field['id']), array('include_inactive' => TRUE)));
+  }
+  foreach ($instances as $instance) {
+    $update_instance = FALSE;
+    foreach ($instance['display'] as $view_mode => $display) {
+      if (strpos($display['type'], 'styles_image_') === 0) {
+        $update_instance = TRUE;
+        $image_style = substr($display['type'], strlen('styles_image_'));
+        $instance['display'][$view_mode]['type'] = 'image';
+        $instance['display'][$view_mode]['settings'] = array('image_style' => $image_style, 'image_link' => FALSE);
+      }
+    }
+    if ($update_instance) {
+      field_update_instance($instance);
+    }
+  }
 }

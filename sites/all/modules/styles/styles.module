@@ -1,5 +1,4 @@
 <?php
-// $Id: styles.module,v 1.2.2.26.2.22 2011/01/18 22:49:48 aaron Exp $
 
 /**
  *  @file
@@ -469,13 +468,6 @@ function styles_get_styles_class_by_class_name($class_name = NULL, $reset = FALS
   else if (!isset($class_name)) {
     return $classes;
   }
-}
-
-/**
- * Implementation of hook_perm().
- */
-function styles_perm() {
-  return array('administer styles');
 }
 
 function styles_instance($field_type, $style_name, $object) {

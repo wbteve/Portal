@@ -1,5 +1,4 @@
 <?php
-// $Id: FileStyles.inc,v 1.1.2.11 2011/01/11 16:40:36 aaron Exp $
 
 /**
  * @file styles/contrib/file_styles/includes/styles/FileStyles.inc
@@ -134,6 +133,13 @@ class FileStyles extends StylesDefault {
     }
     if (isset($height)) {
       $attributes['height'] = $height;
+    }
+
+    // We have a .media-image class for WYSIWYG.
+    // We can't used ->get_class, because that's restricted.
+    $class = $this->override('class');
+    if (isset($class)) {
+      $attributes['class'] = $class;
     }
 
     // Set any WYSIWYG prescribed styles.

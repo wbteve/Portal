@@ -1,5 +1,4 @@
 <?php
-// $Id: file_styles.module,v 1.1.2.8.2.11 2011/01/14 20:39:54 aaron Exp $
 
 /**
  *  @file styles/contrib/file_styles/file_styles.module
@@ -61,7 +60,8 @@ function file_styles_styles_filter($object, $element = NULL) {
  */
 function file_styles_strstr($haystack, $needle, $before_needle = FALSE){
   if ($before_needle) {
-    return array_shift(explode($needle, $haystack, 2));
+    list($var) = explode($needle, $haystack, 2);
+    return $var;
   }
   return strstr($haystack, $needle);
 }

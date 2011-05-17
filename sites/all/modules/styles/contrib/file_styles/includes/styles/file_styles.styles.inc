@@ -1,5 +1,4 @@
 <?php
-// $Id: file_styles.styles.inc,v 1.1.2.8 2011/01/12 21:49:17 aaron Exp $
 
 /**
  * @file styles/contrib/file_styles/includes/styles/file_styles.styles.inc
@@ -22,7 +21,6 @@ function file_styles_styles_default_containers() {
     'file' => array(
       'admin' => array(
         'path' => 'admin/config/media/file-styles',
-        'access arguments' => array('administer file styles'),
       ),
       'filter callback' => 'file_styles_styles_filter',
       'help' => t('Each of the following containers defines a set of styles that will be applied when a file is of the specified type. For instance, if a file field allows images and videos, a specific style might be defined for \'Thumbnail\', that will display a cropped image when a JPEG is given, or a thumbnail linking to a shadowboxed video when an MPEG is stored.'),
