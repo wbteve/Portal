@@ -1,0 +1,11 @@
+<?php
+function bg_media_stream_wrappers() {
+  return array(
+    'openimages' => array(
+      'name' => t('Open Images media'),
+      'class' => 'MediaOpenImagesStreamWrapper',
+      'description' => t('Media provided by Open Images.'),
+      'type' => STREAM_WRAPPERS_READ_VISIBLE,
+    ),
+  );
+}

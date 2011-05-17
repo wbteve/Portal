@@ -1,0 +1,6 @@
+name = Beeld en Geluid Media plugins
+description = Provides support for to the Media module.
+package = "Beeld en Geluid"
+core = 7.x
+files[] = bg_media.module
+files[] = MediaOpenImagesStreamWrapper.inc
