@@ -4,3 +4,4 @@ package = "Beeld en Geluid"
 core = 7.x
 files[] = bg_media.module
 files[] = MediaOpenImagesStreamWrapper.inc
+dependencies[] = media
