@@ -5,7 +5,7 @@
  * @file
  * Provides smart paging capability to Drupal contents.
  *
- * @author Roland Michael dela Peña.
+ * @author Roland Michael dela Peï¿½a.
  * @version $Id: smart_paging.module,v 1.1.2.10 2011/02/22 15:29:51 arpeggio Exp $
  */
 
@@ -47,7 +47,7 @@ function smart_paging_menu() {
  * Implements hook_form_alter()
  */
 function smart_paging_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == 'field_ui_display_overview_form') {
+  if ($form_id == 'field_ui_display_overview_form' && $form['#entity_type'] == 'node') {
     // Modified part copy from field_ui_display_overview_form() at /modules/field_ui/field_ui.admin.inc
     // Base button element for the various formatter settings actions.
     $base_button = array(
