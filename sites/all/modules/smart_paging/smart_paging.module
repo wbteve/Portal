@@ -5,7 +5,7 @@
  * @file
  * Provides smart paging capability to Drupal contents.
  *
- * @author Roland Michael dela Pe�a.
+ * @author Roland Michael dela Peña.
  * @version $Id: smart_paging.module,v 1.1.2.10 2011/02/22 15:29:51 arpeggio Exp $
  */
 
