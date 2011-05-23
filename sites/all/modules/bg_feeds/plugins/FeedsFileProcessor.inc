@@ -250,6 +250,10 @@ class FeedsFileProcessor extends FeedsProcessor {
         'name' => t('Published date'),
         'description' => t('The UNIX time when a file has been published.'),
       ),
+      'type' => array(
+        'name' => t('File type'),
+        'description' => t('The bundle to which this entity belongs.'),
+      ),
     );
     // If the target content type is a Feed file, expose its source field.
     if ($id = feeds_get_importer_id($this->config['file_type'])) {

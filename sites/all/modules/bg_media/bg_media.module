@@ -1,4 +1,27 @@
 <?php
+function bg_media_file_view($file, $view_mode, $langcode) {
+  // Set page title
+  if(in_array($file->type, array('video'))) {
+    drupal_set_title($file->field_file_title['und'][0]['value']);
+  }
+}
+
+/**
+ *  Implements hook_theme().
+ */
+function bg_media_theme($existing, $type, $theme, $path) {
+  return array(
+    'bg_media_video' => array(
+      'variables' => array('file' => NULL, 'thumbnail' => NULL),
+      'file' => 'bg_media.theme.inc',
+      'path' => $path . '/includes/themes',
+    ),
+  );
+}
+
+/**
+ * Implements hook_stream_wrappers().
+ */
 function bg_media_stream_wrappers() {
   return array(
     'openimages' => array(
@@ -8,4 +31,47 @@ function bg_media_stream_wrappers() {
       'type' => STREAM_WRAPPERS_READ_VISIBLE,
     ),
   );
+}
+
+/**
+ * Implements hook_file_formatter_info().
+ */
+function bg_media_file_formatter_info() {
+  $formatters['bg_media_video'] = array(
+    'label' => t('Beeld & Geluid video'),
+    'view callback' => 'bg_media_file_formatter_bg_media_video_view',
+    'settings callback' => 'bg_media_file_formatter_bg_media_video_settings',
+  );
+  return $formatters;
+}
+
+/**
+ * Implements hook_file_formatter_FORMATTER_view().
+ */
+function bg_media_file_formatter_bg_media_video_view($file, $display, $langcode) {
+  $scheme = file_uri_scheme($file->uri);
+  
+  $formatter = "bg_media_{$scheme}_video_formatter";
+  
+  if(function_exists($formatter)) {
+    return $formatter($file);
+  }
+}
+
+/**
+ * Implements hook_file_formatter_FORMATTER_settings().
+ */
+function bg_media_file_formatter_bg_media_video_settings($form, &$form_state, $settings) {
+  $element = array();
+  
+  return $element;
+}
+
+function bg_media_openimages_video_formatter($file) {
+  // WYSIWYG does not yet support video inside a running editor instance.
+  $element = array(
+    '#theme' => 'bg_media_video',
+    '#file' => $file,
+  );
+  return $element;
 }

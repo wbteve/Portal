@@ -13,7 +13,7 @@
  */
 class FeedsOAIOIParser extends FeedsOAIParser {
   protected static $extensions = array(
-    'video' => array('ogv'),
+    'video' => array('mp4', 'ogv'),
     'audio' => array('mp3'),
     'image' => array('jpg', 'png'),
   );
@@ -86,10 +86,6 @@ class FeedsOAIOIParser extends FeedsOAIParser {
             continue;
           }
           
-          // Set media file source
-          if(!is_array($item['medium'])) {
-            dsm($item);
-          }
           $file_media = $this->getMedia($item['medium'], $item['computedSourceType']);
           
           // If medium could not be found
@@ -100,6 +96,9 @@ class FeedsOAIOIParser extends FeedsOAIParser {
             )));
             continue;
           }
+          
+          // Set identifier to GUID because of missing identifiers in some records
+          $item['identifier'] = $item['guid'];
           
           $file_url = parse_url($file_media);
           $item['computedSource'] = 'openimages:/' . $file_url['path'];
