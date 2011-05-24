@@ -12,21 +12,15 @@
  * Parses RSS and Atom feeds.
  */
 class FeedsOAIOIParser extends FeedsOAIParser {
-  protected static $extensions = array(
-    'video' => array('mp4', 'ogv'),
-    'audio' => array('mp3'),
-    'image' => array('jpg', 'png'),
-  );
-  
   /**
    * Implementation of FeedsParser::parse().
    */
   public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     require_once(drupal_get_path('module', 'feeds_oai_pmh') . '/feeds_oai_pmh.inc');
     require_once(drupal_get_path('module', 'bg_feeds') . '/bg_feeds.inc');
-    
+
     $feed = bg_feeds_oai_oi_parse($fetcher_result->getRaw());
-    
+
     // TODO: are these needed?
     #$batch->setTitle($result['title']);
     #$batch->setDescription($result['description']);
@@ -50,59 +44,29 @@ class FeedsOAIOIParser extends FeedsOAIParser {
             $set_name = $identify_response['repository']['sets'][$setspec]['name'];
             $feed['items'][$index]['setspec_name'][] = $set_name;
           }
-          
+
           foreach ($item as $key => &$data) {
             if(is_array($data) && !in_array($key, array('subject', 'publisher', 'medium', 'spatial'))) {
               $data = array_shift($data);
             }
           }
+
+          $item['importSource'] = 'Open Images';
           
-          // Set (MIME) type
-          switch($item['type']) {
-            case 'Moving Image':
-              $item['computedSourceMime'] = 'video/openbeelden';
-              $item['computedSourceType'] = 'video';
-              break;
-            
-            case 'Still Image':
-            case 'Image':
-              $item['computedSourceMime'] = 'image/openbeelden';
-              $item['computedSourceType'] = 'image';
-              break;
-            
-            case 'Sound Recording':
-            case 'Sound':
-              $item['computedSourceMime'] = 'audio/openbeelden';
-              $item['computedSourceType'] = 'audio';
-              break;
-          }
-          
-          // Source type is unknown move to next record
-          if(!isset($item['computedSourceType'])) {
+          $item['computedSource'] = new FeedsOAIOIEnclosure('openimages://' . $item['guid'], $item['type']);
+
+          // Source type is unknown so move to next record
+          if(is_null($item['computedSource']->getType())) {
             watchdog('Beeld en Geluid - Feeds', t('Unknown item of type %type in item %guid', array(
               '%type' => $item['type'], 
               '%guid' => $item['guid']
             )));
             continue;
           }
-          
-          $file_media = $this->getMedia($item['medium'], $item['computedSourceType']);
-          
-          // If medium could not be found
-          if(is_null($file_media)) {
-            watchdog('Beeld en Geluid - Feeds', t('No media found of type %type in item %guid', array(
-              '%type' => $item['type'], 
-              '%guid' => $item['guid']
-            )));
-            continue;
-          }
-          
+
           // Set identifier to GUID because of missing identifiers in some records
           $item['identifier'] = $item['guid'];
-          
-          $file_url = parse_url($file_media);
-          $item['computedSource'] = 'openimages:/' . $file_url['path'];
-          
+
           // Return the items found in feed.
           $result->items[] = $item;
         }
@@ -110,18 +74,6 @@ class FeedsOAIOIParser extends FeedsOAIParser {
     }
 
     return $result;
-  }
-  
-  public function getMedia($medium, $type) {
-    foreach($medium as $media) {
-      $extension = pathinfo($media, PATHINFO_EXTENSION);
-
-      if(in_array($extension, self::$extensions[$type])) {
-        return $media;
-      }
-    }
-
-    return null;
   }
   
   /**
@@ -162,7 +114,7 @@ class FeedsOAIOIParser extends FeedsOAIParser {
       'identifier', 'source', 'language', 'references', 'spatial', 'attributionName',
       'attributionURL', 'license', 
       // Computed fields
-      'computedSource', 'computedSourceMime', 'computedSourceType'
+      'computedSource', 'importSource',
       );
     foreach ($elements as $element) {
       $sources[$element] = array(
@@ -170,8 +122,86 @@ class FeedsOAIOIParser extends FeedsOAIParser {
         'description' => t('From the metadata record.'),
       );
     }
-    
+
     return $sources;
+  }
+}
+
+/**
+ * Enclosure element, can be part of the result array.
+ */
+class FeedsOAIOIEnclosure extends FeedsEnclosure {
+  protected $type;
+
+  /**
+   * Constructor, requires MIME type.
+   *
+   * @param $value
+   *   A path to a local file or a URL to a remote document.
+   * @param $mimetype
+   *   The mime type of the resource.
+   */
+  public function __construct($value, $type) {
+    parent::__construct($value);
+    
+    // Set (MIME) type
+    switch($type) {
+      case 'Moving Image':
+        $this->mime_type = 'video/openbeelden';
+        $this->type = 'video';
+        break;
+      
+      case 'Still Image':
+      case 'Image':
+        $this->mime_type = 'image/openbeelden';
+        $this->type = 'image';
+        break;
+      
+      case 'Sound Recording':
+      case 'Sound':
+        $this->mime_type = 'audio/openbeelden';
+        $this->type = 'audio';
+        break;
+    }
+  }
+  
+  public function getType() {
+    return $this->type;
+  }
+
+  /**
+   * Get a Drupal file object of the enclosed resource, download if necessary.
+   *
+   * @param $destination
+   *   The path or uri specifying the target directory in which the file is
+   *   expected. Don't use trailing slashes unless it's a streamwrapper scheme.
+   *
+   * @return
+   *   A Drupal temporary file object of the enclosed resource.
+   *
+   * @throws Exception
+   *   If file object could not be created.
+   */
+  public function getFile($destination) {
+    $file = NULL;
+    
+    if ($this->getValue() && !is_null($this->type)) {
+      $file           = new stdClass();
+      $file->uid      = 0;
+      $file->uri      = $this->getValue();
+      $file->filename = basename($file->uri);
+      $file->filemime = $this->mime_type;
+      $file->type     = $this->type;
+      
+      file_save($file);
+      
+      // We couldn't make sense of this enclosure, throw an exception.
+      if (!$file) {
+        throw new Exception(t('Invalid enclosure %enclosure', array('%enclosure' => $this->getValue())));
+      }
+    }
+    
+    return $file;
   }
 }
 
