@@ -2,15 +2,14 @@
 
 define('SERVICECONNECT_TWITTER_PATH_LOGIN', 'login-via-twitter');
 define('SERVICECONNECT_TWITTER_PATH_LINK', 'link-twitter-profile');
-define('SERVICECONNECT_TWITTER_PATH_ADMIN', 'admin/settings/serviceconnect/twitter');
-define('SERVICECONNECT_TWITTER_PATH_ADMIN_SETTINGS', 'admin/settings/serviceconnect/twitter/settings');
-define('SERVICECONNECT_TWITTER_PATH_ADMIN_TEST', 'admin/settings/serviceconnect/twitter/test');
+define('SERVICECONNECT_TWITTER_PATH_ADMIN', 'admin/config/serviceconnect/twitter');
+define('SERVICECONNECT_TWITTER_PATH_ADMIN_SETTINGS', 'admin/config/serviceconnect/twitter/settings');
+define('SERVICECONNECT_TWITTER_PATH_ADMIN_TEST', 'admin/config/serviceconnect/twitter/test');
 
 define('SERVICECONNECT_TWITTER_PERM_LOGIN', 'login via twitter');
 define('SERVICECONNECT_TWITTER_PERM_LINK', 'link twitter profile');
 
 define('SERVICECONNECT_TWITTER_VAR_CONSUMER_KEY', 'serviceconnect_twitter_consumer_key');
-define('SERVICECONNECT_TWITTER_VAR_CONSUMER_SECRET', 'serviceconnect_twitter_consumer_secret');
 define('SERVICECONNECT_TWITTER_VAR_CONSUMER_SECRET', 'serviceconnect_twitter_consumer_secret');
 
 // OAuth specifies 3 different URL's for the authorisation process, which may be different
@@ -47,10 +46,10 @@ define('SERVICECONNECT_TWITTER_SERVICE_NAME', 'twitter');
 /**
  * Implementation of hook_perm().
  */
-function serviceconnect_twitter_perm() {
+function serviceconnect_twitter_permission() {
   return array(
-    SERVICECONNECT_TWITTER_PERM_LOGIN,
-    SERVICECONNECT_TWITTER_PERM_LINK,
+    SERVICECONNECT_TWITTER_PERM_LOGIN => array('title' => t('login via twitter')),
+    SERVICECONNECT_TWITTER_PERM_LINK => array('title' => t('link twitter profile')),
   );
 }
 
@@ -455,8 +454,8 @@ function serviceconnect_twitter_get_active_token() {
 }
 
 function serviceconnect_twitter_cron() {
-  $sql = 'DELETE FROM {serviceconnect_twitter_auth_session} WHERE created < %d';
-  db_query($sql, time() - (3600 * 6));
+  $sql = 'DELETE FROM {serviceconnect_twitter_auth_session} WHERE created < :time';
+  db_query($sql, array('time' => REQUEST_TIME - (3600 * 6)));
 }
 
 function _serviceconnect_twitter_secret_hash($data) {

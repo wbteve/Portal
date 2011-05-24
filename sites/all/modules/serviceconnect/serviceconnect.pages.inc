@@ -21,18 +21,18 @@ function serviceconnect_manage_linked_services_page($account) {
   $rows = array();
   $sql = 'SELECT scpid, service, service_profile_url, displayname, created, expires, last_login, login_attempts
   FROM {serviceconnect_user}
-  WHERE uid = %d
+  WHERE uid = :uid 
   ORDER BY last_login DESC';
-  $res = db_query($sql, $account->uid);
-  while ($rec = db_fetch_array($res)) {
+  $res = db_query($sql, array(':uid' => $account->uid));
+  foreach($res as $rec) {
     $rows[] = array(
-      t($rec['service']),
-      l($rec['displayname'], $rec['service_profile_url']),
-      format_date($rec['created'], 'custom', 'j M Y'),
-      $rec['expires'] > 2000000000 ? t('never') : format_date($rec['expires'], 'custom', 'j M Y'),
-      format_date($rec['last_login'], 'custom', 'j M Y'),
-      $rec['login_attempts'],
-      l(t('unlink'), str_replace(array('%user', '%'), array($account->uid, $rec['scpid']), SERVICECONNECT_PATH_UNLINK_SERVICE)),
+      t($rec->service),
+      l($rec->displayname, $rec->service_profile_url),
+      format_date($rec->created, 'custom', 'j M Y'),
+      $rec->expires > 2000000000 ? t('never') : format_date($rec->expires, 'custom', 'j M Y'),
+      format_date($rec->last_login, 'custom', 'j M Y'),
+      $rec->login_attempts,
+      l(t('unlink'), str_replace(array('%user', '%'), array($account->uid, $rec->scpid), SERVICECONNECT_PATH_UNLINK_SERVICE)),
     );
   }
 

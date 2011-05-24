@@ -34,8 +34,8 @@ function serviceconnect_statistics_page() {
   $rows = array();
   $sql = 'SELECT name, count FROM {serviceconnect_counter} ORDER BY name';
   $res = db_query($sql);
-  while ($rec = db_fetch_array($res)) {
-    $rows[] = array($rec['name'], $rec['count']);
+  foreach($res as $rec) {
+    $rows[] = array($rec->name, $rec->count);
   }
   return theme('table', $header, $rows);
 }

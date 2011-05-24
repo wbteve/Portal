@@ -2,9 +2,9 @@
 
 define('SERVICECONNECT_FACEBOOK_PATH_LOGIN', 'login-via-facebook');
 define('SERVICECONNECT_FACEBOOK_PATH_LINK', 'link-facebook-profile');
-define('SERVICECONNECT_FACEBOOK_PATH_ADMIN', 'admin/settings/serviceconnect/facebook');
-define('SERVICECONNECT_FACEBOOK_PATH_ADMIN_SETTINGS', 'admin/settings/serviceconnect/facebook/settings');
-define('SERVICECONNECT_FACEBOOK_PATH_ADMIN_TEST', 'admin/settings/serviceconnect/facebook/test');
+define('SERVICECONNECT_FACEBOOK_PATH_ADMIN', 'admin/config/serviceconnect/facebook');
+define('SERVICECONNECT_FACEBOOK_PATH_ADMIN_SETTINGS', 'admin/config/serviceconnect/facebook/settings');
+define('SERVICECONNECT_FACEBOOK_PATH_ADMIN_TEST', 'admin/config/serviceconnect/facebook/test');
 
 define('SERVICECONNECT_FACEBOOK_PERM_LOGIN', 'login via facebook');
 define('SERVICECONNECT_FACEBOOK_PERM_LINK', 'link facebook profile');
@@ -46,10 +46,10 @@ define('SERVICECONNECT_FACEBOOK_SERVICE_NAME', 'facebook');
 /**
  * Implementation of hook_perm().
  */
-function serviceconnect_facebook_perm() {
+function serviceconnect_facebook_permission() {
   return array(
-    SERVICECONNECT_FACEBOOK_PERM_LOGIN,
-    SERVICECONNECT_FACEBOOK_PERM_LINK,
+    SERVICECONNECT_FACEBOOK_PERM_LOGIN => array('title' => t('Allow login through Facebook')),
+    SERVICECONNECT_FACEBOOK_PERM_LINK => array('title' => t('Allow link to Facebook profile')),
   );
 }
 
@@ -124,8 +124,7 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
       'first_name' => $response->first_name,
       'last_name' => $response->last_name,
       'service_profile_url' => $response->link,
-      'birthday' => $response->birthday,
-      'gender' => $response->gender,
+      'gender' => $response->gender
     );
     
     // Not implemented yet
@@ -158,9 +157,9 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
         );
       }
     }
-    
+   
+    // XXX 
     // The real registration / login work starts here
-    
     if (user_is_logged_in()) {
       if ($link) {
         if ($scprofile->uid) {
@@ -216,18 +215,18 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
     // Save record in serviceconnect_user_facebook
     $sql = 'SELECT suf.profile_image_filesize, suf.friendscount
     FROM {serviceconnect_user_facebook} suf
-    WHERE suf.scpid = %d';
-    $res = db_query($sql, $scpid);
-    if ($rec = db_fetch_array($res)) {
-      $old_profile_image_filesize = $rec['profile_image_filesize'];
-      $old_friendscount = $rec['friendscount'];
+    WHERE suf.scpid = :scpid';
+    $res = db_query($sql, array('scpid' => $scpid))->fetchObject();
+    if ($res) {
+      $old_profile_image_filesize = $res->profile_image_filesize;
+      $old_friendscount = $res->friendscount;
       $sql = 'UPDATE {serviceconnect_user_facebook} SET
-      token = \'%s\',
-      name = \'%s\',
-      profile_image_filesize = \'%s\',
-      friendscount = %d
-      WHERE scpid = %d';
-      db_query($sql, $token, $profile['name'], $profile['profile_image_filesize'], $profile['friendscount'], $scpid);
+      token = :token,
+      name = :name,
+      profile_image_filesize = :profile_image_filesize,
+      friendscount = :friendscount 
+      WHERE scpid = :scpid';
+      db_query($sql, array('token' => $token, 'name' => $profile['name'], 'profile_image_filesize' => $profile['profile_image_filesize'], 'friendscount' => $profile['friendscount'], 'scpid' => $scpid));
     } else {
       $old_profile_image_filesize = 0;
       $old_friendscount = 0;
@@ -241,12 +240,16 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
       drupal_write_record('serviceconnect_user_facebook', $suf);
     }
   } catch (Exception $e){
+    /*
     global $_serviceconnect_facebook_last_response;
     if ($_serviceconnect_facebook_last_response->code == 502) {
       drupal_set_message(t('Unable to login with Facebook. Facebook seems to be over capacity at the moment.'), 'error');
     } else {
+    */
       drupal_set_message(t('Unable to login with Facebook'), 'error');
+    /*
     }
+    */
     watchdog('ServiceConnect', $e->getMessage(), array(), WATCHDOG_ALERT);
     drupal_goto('');
     return '';
@@ -338,8 +341,8 @@ function _serviceconnect_facebook_page_new($link_facebook_to_user = FALSE){
   $params['session_version'] = '3';
   $params['v'] = '1.0';
 
-  $query = http_build_query($params, '', '&');
-  drupal_goto($url, $query);
+  // $query = http_build_query($params, '', '&');
+  drupal_goto($url, array('query' => $params));
   return '';
 }
 
@@ -352,7 +355,7 @@ function serviceconnect_facebook_get_active_token() {
   FROM {serviceconnect_user_facebook} suh
   WHERE suh.scpid = %d';
   $res = db_query($sql, $scpid);
-  return db_fetch_array($res);
+  return $res;
 }
 
 function _serviceconnect_facebook_secret_hash($data) {

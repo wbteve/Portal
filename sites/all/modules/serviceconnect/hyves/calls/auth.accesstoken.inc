@@ -7,7 +7,7 @@
  * @param string $token_secret
  * @return array
  */
-function serviceconnect_hyves_call_auth_accesstoken($token, $token_secret) {
+function serviceconnect_hyves_call_auth_accesstoken($token, $token_secret, $timestamp_difference) {
   $params = array();
   $params['ha_fancylayout'] = 'FALSE';
   $params['ha_format'] = 'xml';
@@ -25,6 +25,6 @@ function serviceconnect_hyves_call_auth_accesstoken($token, $token_secret) {
     'token' => $values['oauth_token'],
     'token_secret' => $values['oauth_token_secret'],
     'service_user_id' => $values['userid'],
-    'expire_date' => (int) $values['expiredate'] - (int) $session->timestamp_difference
+    'expire_date' => (int) $values['expiredate'] - (int) $timestamp_difference
   );
 }

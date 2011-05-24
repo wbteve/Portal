@@ -1,8 +1,8 @@
 <?php
 
-define('SERVICECONNECT_PATH_ADMIN', 'admin/settings/serviceconnect');
-define('SERVICECONNECT_PATH_ADMIN_SETTINGS', 'admin/settings/serviceconnect/settings');
-define('SERVICECONNECT_PATH_ADMIN_STATISTICS', 'admin/settings/serviceconnect/stats');
+define('SERVICECONNECT_PATH_ADMIN', 'admin/config/serviceconnect');
+define('SERVICECONNECT_PATH_ADMIN_SETTINGS', 'admin/config/serviceconnect/settings');
+define('SERVICECONNECT_PATH_ADMIN_STATISTICS', 'admin/config/serviceconnect/stats');
 define('SERVICECONNECT_PATH_MANAGE_SERVICES', 'user/%user/services');
 define('SERVICECONNECT_PATH_UNLINK_SERVICE', 'user/%user/services/unlink/%');
 
@@ -19,11 +19,11 @@ define('SERVICECONNECT_VAR_COLLECT_STATISTICS_DEFAULT', TRUE);
 /**
  * Implementation of hook_perm().
  */
-function serviceconnect_perm() {
+function serviceconnect_permission() {
   return array(
-    SERVICECONNECT_PERM_ADMINISTER,
-    SERVICECONNECT_PERM_MANAGE_OWN_SERVICES,
-    SERVICECONNECT_PERM_MANAGE_ALL_SERVICES,
+    SERVICECONNECT_PERM_ADMINISTER => array('title' => t('Administer serviceconnect')),
+    SERVICECONNECT_PERM_MANAGE_OWN_SERVICES => array('title' => t('Manage owned linked services')),
+    SERVICECONNECT_PERM_MANAGE_ALL_SERVICES => array('title' => t('Manage all linked services'))
   );
 }
 
@@ -122,10 +122,10 @@ function serviceconnect_may_manage_services($account) {
 function serviceconnect_get_uid_by_service_uid($service, $service_uid) {
   $sql = 'SELECT su.scpid, su.uid
   FROM {serviceconnect_user} su
-  WHERE su.service = \'%s\'
-  AND su.service_uid = \'%s\' LIMIT 1';
-  $res = db_query($sql, $service, $service_uid);
-  return db_fetch_object($res);
+  WHERE su.service = :service
+  AND su.service_uid = :serviceuid LIMIT 1';
+  $res = db_query($sql, array('service' => $service, 'serviceuid' => $service_uid));
+  return $res->fetchObject();
 }
 
 /**
@@ -140,10 +140,10 @@ function serviceconnect_login_with_new_user($service, $service_uid, $username, $
   global $user;
 
   // Make sure there is a session, login will fail otherwise (required for Pressflow).
-  sess_regenerate();
+  drupal_session_regenerate();
 
   // Pressflow will delete sessions which do not have any variables.
-  sess_write('serviceconnect', 'keep-session');
+  _drupal_session_write('serviceconnect', 'keep-session');
 
   serviceconnect_increment_counter('new ' . $service . ' user');
   
@@ -153,17 +153,15 @@ function serviceconnect_login_with_new_user($service, $service_uid, $username, $
     'mail' => $email,
     'init' => $username,
     'status' => 1,
-    "authname_$module" => $name,
-    'access' => time()
+     // "authname_$module" => $name,
+    'access' => REQUEST_TIME 
   );
   $account = user_save('', $userinfo);
   // Terminate if an error occured during user_save().
   if (!$account) {
     throw new Exception('Unable to create new account');
   }
-  $user = $account;
-  
-  return $user->uid;
+  return $account->uid;
 }
 
 /**
@@ -178,10 +176,10 @@ function serviceconnect_login_with_existing_user($scpid, $uid, $expires) {
   global $user;
   
   // Make sure there is a session, login will fail otherwise (required for Pressflow).
-  sess_regenerate();
+  drupal_session_regenerate();
 
   // Pressflow will delete sessions which do not have any variables.
-  sess_write('serviceconnect', 'keep-session');
+  _drupal_session_write('serviceconnect', 'keep-session');
 
   serviceconnect_increment_counter('login with existing user');
   
@@ -189,10 +187,10 @@ function serviceconnect_login_with_existing_user($scpid, $uid, $expires) {
   $sql = 'UPDATE {serviceconnect_user} SET
   login_attempts = login_attempts + 1,
   second_last_login = last_login,
-  last_login = %d,
-  expires = %d
-  WHERE scpid = %d';
-  db_query($sql, time(), $expires, $scpid);
+  last_login = :request_time,
+  expires = :expires 
+  WHERE scpid = :scpid';
+  db_query($sql, array('request_time' => REQUEST_TIME, 'expires' => $expires, 'scpid' => $scpid));
   
   $existing_user = user_load(array('uid' => $uid));
   if (isset($existing_user->uid)) {
@@ -224,11 +222,11 @@ function serviceconnect_link_service($service, $service_uid, $service_profile_ur
   $_serviceconnect_user->service_uid = $service_uid;
   $_serviceconnect_user->service_profile_url = $service_profile_url;
   $_serviceconnect_user->displayname = $displayname;
-  $_serviceconnect_user->created = time();
+  $_serviceconnect_user->created = REQUEST_TIME;
   if ($expires) {
     $_serviceconnect_user->expires = $expires;
   }
-  $_serviceconnect_user->last_login = time();
+  $_serviceconnect_user->last_login = REQUEST_TIME;
   $_serviceconnect_user->login_attempts = 1;
   drupal_write_record('serviceconnect_user', $_serviceconnect_user);
   
@@ -307,8 +305,8 @@ function serviceconnect_get_scpid_by_service($service) {
   AND (su.expires IS NULL OR su.expires > %d)
   ORDER BY su.last_login DESC
   LIMIT 1';
-  $res = db_query($sql, $user->uid, $service, time());
-  return db_result($res);
+  $res = db_query($sql, $user->uid, $service, REQUEST_TIME);
+  return $res;
 }
 
 /**
@@ -330,7 +328,7 @@ function serviceconnect_get_profile_url_for_service($service, $uid = NULL) {
   ORDER BY su.last_login DESC
   LIMIT 1';
   $res = db_query($sql, $uid, $service);
-  return db_result($res);
+  return $res;
 }
 
 /**
@@ -367,8 +365,8 @@ function serviceconnect_import_user_relationships($service, $service_uids, $rtid
     AND service_uid IN (' . implode(',', array_pad(array(), count($batch), '\'%s\'')) . ')';
     array_unshift($batch, $service);
     $res = db_query($sql, $batch);
-    while ($rec = db_fetch_array($res)) {
-      $relations[] = $rec['uid'];
+    foreach ($res as $rec) {
+      $relations[] = $rec->uid;
     }
   }
   module_load_include('inc', 'user_relationships_api', 'user_relationships_api.api');
@@ -419,8 +417,8 @@ function serviceconnect_get_profile_fields($type = 'all', $include_none = TRUE) 
     $sql = 'SELECT pf.fid, pf.title
     FROM {profile_fields} pf';
     $res = db_query($sql);
-    while ($rec = db_fetch_array($res)) {
-      $options[$rec['fid']] = $rec['title'];
+    foreach ($res as $rec) {
+      $options[$rec->fid] = $rec->title;
     }
   }
   if (module_exists('content_profile')) {
@@ -440,13 +438,12 @@ function serviceconnect_get_profile_fields($type = 'all', $include_none = TRUE) 
       $sql = 'SELECT cnfi.type_name, cnfi.field_name, cnf.module
       FROM {content_node_field_instance} cnfi
       JOIN {content_node_field} cnf ON cnfi.field_name = cnf.field_name
-      WHERE cnfi.type_name IN (' . db_placeholders($types, 'varchar') . ')
-      AND cnf.type IN (' . db_placeholders($select_types, 'varchar') . ')';
-      $args = array_merge($types, $select_types);
-      $res = db_query($sql, $args);
-      while ($rec = db_fetch_array($res)) {
-        $key = $rec['type_name'] . '.' . $rec['field_name'];
-        $label = "$key (" . $rec['module'] . ')';
+      WHERE cnfi.type_name IN (:types)
+      AND cnf.type IN (:selecttypes)';
+      $res = db_query($sql, array(':types' => $types, ':selecttypes' => $select_types));
+      foreach($res as $rec) {
+        $key = $rec->type_name . '.' . $rec->field_name;
+        $label = "$key (" . $rec->module . ')';
         $options[$key] = $label;
       }
     }
@@ -499,7 +496,8 @@ function serviceconnect_save_profile($fields) {
         // Handle CCK fields.
         $sql = 'SELECT type FROM {content_node_field} WHERE field_name = \'%s\'';
         $res = db_query($sql, $fieldname);
-        switch (db_result($res)) {
+        // XXX: might be broken
+        switch ($res->type) {
           case 'text':
             $content_profiles[$typename]->$fieldname = array(0 => array('value' => $value));
             break;
@@ -553,6 +551,7 @@ function serviceconnect_save_profile($fields) {
 function serviceconnect_clear_user_data($scpid) {
   $sql = 'SELECT uid FROM {serviceconnect_user} WHERE scpid = %d';
   $res = db_query($sql, $scpid);
+  // XXX
   if ($uid = db_result($res)) {
     $sql = 'DELETE FROM {profile_values} WHERE uid = %d';
     db_query($sql, $uid);
@@ -576,9 +575,9 @@ function serviceconnect_increment_counter($name) {
   $sql = 'INSERT INTO {serviceconnect_counter}
   (name, count)
   VALUES
-  (\'%s\', 1)
+  (\':name\', 1)
   ON DUPLICATE KEY UPDATE count = count + 1';
-  db_query($sql, $name);
+  db_query($sql, array('name' => $name));
 }
 
 /**
@@ -660,12 +659,14 @@ function serviceconnect_register_form_validate($form, &$form_state) {
 
   $sql = 'SELECT uid FROM {users} WHERE mail = \'%s\'';
   $res = db_query($sql, $email);
+  // XXX
   if (db_fetch_array($res)) {
     form_set_error('email', t('This e-mail address is already in use for another account.'));
   }
 
   $sql = 'SELECT uid FROM {users} WHERE name = \'%s\'';
   $res = db_query($sql, $username);
+  // XXX
   if (db_fetch_array($res)) {
     form_set_error('username', t('This username is already taken.'));
   }
