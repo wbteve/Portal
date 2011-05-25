@@ -144,9 +144,16 @@ function beeldgeluid_preprocess_comment(&$variables, $hook) {
  * @param $hook
  *   The name of the template being rendered ("block" in this case.)
  */
-/* -- Delete this line if you want to use this function
 function beeldgeluid_preprocess_block(&$variables, $hook) {
-  // Add a count to all the blocks in the region.
-  $variables['classes_array'][] = 'count-' . $variables['block_id'];
+  if ($variables['block']->module == 'nodeblock') {
+    $variables['elements']['#block']->subject = NULL;
+  }
 }
-// */
+
+/**
+ * Theme the way an 'all day' label will look.
+ * Return an empty string to disable the '(all day)' suffix. 
+ */
+function beeldgeluid_date_all_day_label() {
+  return '';
+}
