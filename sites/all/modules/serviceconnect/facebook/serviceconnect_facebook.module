@@ -54,6 +54,17 @@ function serviceconnect_facebook_permission() {
 }
 
 /**
+ * Add a Facebook icon to login with facebook
+ */
+function serviceconnect_facebook_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == 'user_login') {
+    $imagepath = base_path() . drupal_get_path('module', 'serviceconnect_facebook') . '/img/facebook-48.png';
+    $loginpath = base_path() . SERVICECONNECT_FACEBOOK_PATH_LOGIN;
+    $form['facebook'] = array('#markup' => '<a href="' . $loginpath . '"><img src="'. $imagepath .'" title="" /></a>');
+  }
+}
+
+/**
  * Implementation of hook_menu().
  */
 function serviceconnect_facebook_menu() {
@@ -158,7 +169,6 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
       }
     }
    
-    // XXX 
     // The real registration / login work starts here
     if (user_is_logged_in()) {
       if ($link) {
@@ -226,7 +236,12 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
       profile_image_filesize = :profile_image_filesize,
       friendscount = :friendscount 
       WHERE scpid = :scpid';
-      db_query($sql, array('token' => $token, 'name' => $profile['name'], 'profile_image_filesize' => $profile['profile_image_filesize'], 'friendscount' => $profile['friendscount'], 'scpid' => $scpid));
+
+      db_query($sql, array('token' => $token, 
+                           'name' => $profile['name'], 
+                           'profile_image_filesize' => $profile['profile_image_filesize'], 
+                           'friendscount' => $profile['friendscount'], 
+                           'scpid' => $scpid));
     } else {
       $old_profile_image_filesize = 0;
       $old_friendscount = 0;

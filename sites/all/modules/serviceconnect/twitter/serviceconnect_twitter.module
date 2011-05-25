@@ -54,6 +54,17 @@ function serviceconnect_twitter_permission() {
 }
 
 /**
+ * Add a Twitter icon to login with twitter 
+ */
+function serviceconnect_twitter_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == 'user_login') {
+    $imagepath = base_path() . drupal_get_path('module', 'serviceconnect_twitter') . '/img/twitter-48.png';
+    $loginpath = base_path() . SERVICECONNECT_TWITTER_PATH_LOGIN;
+    $form['twitter'] = array('#markup' => '<a href="' . $loginpath . '"><img src="'. $imagepath .'" title="" /></a>');
+  }
+}
+
+/**
  * Implementation of hook_menu().
  */
 function serviceconnect_twitter_menu() {
