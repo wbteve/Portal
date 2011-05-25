@@ -50,10 +50,17 @@ function bg_feeds_oai_oi_parse($raw_xml) {
       'publisher', 'contributor', 'date', 'type', 'extent', 'medium',
       'identifier', 'source', 'language', 'references', 'spatial', 'attributionName',
       'attributionURL', 'license');
-    
     foreach ($elements as $element) {
       if (isset($xml_oi_metadata->$element)) {
         $item[$element] = array();
+        $xml_ns = $xml_oi_metadata->$element->attributes("xml", 1);
+        $lang = (string)$xml_ns["lang"];
+
+        // Only select content which is language independent or Dutch
+        if(!in_array($lang, array('', 'nl'))) {
+          continue;
+        }
+
         foreach ($xml_oi_metadata->$element as $value) {
           $value = (string)$value;
           // TODO: add callback functions to further process values (like convert dates to timestamps, split subjects, etc.)
