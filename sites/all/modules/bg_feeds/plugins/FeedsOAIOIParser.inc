@@ -184,23 +184,22 @@ class FeedsOAIOIEnclosure extends FeedsEnclosure {
    */
   public function getFile($destination) {
     $file = NULL;
-    
+
     if ($this->getValue() && !is_null($this->type)) {
-      $file           = new stdClass();
-      $file->uid      = 0;
-      $file->uri      = $this->getValue();
-      $file->filename = basename($file->uri);
+      $file = file_uri_to_object($this->getValue());
+      // Override file MIME
       $file->filemime = $this->mime_type;
-      $file->type     = $this->type;
+      // Append file entity type
+      $file->type = $this->type;
       
       file_save($file);
-      
+
       // We couldn't make sense of this enclosure, throw an exception.
       if (!$file) {
         throw new Exception(t('Invalid enclosure %enclosure', array('%enclosure' => $this->getValue())));
       }
     }
-    
+
     return $file;
   }
 }

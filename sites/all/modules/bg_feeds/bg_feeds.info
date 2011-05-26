@@ -2,5 +2,6 @@ name = Beeld en Geluid Feeds plugins
 description = Custom plugins for Feeds.
 dependencies[] = feeds
 dependencies[] = feeds_oai_pmh
+dependencies[] = bg_media
 package = Beeld en Geluid
 core = 7.x

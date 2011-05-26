@@ -5,3 +5,5 @@ core = 7.x
 files[] = bg_media.module
 files[] = MediaOpenImagesStreamWrapper.inc
 dependencies[] = media
+dependencies[] = file_entity
+dependencies[] = video_js

@@ -12,21 +12,14 @@
 function bg_media_preprocess_bg_media_video(&$variables) {
   $wrapper = file_stream_wrapper_get_instance_by_uri($variables['file']->uri);
   
-  $variables['file']->filemime = $wrapper->getMimeType($variables['file']->uri);
-  
-  // Create thumbnail
-  $variables['thumbnail'] = new stdClass();
-  $variables['thumbnail']->uri = $wrapper->getLocalThumbnailPath($variables['file']->filename);
+  if($wrapper instanceof MediaReadOnlyStreamWrapper) {
+    $variables['items'] = array(
+      get_object_vars(file_uri_to_object($wrapper->getLocalThumbnailPath())),
+      get_object_vars(file_uri_to_object($wrapper->getExternalUrl())),
+    );
+  }
 }
 
 function theme_bg_media_video(&$variables) {
-  $video = $variables['file'];
-  $thumbnail = $variables['thumbnail'];
-  
-  return theme('videojs', array(
-    'items' => array(
-      get_object_vars($thumbnail),
-      get_object_vars($video) 
-    )
-  ));
+  return theme('videojs', $variables);
 }

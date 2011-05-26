@@ -1,18 +1,13 @@
 <?php
-function bg_media_file_view($file, $view_mode, $langcode) {
-  // Set page title
-  if(in_array($file->type, array('video'))) {
-    drupal_set_title($file->field_file_title['und'][0]['value']);
-  }
-}
+define('BG_MEDIA_THEME_FUNCTION_PREFIX', 'bg_media');
 
 /**
  *  Implements hook_theme().
  */
 function bg_media_theme($existing, $type, $theme, $path) {
   return array(
-    'bg_media_video' => array(
-      'variables' => array('file' => NULL, 'thumbnail' => NULL),
+    BG_MEDIA_THEME_FUNCTION_PREFIX . '_video' => array(
+      'variables' => array('file' => NULL),
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
     ),
@@ -34,6 +29,53 @@ function bg_media_stream_wrappers() {
 }
 
 /**
+ * Implementation of CCK's hook_field_formatter_info().
+ */
+function bg_media_field_formatter_info() {
+  return array(
+    'bg_media' => array(
+      'label' => t('Beeld en Geluid: Media'),
+      'field types' => array('file'),
+      'description' => t('Display a Beeld en Geluid media.'),
+    )
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function bg_media_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  switch ($display['type']) {
+    case 'bg_media':
+      $theme_registry = array_keys(theme_get_registry());
+
+      foreach($items as $item) {
+        $theme_function = BG_MEDIA_THEME_FUNCTION_PREFIX . '_' . $item['type'];
+
+        // Check if theme function exists for this media type
+        if(in_array($theme_function, $theme_registry)) {
+          $element[] = array(
+            '#theme' => $theme_function,
+            '#file' => (object)$item,
+          );
+        }
+      }
+      break;
+  }
+
+  return $element;
+}
+
+
+/**
+ * Notice: File formatters are not used, but are a remenant of the previous branch 
+ * which could be used in the future
+ */
+
+/**
  * Implements hook_file_formatter_info().
  */
 function bg_media_file_formatter_info() {
@@ -42,6 +84,11 @@ function bg_media_file_formatter_info() {
     'view callback' => 'bg_media_file_formatter_bg_media_video_view',
     'settings callback' => 'bg_media_file_formatter_bg_media_video_settings',
   );
+  $formatters['bg_media_image'] = array(
+    'label' => t('Beeld en geluid image'),
+    'view callback' => 'bg_media_file_formatter_bg_media_image_view',
+  );
+  
   return $formatters;
 }
 
@@ -58,15 +105,6 @@ function bg_media_file_formatter_bg_media_video_view($file, $display, $langcode)
   }
 }
 
-/**
- * Implements hook_file_formatter_FORMATTER_settings().
- */
-function bg_media_file_formatter_bg_media_video_settings($form, &$form_state, $settings) {
-  $element = array();
-  
-  return $element;
-}
-
 function bg_media_openimages_video_formatter($file) {
   // WYSIWYG does not yet support video inside a running editor instance.
   $element = array(
@@ -74,4 +112,20 @@ function bg_media_openimages_video_formatter($file) {
     '#file' => $file,
   );
   return $element;
+}
+
+/**
+ * Implements hook_file_formatter_FORMATTER_view().
+ */
+function bg_media_file_formatter_bg_media_image_view($file, $display, $langcode) {
+  $scheme = file_uri_scheme($file->uri);
+  if ($scheme == 'openimages') {
+    $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
+    $element = array(
+      '#theme' => 'image',
+      '#path' => $wrapper->getLocalThumbnailPath(),
+    );
+
+    return $element;
+  }
 }
