@@ -56,12 +56,12 @@ li a.active {
  * Drupal core has limited ways in which it can display its menus. To get around
  * these limitations, see http://drupal.org/project/menu_block
  */
-#header #block-nice-menus-1 {
+#header .block-nice-menus {
   margin: 0;
   float: left;
 }
 
-#header #block-nice-menus-1 .content ul {
+#header .block-nice-menus .content ul {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -69,11 +69,11 @@ li a.active {
   border: 0;
 }
 
-/*#header #block-nice-menus-1 .content ul {
+/*#header .block-nice-menus .content ul {
   margin-top: 16px;
 }*/
 
-#header #block-nice-menus-1 .content ul li {
+#header .block-nice-menus .content ul li {
   display: inline;
   list-style: none;
   list-style-image: none;
@@ -85,19 +85,19 @@ li a.active {
   border: 0;
 }
 
-#header #block-nice-menus-1 .content ul li a {
+#header .block-nice-menus .content ul li a {
   color: #C7C2BA;
   text-decoration: none;
   padding: 0;
 }
 
-#header #block-nice-menus-1 .content ul li a:hover,
-#header #block-nice-menus-1 .content ul li a.active-trail {
+#header .block-nice-menus .content ul li a:hover,
+#header .block-nice-menus .content ul li a.active-trail {
   color: #fff;
 }
 
 /* dropdown */
-#header #block-nice-menus-1 .content ul ul {
+#header .block-nice-menus .content ul ul {
   background: url('../images/dropdown.png') no-repeat 0 0 #FFF;
   top: 56px;
   width: 179px;
@@ -106,15 +106,15 @@ li a.active {
   box-shadow:  0 0 10px rgba(0, 0, 0, 0.35);
 }
 
-#header #block-nice-menus-1 .content ul ul li.first {
+#header .block-nice-menus .content ul ul li.first {
   margin-top: 25px;
 }
 
-#header #block-nice-menus-1 .content ul ul li.last {
+#header .block-nice-menus .content ul ul li.last {
   margin-bottom: 10px;
 }
 
-#header #block-nice-menus-1 .content ul ul li {
+#header .block-nice-menus .content ul ul li {
   background: white;
   font-size: 12px;
   line-height: 20px;
@@ -125,26 +125,26 @@ li a.active {
   text-transform: none;
 }
 
-#header #block-nice-menus-1 .content ul ul li a,
-#header #block-nice-menus-1 .content ul ul li a:hover {
+#header .block-nice-menus .content ul ul li a,
+#header .block-nice-menus .content ul ul li a:hover {
   color: #4A4A4A;
 }
 
 /* Aligning the drop down menu for each parent item until there's a script to calculate the center */
 
-#header #block-nice-menus-1 .menu-680 ul {
+#header .block-nice-menus .menu-680 ul {
   left: -41px;
 }
 
-#header #block-nice-menus-1 .menu-685 ul {
+#header .block-nice-menus .menu-685 ul {
   left: -45px;
 }
 
-#header #block-nice-menus-1 .menu-419 ul {
+#header .block-nice-menus .menu-419 ul {
   left: -60px;
 }
 
-#header #block-nice-menus-1 .menu-420 ul {
+#header .block-nice-menus .menu-420 ul {
   left: -34px;
 }
 
