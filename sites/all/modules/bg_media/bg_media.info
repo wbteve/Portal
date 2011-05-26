@@ -6,4 +6,4 @@ files[] = bg_media.module
 files[] = MediaOpenImagesStreamWrapper.inc
 dependencies[] = media
 dependencies[] = file_entity
-dependencies[] = video_js
+dependencies[] = videojs
