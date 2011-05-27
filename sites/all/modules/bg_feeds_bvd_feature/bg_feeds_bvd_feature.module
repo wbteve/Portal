@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Barend en Van Dorp feeds feature feature.
+ */
+
+include_once('bg_feeds_bvd_feature.features.inc');
