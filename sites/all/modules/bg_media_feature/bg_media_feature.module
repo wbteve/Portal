@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Beeld en Geluid Media feature feature.
+ */
+
+include_once('bg_media_feature.features.inc');
