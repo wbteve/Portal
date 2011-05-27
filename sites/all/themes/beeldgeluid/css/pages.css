@@ -151,12 +151,12 @@ h1.title {
   font-family: 'BebasNeue';
   font-size: 48px;
   line-height: 40px;
-  height: 40px;
   overflow: hidden;
   color: #C7C2BA;
   text-align: center;
   text-transform: uppercase;
-  margin: 0 0 20px 0;
+  padding-top: 2px; /* Add padding-top to prevent characters from being cut off at the top.*/
+  margin: -2px 0 20px 0; /* Negative top margin to compensate for the padding-top. */
 }
 
 .node-type-blog h2#page-title {
