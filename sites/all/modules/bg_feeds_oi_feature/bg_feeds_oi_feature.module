@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Open Images feeds feature feature.
+ */
+
+include_once('bg_feeds_oi_feature.features.inc');
