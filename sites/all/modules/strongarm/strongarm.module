@@ -2,9 +2,12 @@
 // $Id: strongarm.module,v 1.1.2.6.2.9.2.4 2010/09/27 03:30:02 yhahn Exp $
 
 /**
- * Implements hook_init().
+ * Implements hook_stream_wrappers().
+ * 
+ * This is ugly but very effective. hook_stream_wrappers is early invoked even before
+ * drupal_path_initialize and resolves various other issues.
  */
-function strongarm_init() {
+function strongarm_stream_wrappers() {
   strongarm_set_conf();
 
   // This is a workaround for the very early check of the 'site_frontpage'

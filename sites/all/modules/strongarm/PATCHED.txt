@@ -1,0 +1,2 @@
+MvG: stongarm.module was patched with http://drupal.org/node/1062452#comment-4327034.
+Without the patch, it breaks language path prefixes. 
