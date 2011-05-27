@@ -30,6 +30,18 @@ function bg_feeds_feeds_plugins() {
     ),
   );
   
+  // Define Barend en Van Dorp CSV parser plugin for Feeds
+  $info['FeedsBVDCSVParser'] = array(
+    'name' => 'Barend en Van Dorp CSV parser',
+    'description' => 'Parse CSV files from Barend en Van Dorp.',
+    'handler' => array(
+      'parent' => 'FeedsCSVParser',
+      'class' => 'FeedsBVDCSVParser',
+      'file' => 'FeedsBVDCSVParser.inc',
+      'path' => $plugin_path,
+    ),
+  );
+  
   // Define file processor plugin for Feeds
   $info['FeedsFileProcessor'] = array(
     'name' => 'File processor',
