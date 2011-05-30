@@ -7,9 +7,9 @@ files[] = smart_paging.module
 files[] = includes/smart_paging.admin.inc
 dependencies[] = filter
 configure = admin/config/content/smart_paging
-; Information added by drupal.org packaging script on 2011-03-18
-version = "7.x-1.1-alpha3"
+; Information added by drupal.org packaging script on 2011-05-26
+version = "7.x-1.2"
 core = "7.x"
 project = "smart_paging"
-datestamp = "1300412768"
+datestamp = "1306419716"
 

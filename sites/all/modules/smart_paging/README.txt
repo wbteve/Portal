@@ -63,6 +63,8 @@ Installation:
 5. Disable the "Convert line breaks into HTML (i.e. <br> and <p>)" input filter. In replace to 
 this input filter, enable the "Convert line breaks into HTML (i.e. <br> and <p>) for Smart 
 Paging compatibility"
+6. verify that the comment tags <!-- --> are included in "Limit allowed HTML tags" list if it 
+is enabled in input filter Text formats settings.
 
 Support:
 Please use the issue queue for filing bugs with this module at

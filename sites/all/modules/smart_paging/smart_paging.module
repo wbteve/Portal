@@ -5,7 +5,7 @@
  * @file
  * Provides smart paging capability to Drupal contents.
  *
- * @author Roland Michael dela PeÃ±a.
+ * @author Roland Michael dela Peña.
  * @version $Id: smart_paging.module,v 1.1.2.10 2011/02/22 15:29:51 arpeggio Exp $
  */
 
@@ -47,7 +47,7 @@ function smart_paging_menu() {
  * Implements hook_form_alter()
  */
 function smart_paging_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == 'field_ui_display_overview_form' && $form['#entity_type'] == 'node') {
+  if ($form_id == 'field_ui_display_overview_form') {
     // Modified part copy from field_ui_display_overview_form() at /modules/field_ui/field_ui.admin.inc
     // Base button element for the various formatter settings actions.
     $base_button = array(
@@ -91,7 +91,7 @@ function smart_paging_form_alter(&$form, &$form_state, $form_id) {
       );
       $form['fields']['smart_paging']['#attributes']['class'][] = 'field-formatter-settings-editing';
     }
-    else {
+    elseif (isset($form['#entity_type']) && $form['#entity_type'] != 'comment') {
       $form['fields']['smart_paging']['settings_summary'] = array(
         '#markup' => '<div class="field-formatter-summary">' . smart_paging_field_formatter_settings_summary($form, $summary) . '</div>',
         '#cell_attributes' => array('class' => array('field-formatter-summary-cell')),
@@ -663,15 +663,20 @@ function smart_paging_field_attach_view_alter(&$build, $context) {
                 }
               }
             }
-
-            // Remove all line break/new line
-            $markup_content = preg_replace('/[\n\r]*/', '', $markup_content);
+            // Remove all line break/new line near the closing tag. Eg. Change from <[html tag]/>\n\r<[html tag]> to <[html tag]/><[html tag]>
+            preg_match_all('#<[A-Za-z/ ]+>#', $markup_content, $matched_tags);
+            foreach ($matched_tags[0] as $matched_tag) {
+              $matched_tag_regex = preg_quote($matched_tag, '#');
+              $markup_content    = preg_replace('#' . $matched_tag_regex . '[\n\r]*#', $matched_tag, $markup_content);
+            }
             do {
               // Look for consecutive placeholder and closing tag. Eg. <!--pagebreak--></p>
-              preg_match_all("#($placeholder)([ \t]*)(</[a-zA-Z]+>)#", $markup_content, $match);
+              $placeholder_regex = preg_quote($placeholder, '#');
+              preg_match_all("#($placeholder_regex)([ \t]*)(</[a-zA-Z]+>)#", $markup_content, $match);
               if (isset($match[1][0]) && isset($match[3][0])) {
                 // Move the placeholder to the end of closing tag. From the above example </p><!--pagebreak-->
-                $markup_content = preg_replace('#' . $match[1][0] . (isset($match[2][0]) ? $match[2][0] : '') . $match[3][0] . '#', (isset($match[2][0]) ? $match[2][0] : '') . $match[3][0] . $match[1][0], $markup_content);
+                $match_regex = preg_quote($match[1][0] . (isset($match[2][0]) ? $match[2][0] : '') . $match[3][0], '#');
+                $markup_content = preg_replace("#$match_regex#", (isset($match[2][0]) ? $match[2][0] : '') . $match[3][0] . $match[1][0], $markup_content);
               }
             } while (!empty($match[0]) && !empty($match[1]) && !empty($match[2]) && !empty($match[3]));
             // Break HTML content properly and insert placeholder
@@ -684,7 +689,7 @@ function smart_paging_field_attach_view_alter(&$build, $context) {
               // Remove the last page with only an empty tag content
               unset($pagebreak[$pagebreak_end]);
             }
-            if ($use_autop) {
+            if (isset($use_autop)) {
               // Use "Convert line breaks into HTML" filter
               foreach ($pagebreak as $index => $content_value) {
                 $pagebreak[$index] = _filter_autop($content_value);
@@ -749,8 +754,8 @@ function smart_paging_field_attach_view_alter(&$build, $context) {
       $variables['element']  = $pager_element;
       $variables['quantity'] = 10;
       $build['smart_paging']['#markup'] = '<div class="smart-paging-pager">' . theme('pager', $variables) . '</div>';
-      $build['smart_paging']['#weight'] = $display_settings['weight'];
-      $build['smart_paging']['#access'] = $display_settings['visible'];
+      $build['smart_paging']['#weight'] = isset($display_settings['weight']) ? $display_settings['weight'] : 0;
+      $build['smart_paging']['#access'] = isset($display_settings['visible']) ? $display_settings['visible'] : TRUE;
     }
   }
   // Comment entity
@@ -874,9 +879,11 @@ function smart_paging_field_extra_fields($get_defaults = FALSE) {
   // User
   $extra['user']['user'] = $defaults;
   // Taxonomy term
-  $vocabularies = taxonomy_get_vocabularies();
-  foreach ($vocabularies as $vocabulary) {
-    $extra['taxonomy_term'][$vocabulary->machine_name] = $defaults;
+  if (module_exists('taxonomy')) {
+    $vocabularies = taxonomy_get_vocabularies();
+    foreach ($vocabularies as $vocabulary) {
+      $extra['taxonomy_term'][$vocabulary->machine_name] = $defaults;
+    }
   }
   
   if (!$get_defaults) {
@@ -1084,7 +1091,10 @@ function smart_paging_help($path, $arg) {
  * @return
  *   HTML output of properly break HTML content and insert placeholder.
  */
-function smart_page_break_insert_placeholder($text, $placeholder = '<!--pagebreak-->') {
+function smart_page_break_insert_placeholder($text, $placeholder = NULL) {
+  if (empty($placeholder)) {
+    $placeholder = variable_get('smart_paging_pagebreak', '<!--pagebreak-->');
+  }
   // Perform HTML correction
   $text = _filter_htmlcorrector($text);
   $break_map = array();
@@ -1212,4 +1222,16 @@ function smart_paging_get_content_configuration($entity_type, $entity_id) {
     }
   }
   return $config;
+}
+
+/**
+ * Implements hook_paging_wysiwyg_include_directory().
+ */
+function smart_paging_wysiwyg_include_directory($type) {
+  switch ($type) {
+    case 'plugins':
+      // You can just return $type, if you place your Wysiwyg plugins into a
+      // sub-directory named 'plugins'.
+      return 'plugins/wysiwyg';
+  }
 }
