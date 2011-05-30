@@ -39,7 +39,7 @@ class FeedsBVDCSVParser extends FeedsCSVParser {
     
     // Process rows for Beeld en Geluid media nodes
     foreach($rows as &$row) {
-      $row['bvd_file']    = new FeedsBVDEnclosure('barendenvandorp://' . $row['expressie id']);
+      $row['bvd_file']    = new FeedsBVDEnclosure('barendenvandorp://' . $row['naam videofile']);
       $row['bvd_source']  = 'Barend en Van Dorp';
 
       $tags = explode(';', $row['onderwerpen']);
