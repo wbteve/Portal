@@ -25,6 +25,12 @@ function bg_media_stream_wrappers() {
       'description' => t('Media provided by Open Images.'),
       'type' => STREAM_WRAPPERS_READ_VISIBLE,
     ),
+    'barendenvandorp' => array(
+      'name' => t('Barend en Van Dorp media'),
+      'class' => 'MediaBVDStreamWrapper',
+      'description' => t('Media provided by Barend en Van Dorp.'),
+      'type' => STREAM_WRAPPERS_READ_VISIBLE,
+    ),
   );
 }
 
