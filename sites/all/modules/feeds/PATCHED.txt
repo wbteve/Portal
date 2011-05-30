@@ -1,0 +1,2 @@
+MvG: added "files[] = plugins/FeedsPlugin.inc" to feeds.info to prevent Fatal Error.
+See http://drupal.org/node/1169986. Hope this will be fixed in the next version so this patch doesn't have to be ported.
