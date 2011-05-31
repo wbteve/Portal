@@ -142,7 +142,7 @@ class FeedsOAIOIEnclosure extends FeedsEnclosure {
    *   The mime type of the resource.
    */
   public function __construct($value, $type) {
-    parent::__construct($value);
+    parent::__construct($value, $type);
     
     // Set (MIME) type
     switch($type) {
