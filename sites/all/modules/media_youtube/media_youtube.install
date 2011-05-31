@@ -62,3 +62,10 @@ function media_youtube_update_7005() {
 function media_youtube_update_7006() {
   return array();
 }
+
+/**
+ * Rebuild the registry to locate class files in new location.
+ */
+function media_youtube_update_7007() {
+  registry_rebuild();
+}

@@ -20,7 +20,7 @@ function media_youtube_preprocess_media_youtube_video(&$variables) {
   $variables['height'] = isset($variables['height']) ? $variables['height'] : media_youtube_variable_get('height');
   $variables['autoplay'] = isset($variables['autoplay']) ? $variables['autoplay'] : media_youtube_variable_get('autoplay');
   $variables['fullscreen'] = isset($variables['fullscreen']) ? $variables['fullscreen'] : media_youtube_variable_get('fullscreen');
-  $variables['autoplay'] = $variables['autoplay'] ? 1 : 1;
+  $variables['autoplay'] = $variables['autoplay'] ? 1 : 0;
   $variables['fullscreen'] = $variables['fullscreen'] ? 'true' : 'false';
 
   $variables['wrapper_id'] = 'media_youtube_' . $variables['video_id'] . '_' . $variables['id'];
@@ -53,6 +53,7 @@ OUTPUT;
         $JSObject.video_id = "{$variables['video_id']}";
         $JSObject.fullscreen = {$variables['fullscreen']};
         $JSObject.id = $iframe_id;
+        $JSObject.options = { autoplay: {$variables['autoplay']} };
         Drupal.media_youtube.insertEmbed($wrapper_id);
       }
     </script>

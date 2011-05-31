@@ -48,7 +48,7 @@ Drupal.media_youtube.insertEmbed = function (embed_id) {
   var src = 'http://www.youtube.com/embed/' + settings.video_id;
 
   // Allow other modules to modify the video settings.
-  settings.options = {wmode : 'opaque'};
+  settings.options.wmode = 'opaque';
   $(window).trigger('media_youtube_load', settings);
 
   // Merge YouTube options (such as autoplay) into the source URL.
