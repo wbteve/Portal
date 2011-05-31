@@ -126,8 +126,14 @@ class MediaOpenImagesStreamWrapper extends MediaReadOnlyStreamWrapper {
    */
   public function getMedia($oai_oi_record, $type) {
     $media = $oai_oi_record->metadata->children('oai_oi', TRUE)->children('oi', TRUE)->medium;
-    $media_amount = $media->count();
-    
+
+    if(phpversion() >= '5.3.0'){ 
+      $media_amount = $media->count();
+    }
+    else {
+      $media_amount = count($media);
+    }
+
     // Start at back for image
     if($type == 'image') {
       foreach($this->qualified_media[$type] as $qualified_mime_type) {
@@ -152,7 +158,7 @@ class MediaOpenImagesStreamWrapper extends MediaReadOnlyStreamWrapper {
         }
       }
     }
-    
+
     return FALSE;
   }
 }
