@@ -28,6 +28,13 @@ function serviceconnect_permission() {
 }
 
 /**
+ *  Add icons to the user_login form
+ */
+/*function serviceconnect_form_user_login_alter(&$form, &$form_state, $form_id) {
+  $form['extra'] = array('#markup' => '<h1>hi</h1>');
+}*/
+
+/**
  * Implementation of hook_menu().
  */
 function serviceconnect_menu() {
@@ -495,8 +502,7 @@ function serviceconnect_save_profile($fields) {
       else {
         // Handle CCK fields.
         $sql = 'SELECT type FROM {content_node_field} WHERE field_name = \'%s\'';
-        $res = db_query($sql, $fieldname);
-        // XXX: might be broken
+        $res = db_query($sql, $fieldname)->fetchObject();
         switch ($res->type) {
           case 'text':
             $content_profiles[$typename]->$fieldname = array(0 => array('value' => $value));
@@ -551,15 +557,14 @@ function serviceconnect_save_profile($fields) {
 function serviceconnect_clear_user_data($scpid) {
   $sql = 'SELECT uid FROM {serviceconnect_user} WHERE scpid = %d';
   $res = db_query($sql, $scpid);
-  // XXX
   if ($uid = db_result($res)) {
-    $sql = 'DELETE FROM {profile_values} WHERE uid = %d';
-    db_query($sql, $uid);
-    $sql = 'UPDATE {users} SET picture = \'\' WHERE uid = %d';
-    db_query($sql, $uid);
+    $sql = 'DELETE FROM {profile_values} WHERE uid = :uid';
+    db_query($sql, array('uid' => $uid));
+    $sql = 'UPDATE {users} SET picture = \'\' WHERE uid = :uid';
+    db_query($sql, array('uid' => $uid));
   }
-  $sql = 'DELETE FROM {serviceconnect_user} WHERE scpid = %d';
-  db_query($sql, $scpid);
+  $sql = 'DELETE FROM {serviceconnect_user} WHERE scpid = :scpid';
+  db_query($sql, array('scpid' => $scpid));
   serviceconnect_increment_counter('clearing user data');
 }
 
@@ -659,15 +664,13 @@ function serviceconnect_register_form_validate($form, &$form_state) {
 
   $sql = 'SELECT uid FROM {users} WHERE mail = \'%s\'';
   $res = db_query($sql, $email);
-  // XXX
-  if (db_fetch_array($res)) {
+  if ($res->numRows) {
     form_set_error('email', t('This e-mail address is already in use for another account.'));
   }
 
   $sql = 'SELECT uid FROM {users} WHERE name = \'%s\'';
   $res = db_query($sql, $username);
-  // XXX
-  if (db_fetch_array($res)) {
+  if ($res->numRows) {
     form_set_error('username', t('This username is already taken.'));
   }
 
