@@ -971,3 +971,499 @@ function _token_profile_fields() {
 
   return $fields;
 }
+
+/**
+ * Implements hook_token_info() on behalf of field.module.
+ */
+function field_token_info() {
+  $info['types']['field'] = array(
+    'name' => t('Fields'),
+    'description' => t('Tokens related to fields.'),
+    'needs-data' => 'field',
+  );
+  $info['tokens']['field']['label'] = array(
+    'name' => t('Label'),
+    'description' => t('The label of the field.'),
+  );
+  $info['tokens']['field']['description'] = array(
+    'name' => t('Help text'),
+    'description' => t('The optional description of the field.'),
+  );
+  $info['tokens']['field']['machine-name'] = array(
+    'name' => t('Machine-readable name'),
+    'description' => t("The unique machine-readable name of the field."),
+  );
+
+  // Because taxonomy module already declares its own tokens, we have to add
+  // taxonomy term reference field support here.
+  if (module_exists('taxonomy')) {
+    $info['types']['taxonomy-term-reference-field'] = array(
+      'name' => t('Taxnomy term reference fields'),
+      'description' => t('Tokens related to taxonomy term reference field instances.'),
+      'needs-data' => 'taxonomy-term-reference-field',
+      'field' => TRUE,
+      'module' => 'token',
+    );
+
+    $info['types']['taxonomy-term-reference-field-value'] = array(
+      'name' => t('Taxonomy term reference field values'),
+      'description' => t('Tokens related to taxonomy term reference field values.'),
+      'needs-data' => 'taxonomy-term-reference-field-value',
+      'field-value' => TRUE,
+      'module' => 'token',
+    );
+    $info['tokens']['taxonomy-term-reference-field-value']['term'] = array(
+      'name' => t('Term'),
+      'description' => t('The field term.'),
+      'type' => 'term',
+    );
+  }
+
+  return $info;
+}
+
+/**
+ * Implements hook_token_info_alter() on behalf of field.module.
+ *
+ * We use hook_token_info_alter() rather than hook_token_info() as other
+ * modules may already have defined some field tokens.
+ */
+function field_token_info_alter(&$info) {
+  $fields = field_info_fields();
+  $instances = field_info_instances();
+
+  // Attach field tokens to their respecitve entity tokens.
+  foreach ($fields as $field_name => $field) {
+    if (!empty($field['bundles'])) {
+      foreach (array_keys($field['bundles']) as $entity) {
+        // Make sure a token type exists for this entity and field type.
+        $token_type = token_get_entity_mapping('entity', $entity);
+        $field_token_type = strtr($field['type'], '_', '-') . '-field';
+        if (empty($token_type) || !isset($info['types'][$field_token_type])) {
+          continue;
+        }
+
+        // If a token already exists for this field, then don't add it.
+        $field_token_name = strtr($field_name, '_', '-');
+        if (isset($info['tokens'][$token_type][$field_token_name]) || ($entity == 'comment' && $field_name == 'comment_body')) {
+          continue;
+        }
+
+        // Yay! Add the field token to this entity's tokens.
+        $info['tokens'][$token_type][$field_token_name] = array(
+          // @todo How the &#!% do we figure out what this token should be
+          // named when each bundle can have a different label???
+          'name' => $field_token_name,
+          'description' => '',
+          'module' => 'token',
+          'type' => $field_token_type,
+        );
+      }
+    }
+  }
+
+  foreach (array_keys($info['types']) as $token_type) {
+    if (!empty($info['types'][$token_type]['field'])) {
+      // Merge in the default field value token type.
+      $info['types'][$token_type] += array('field-value-type' => $token_type . '-value');
+      $field_value_token_type = $info['types'][$token_type]['field-value-type'];
+      if (!isset($info['types'][$field_value_token_type])) {
+        // If the field value token type does not exist, skip processing this
+        // token type
+        continue;
+      }
+
+      // Add the field value tokens to the field token type for use with the
+      // first field value.
+      $info['tokens'] += array($token_type => array());
+      if (!empty($info['tokens'][$field_value_token_type])) {
+        $info['tokens'][$token_type] += $info['tokens'][$field_value_token_type];
+      }
+
+      // Add the [field-type:values] and [field-type:field] tokens that are
+      // automatically provided by
+      $info['tokens'][$token_type] += array(
+        'values' => array(
+          'name' => t('Values'),
+          'description' => '',
+          'dynamic' => TRUE,
+        ),
+        'field' => array(
+          'name' => t('Field'),
+          'description' => t('The field instance'),
+          'type' => 'field',
+        ),
+      );
+    }
+  }
+}
+
+/**
+ * Implements hook_tokens() on behalf of field.module.
+ */
+function field_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  $sanitize = !empty($options['sanitize']);
+  $language_code = isset($options['language']) ? $options['language']->language : NULL;
+
+  // Field instance tokens.
+  if ($type == 'field' && !empty($data['field'])) {
+    $field = $data['field'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'label':
+          $replacements[$original] = $sanitize ? check_plain($field['instance']['label']) : $field['instance']['label'];
+          break;
+        case 'description':
+          $replacements[$original] = $sanitize ? filter_xss($field['instance']['description']) : $field['instance']['description'];
+          break;
+        case 'machine-name':
+          // This is a machine name so does not ever need to be sanitized.
+          $replacements[$original] = $field['field_name'];
+          break;
+      }
+    }
+  }
+
+  // Field value tokens.
+  if ($type == 'field-value' && !empty($data['field'])) {
+    $field = $data['field'];
+    $type_info = token_get_info($field['field_token_type']);
+    $field_value_token_type = $type_info['field-value-type'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'field':
+          $replacements[$original] = $sanitize ? check_plain($field['instance']['label']) : $field['instance']['label'];
+          break;
+      }
+    }
+
+    // Merge in the token value tokens for the first item value.
+    $items = field_get_items($field['entity_type'], $field['entity'], $field['field_name'], $language_code);
+    $replacements += token_generate($field_value_token_type, $tokens, array('item' => reset($items), 'field' => $field), $options);
+
+    // Chained [field-name:field] tokens.
+    if (($field_tokens = token_find_with_prefix($tokens, 'field'))) {
+      $replacements += token_generate('field', $field_tokens, array('field' => $field), $options);
+    }
+
+    // Chained [field-name:values] dynamic tokens.
+    if ($value_tokens = token_find_with_prefix($tokens, 'values')) {
+      $item_tokens = array();
+      foreach ($value_tokens as $name => $original) {
+        if (strpos($name, ':') === FALSE) {
+          // [field-name:values:index]
+          if (isset($items[(int) $name])) {
+            $output = field_view_value($field['entity_type'], $field['entity'], $field['field_name'], $items[(int) $name], 'token', $language_code);
+            $replacements[$original] = render($output);
+          }
+        }
+        else {
+          // [field-name:values:index:token]
+          list($index, $name) = explode(':', $name, 2);
+          $item_tokens[(int) $index][$name] = $original;
+        }
+      }
+      foreach ($item_tokens as $index => $value_tokens) {
+        if (isset($items[$index])) {
+          $replacements += token_generate($field_value_token_type, $value_tokens, array('item' => $items[$index], 'field' => $field), $options);
+        }
+      }
+    }
+  }
+
+  // Field tokens on entities.
+  if (!empty($data[$type]) && $entity_type = token_get_entity_mapping('token', $type)) {
+    // The field API does weird stuff to the entity, so let's clone it.
+    $entity = clone $data[$type];
+
+    list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+    $fields = field_info_instances($entity_type, $bundle);
+
+    foreach ($fields as $field_name => $field_instance) {
+      // Do not continue if the field is empty.
+      if (empty($entity->{$field_name})) {
+        continue;
+      }
+
+      // Assert that this field was added by token.module.
+      $field_token_name = strtr($field_name, '_', '-');
+      $token_info = token_get_info($type, $field_token_name);
+      if (!isset($token_info['module']) || $token_info['module'] != 'token') {
+        continue;
+      }
+
+      // Replace the [entity:field-name] token.
+      if (isset($tokens[$field_token_name])) {
+        $original = $tokens[$field_token_name];
+        $field_output = field_view_field($entity_type, $entity, $field_name, 'token', $language_code);
+        $output = array();
+        foreach (element_children($field_output) as $key) {
+          $output[$key] = $field_output[$key];
+        }
+        $replacements[$original] = render($output);
+      }
+
+      // Replace the [entity:field-name:?] chained token.
+      if ($field_tokens = token_find_with_prefix($tokens, $field_token_name)) {
+        $field = array(
+          'entity' => $entity,
+          'entity_id' => $id,
+          'entity_type' => $entity_type,
+          'bundle' => $bundle,
+          'field_name' => $field_name,
+          'instance' => $field_instance,
+          'field' => field_info_field($field_name),
+        );
+        $field['field_token_type'] = strtr($field['field']['type'], '_', '-') . '-field';
+        $replacements += token_generate('field-value', $field_tokens, array('field' => $field), $options);
+        unset($field_data);
+      }
+    }
+
+    // Remove the cloned object from memory.
+    unset($entity);
+  }
+
+  // Taxonomy term reference field tokens on behalf of taxonomy.module.
+  if ($type == 'taxonomy-term-reference-field-value' && !empty($data['item'])) {
+    $item = $data['item'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'term':
+          $term = taxonomy_term_load($item['tid']);
+          $replacements[$original] = $sanitize ? check_plain($term->name) : $term->name;
+          break;
+      }
+    }
+
+    if (($term_tokens = token_find_with_prefix($tokens, 'term')) && $term = taxonomy_term_load($item['tid'])) {
+      $replacements += token_generate('term', $term_tokens, array('term' => $term), $options);
+    }
+  }
+
+  return $replacements;
+}
+
+/**
+ * Implements hook_token_info() on behalf of file.module.
+ */
+function file_token_info() {
+  $info['types']['file-field'] = array(
+    'name' => t('File fields'),
+    'description' => t('Tokens related to file field instances.'),
+    'needs-data' => 'file-field',
+    'field' => TRUE,
+    'module' => 'token',
+  );
+
+  $info['types']['file-field-value'] = array(
+    'name' => t('File field values'),
+    'description' => t('Tokens related to file field values.'),
+    'needs-data' => 'file-field-value',
+    'field-value' => TRUE,
+    'module' => 'token',
+  );
+  $info['tokens']['file-field-value']['file'] = array(
+    'name' => t('File'),
+    'description' => t('The file value'),
+    'type' => 'file',
+  );
+  $info['tokens']['file-field-value']['description'] = array(
+    'name' => t('Description'),
+    'description' => t('The file description.'),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens() on behalf of file.module.
+ */
+function file_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  $sanitize = !empty($options['sanitize']);
+  $language_code = isset($options['language']) ? $options['language']->language : NULL;
+
+  if ($type == 'file-field-value' && !empty($data['item'])) {
+    $item = $data['item'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'description':
+          if (!empty($item['description'])) {
+            $replacements[$original] = $sanitize ? check_plain($item['description']) : $item['description'];
+          }
+          break;
+        case 'file':
+          $replacements[$original] = theme('file_link', array('file' => file_load($item['fid'])));
+          break;
+      }
+    }
+
+    if (($file_tokens = token_find_with_prefix($tokens, 'file')) && $file = file_load($item['fid'])) {
+      $replacements += token_generate('file', $file_tokens, array('file' => $file), $options);
+    }
+  }
+
+  return $replacements;
+}
+
+/**
+ * Implements hook_token_info() on behalf of image.module.
+ */
+function image_token_info() {
+  $info['types']['image-field'] = array(
+    'name' => t('Image fields'),
+    'description' => t('Tokens related to image field instances.'),
+    'needs-data' => 'image-field',
+    'field' => TRUE,
+    'module' => 'token',
+  );
+
+  $info['types']['image-field-value'] = array(
+    'name' => t('Image field values'),
+    'description' => t('Tokens related to image field values.'),
+    'needs-data' => 'image-field-value',
+    'field-value' => TRUE,
+    'module' => 'token',
+  );
+  $info['tokens']['image-field-value']['file'] = array(
+    'name' => t('File'),
+    'description' => t('The image file.'),
+    'type' => 'file',
+  );
+  $info['tokens']['image-field-value']['title'] = array(
+    'name' => t('Title'),
+    'description' => t('The text used by screen readers, search engines, or when the image cannot be loaded.'),
+  );
+  $info['tokens']['image-field-value']['alt'] = array(
+    'name' => t('Alternate text'),
+    'description' => t('The title used as a tool tip when a user hovers the mouse over the image.'),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens() on behalf of image.module.
+ */
+function image_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  $sanitize = !empty($options['sanitize']);
+  $language_code = isset($options['language']) ? $options['language']->language : NULL;
+
+  if ($type == 'image-field-value' && !empty($data['item'])) {
+    $item = $data['item'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'title':
+          $replacements[$original] = $sanitize ? check_plain($item['title']) : $item['title'];
+          break;
+        case 'alt':
+          $replacements[$original] = $sanitize ? check_plain($item['alt']) : $item['alt'];
+          break;
+        case 'file':
+          $replacements[$original] = theme('file_link', array('file' => file_load($item['fid'])));
+          break;
+      }
+    }
+
+    if (($file_tokens = token_find_with_prefix($tokens, 'file')) && $file = file_load($item['fid'])) {
+      $replacements += token_generate('file', $file_tokens, array('file' => $file), $options);
+    }
+  }
+
+  return $replacements;
+}
+
+/**
+ * Implements hook_token_info() on behalf of text.module.
+ */
+function text_token_info() {
+  // Text module provides three different text field types.
+  $info['types']['text-field'] = array(
+    'name' => t('Text fields'),
+    'description' => t('Tokens related to text field instances.'),
+    'needs-data' => 'text-field',
+    'field' => TRUE,
+    'module' => 'token',
+  );
+  $info['types']['text-long-field'] = array(
+    'name' => t('Long text fields'),
+    'description' => t('Tokens related to long text field instances.'),
+    'needs-data' => 'text-long-field',
+    'field-value-type' => 'text-field-value',
+    'field' => TRUE,
+    'module' => 'token',
+  );
+  $info['types']['text-with-summary-field'] = array(
+    'name' => t('Long text with summary fields'),
+    'description' => t('Tokens related to long text with summary field instances.'),
+    'needs-data' => 'text-with-summary-field',
+    'field' => TRUE,
+    'module' => 'token',
+  );
+
+  // Text and long text fields can share the same field value type.
+  $info['types']['text-field-value'] = array(
+    'name' => t('Text field values'),
+    'description' => t('Tokens related to text field values.'),
+    'needs-data' => 'text-field-value',
+    'field-value' => TRUE,
+    'module' => 'token',
+  );
+  $info['tokens']['text-field-value']['value'] = array(
+    'name' => t('Value'),
+    'description' => t('The text field value.'),
+  );
+
+  // Long text with summary fields need an additional summary token.
+  $info['types']['text-with-summary-field-value'] = array(
+    'name' => t('Text with summmary field values'),
+    'description' => t('Tokens related to text with summaryfield values.'),
+    'needs-data' => 'text-with-summary-field-value',
+    'field-value' => TRUE,
+    'module' => 'token',
+  );
+  $info['tokens']['text-with-summary-field-value']['value'] = array(
+    'name' => t('Value'),
+    'description' => t('The text field value.'),
+  );
+  $info['tokens']['text-with-summary-field-value']['summary'] = array(
+    'name' => t('Summary'),
+    'description' => t('The text field summary.'),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens() on behalf of text.module.
+ */
+function text_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  $sanitize = !empty($options['sanitize']);
+  $language_code = isset($options['language']) ? $options['language']->language : NULL;
+
+  if (($type == 'text-field-value' || $type == 'text-with-summary-field-value') && !empty($data['item'])) {
+    $item = $data['item'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'value':
+        case 'summary':
+          if (isset($item[$name])) {
+            $replacements[$original] = $sanitize ? _text_sanitize($data['field']['instance'], $language_code, $item, $name) : $item[$name];
+          }
+          break;
+      }
+    }
+  }
+
+  return $replacements;
+}

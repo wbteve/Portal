@@ -1,0 +1,2 @@
+MvG: token.module and token.tokens.inc are patched versions from http://drupal.org/node/691078#comment-4499612.
+This adds field support to token module.  
