@@ -52,17 +52,8 @@ class FeedsOAIOIParser extends FeedsOAIParser {
           }
 
           $item['importSource'] = 'Open Images';
-          
-          $item['computedSource'] = new FeedsOAIOIEnclosure('openimages://' . $item['guid'], $item['type']);
 
-          // Source type is unknown so move to next record
-          if(is_null($item['computedSource']->getType())) {
-            watchdog('Beeld en Geluid - Feeds', t('Unknown item of type %type in item %guid', array(
-              '%type' => $item['type'], 
-              '%guid' => $item['guid']
-            )));
-            continue;
-          }
+          $item['computedSource'] = "openimages://{$item['guid']}/{$item['type']}";
 
           // Set identifier to GUID because of missing identifiers in some records
           $item['identifier'] = $item['guid'];
