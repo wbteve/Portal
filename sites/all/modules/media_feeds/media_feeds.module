@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * @file
+ * Implementation of the Feeds mapping API for the media module.
+ */
+
+/**
+ * Implements hook_feeds_processor_targets_alter().
+ */
+function media_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+  if ($bundle_name === NULL) {
+    return;
+  }
+
+  foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {
+    $info = field_info_field($name);
+
+    if ($info['type'] == 'media') {
+      $targets[$name] = array(
+        'name' => t('@label (media_internet)', array('@label' => $instance['label'])),
+        'callback' => 'media_feeds_set_internet_target',
+        'description' => t('The @label field of the node. Value to be claimed by a Media Internet Sources provider.', array('@label' => $instance['label'])),
+      );
+    }
+  }
+}
+
+/**
+ * Callback for mapping an URL or embed code to a field using media_internet.
+ * The actual mapping happens here.
+ */
+function media_feeds_set_internet_target($source, $entity, $target, $values) {
+  if (empty($values)) {
+    return;
+  }
+
+  if (!is_array($values)) {
+    $values = array($values);
+  }
+
+  $field_info = field_info_field($target);
+  $field = array(LANGUAGE_NONE => array());
+
+  foreach ($values as $value) {
+    try {
+      // Find a provider to create a file object
+      $provider = media_internet_get_provider($value);
+      $file = $provider->getFileObject();
+
+      // If existing files are found update the first file with the same URI
+      if ($file) {
+        $query = new EntityFieldQuery();
+        $existing = $query
+          ->entityCondition('entity_type', 'file')
+          ->propertyCondition('uri', $file->uri)
+          ->execute();
+
+        if ($existing && isset($existing['file']) && is_array($existing['file'])) {
+          foreach ($existing['file'] as $fid => $object) {
+            $file->fid = $object->fid;
+            $file->is_new = FALSE;
+            break;
+          }
+        }
+      }
+
+      // Existing providers fail validation if files already exist.
+      // That is bad because now we can't validate existing files.
+      // However, most providers don't do anything else in validate.
+      // @todo: Solve this. If this problem is solved we can and should call
+      // validate before the first $provider->getFileObject() even if the
+      // file is existing.
+      // There is an issue for this in the media module's issue queue:
+      // http://drupal.org/node/1121808
+      if (!$file || $file->is_new) {
+        $provider->validate();
+        $file = $provider->getFileObject();
+        if (!$file) {
+          // This file failed. Do the next.
+          continue;
+        }
+      }
+
+      // Look for the field instance settings
+      $instance = field_info_instance($entity->feeds_item->entity_type, $target, $entity->type);
+      $allowed_types = $instance['widget']['settings']['allowed_types'];
+      $allowed_schemes = $instance['widget']['settings']['allowed_schemes'];
+
+      // Validate the type
+      $type = media_get_type($file);
+      if (!isset($allowed_types[$type]) || !$allowed_types[$type]) {
+        drupal_set_message(t('Type %type not allowed for %target.', array('%type' => $type, '%target' => $target)), 'error');
+        continue;
+      }
+
+      // Validate the URI scheme
+      $scheme = file_uri_scheme($file->uri);
+      if (!isset($allowed_schemes[$scheme]) || !$allowed_schemes[$scheme]) {
+        drupal_set_message(t('Scheme %scheme not allowed for %target.', array('%scheme' => $scheme . '://', '%target' => $target)), 'error');
+        continue;
+      }
+
+      // Apply author settings to the file
+      $file->uid = $entity->uid;
+      $file = file_save($file);
+
+      // Attach the file to the field
+      $field[LANGUAGE_NONE][]['fid'] = $file->fid;
+    } catch (MediaInternetNoHandlerException $e) {
+      drupal_set_message($e->getMessage(), 'error');
+    } catch (MediaInternetValidationException $e) {
+      drupal_set_message($e->getMessage(), 'error');
+    }
+  }
+
+  $entity->{$target} = $field;
+}
