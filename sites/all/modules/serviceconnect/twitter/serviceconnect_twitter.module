@@ -58,7 +58,7 @@ function serviceconnect_twitter_permission() {
  */
 function serviceconnect_twitter_form_alter(&$form, &$form_state, $form_id) {
   if($form_id == 'user_login') {
-    $imagepath = base_path() . drupal_get_path('module', 'serviceconnect_twitter') . '/img/twitter-48.png';
+    $imagepath = base_path() . drupal_get_path('module', 'serviceconnect_twitter') . '/img/twitter.png';
     $loginpath = base_path() . SERVICECONNECT_TWITTER_PATH_LOGIN;
     $form['twitter'] = array('#markup' => '<a href="' . $loginpath . '"><img src="'. $imagepath .'" title="" /></a>');
   }

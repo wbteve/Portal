@@ -58,9 +58,9 @@ function serviceconnect_facebook_permission() {
  */
 function serviceconnect_facebook_form_alter(&$form, &$form_state, $form_id) {
   if($form_id == 'user_login') {
-    $imagepath = base_path() . drupal_get_path('module', 'serviceconnect_facebook') . '/img/facebook-48.png';
+    $imagepath = base_path() . drupal_get_path('module', 'serviceconnect_facebook') . '/img/facebook.png';
     $loginpath = base_path() . SERVICECONNECT_FACEBOOK_PATH_LOGIN;
-    $form['facebook'] = array('#markup' => '<a href="' . $loginpath . '"><img src="'. $imagepath .'" title="" /></a>');
+    $form['facebook'] = array('#markup' => '<a href="' . $loginpath . '"><img src="'. $imagepath .'" title="" /></a><br>');
   }
 }
 

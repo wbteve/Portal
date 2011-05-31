@@ -73,9 +73,9 @@ function serviceconnect_hyves_permission() {
  */
 function serviceconnect_hyves_form_alter(&$form, &$form_state, $form_id) {
   if($form_id == 'user_login') {
-    $imagepath = base_path() . drupal_get_path('module', 'serviceconnect_hyves') . '/img/hyves-48.png';
+    $imagepath = base_path() . drupal_get_path('module', 'serviceconnect_hyves') . '/img/hyves.png';
     $loginpath = base_path() . SERVICECONNECT_HYVES_PATH_LOGIN;
-    $form['hyves'] = array('#markup' => '<a href="' . $loginpath . '"><img src="'. $imagepath .'" title="" /></a>');
+    $form['hyves'] = array('#markup' => '<a href="' . $loginpath . '"><img src="'. $imagepath .'" title="" /></a><br>');
   }
 }
 
