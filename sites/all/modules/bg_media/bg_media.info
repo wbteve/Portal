@@ -2,7 +2,6 @@ name = Beeld en Geluid Media plugins
 description = Provides support for to the Media module.
 package = "Beeld en Geluid"
 core = 7.x
-php = 5.3
 files[] = bg_media.module
 files[] = includes/classes/MediaBVDStreamWrapper.inc
 files[] = includes/classes/MediaOpenImagesStreamWrapper.inc
