@@ -15,6 +15,22 @@ function bg_media_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_media_internet_providers();
+ */
+function bg_media_media_internet_providers() {
+  return array(
+    'MediaInternetOIHandler' => array(
+      'title' => 'Open Images',
+      'hidden' => TRUE,
+    ),
+    'MediaInternetBVDHandler' => array(
+      'title' => 'Barend en Van Dorp',
+      'hidden' => TRUE,
+    ),
+  );
+}
+
+/**
  * Implements hook_stream_wrappers().
  */
 function bg_media_stream_wrappers() {
@@ -41,7 +57,7 @@ function bg_media_field_formatter_info() {
   return array(
     'bg_media' => array(
       'label' => t('Beeld en Geluid: Media'),
-      'field types' => array('file'),
+      'field types' => array('file', 'media'),
       'description' => t('Display a Beeld en Geluid media.'),
     )
   );
@@ -59,13 +75,13 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
       $theme_registry = array_keys(theme_get_registry());
 
       foreach($items as $item) {
-        $theme_function = BG_MEDIA_THEME_FUNCTION_PREFIX . '_' . $item['type'];
+        $theme_function = BG_MEDIA_THEME_FUNCTION_PREFIX . '_' . $item['file']->type;
 
         // Check if theme function exists for this media type
         if(in_array($theme_function, $theme_registry)) {
           $element[] = array(
             '#theme' => $theme_function,
-            '#file' => (object)$item,
+            '#file' => $item['file'],
           );
         }
       }
@@ -74,7 +90,6 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
 
   return $element;
 }
-
 
 /**
  * Notice: File formatters are not used, but are a remenant of the previous branch 
