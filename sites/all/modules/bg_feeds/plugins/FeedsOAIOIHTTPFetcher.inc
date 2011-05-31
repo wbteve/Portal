@@ -45,15 +45,15 @@ class FeedsOAIOIHTTPFetcherResult extends FeedsOAIHTTPFetcherResult {
       if ($ok) {
         $resumption_token = array_pop($matches[1]);
         #dsm("Resumption token: $resumption_token");
-        //$this->setLastDate(0);
+        $this->setLastDate(0);
       }
       else {
         // No resumption token in response. Store current system timestamp
         // so next request limits items returned.
         $resumption_token = "";
-        //$this->setLastDate(time());
+        $this->setLastDate(time());
       }
-      //$this->setResumptionToken($resumption_token);
+      $this->setResumptionToken($resumption_token);
     }
     else {
       // OAI fetch failed
