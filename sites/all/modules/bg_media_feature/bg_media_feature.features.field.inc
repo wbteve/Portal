@@ -168,28 +168,18 @@ function bg_media_feature_field_default_fields() {
       'deleted' => '0',
       'entity_types' => array(),
       'field_name' => 'field_media_file',
-      'foreign keys' => array(
-        'fid' => array(
-          'columns' => array(
-            'fid' => 'fid',
-          ),
-          'table' => 'file_managed',
-        ),
-      ),
+      'foreign keys' => array(),
       'indexes' => array(
         'fid' => array(
           0 => 'fid',
         ),
       ),
-      'module' => 'file',
+      'module' => 'media',
       'settings' => array(
-        'display_default' => 0,
-        'display_field' => 0,
         'profile2_private' => FALSE,
-        'uri_scheme' => 'public',
       ),
       'translatable' => '1',
-      'type' => 'file',
+      'type' => 'media',
     ),
     'field_instance' => array(
       'bundle' => 'media',
@@ -201,7 +191,7 @@ function bg_media_feature_field_default_fields() {
           'module' => 'bg_media',
           'settings' => array(),
           'type' => 'bg_media',
-          'weight' => '1',
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
@@ -213,34 +203,29 @@ function bg_media_feature_field_default_fields() {
       'entity_type' => 'node',
       'field_name' => 'field_media_file',
       'label' => 'File',
-      'required' => 0,
+      'required' => 1,
       'settings' => array(
-        'description_field' => 0,
-        'file_directory' => '',
-        'file_extensions' => 'txt',
-        'max_filesize' => '',
         'user_register_form' => FALSE,
       ),
       'widget' => array(
         'active' => 1,
-        'module' => 'file',
+        'module' => 'media',
         'settings' => array(
-          'insert' => 0,
-          'insert_class' => '',
-          'insert_default' => 'auto',
-          'insert_styles' => array(
-            'auto' => 'auto',
-            'image' => 0,
-            'image_large' => 0,
-            'image_medium' => 0,
-            'image_square_thumbnail' => 0,
-            'image_thumbnail' => 0,
-            'link' => 0,
+          'allowed_schemes' => array(
+            'barendenvandorp' => 'barendenvandorp',
+            'openimages' => 'openimages',
+            'public' => 'public',
+            'youtube' => 'youtube',
           ),
-          'insert_width' => '',
+          'allowed_types' => array(
+            'audio' => 'audio',
+            'default' => 0,
+            'image' => 'image',
+            'video' => 'video',
+          ),
           'progress_indicator' => 'throbber',
         ),
-        'type' => 'file_generic',
+        'type' => 'media_generic',
         'weight' => '4',
       ),
     ),
@@ -360,7 +345,7 @@ function bg_media_feature_field_default_fields() {
           'module' => 'taxonomy',
           'settings' => array(),
           'type' => 'taxonomy_term_reference_link',
-          'weight' => '0',
+          'weight' => '1',
         ),
         'teaser' => array(
           'label' => 'above',
