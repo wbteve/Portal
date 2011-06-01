@@ -115,7 +115,9 @@
   </div></div><!-- /.section, /#header -->
 
   <div id="main-wrapper"><div id="main" class="clearfix<?php if ($main_menu || $page['navigation']) { print ' with-navigation'; } ?>">
-    <?php print $breadcrumb; ?>
+    <div class="breadcrumb-wrapper">
+      <?php print $breadcrumb; ?>
+    </div>
     <?php print render($title_prefix); ?>
     <?php if ($title && isset($node) && $node->type == 'blog'): ?>
       <h2 class="title" id="page-title"><?php print $title; ?></h2>
