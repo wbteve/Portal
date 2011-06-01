@@ -1,0 +1,26 @@
+<?php
+
+  define('GRIDUI_DEBUG', true);
+
+  function gridui_form_alter(&$form, &$form_state, $form_id) {
+
+    if(GRIDUI_DEBUG) dsm('Doing form_alter');
+
+    if($form_id == "dossier_node_form") {
+      if(GRIDUI_DEBUG) dsm('Injecting JavaScript');
+
+      // Inject static files necessary into page
+      drupal_add_js(drupal_get_path('module', 'gridui') . '/js/gridui.js', array('type' => 'file',
+                                                                                 'scope' => 'footer',
+                                                                                 'weight' => 5));
+      drupal_add_css(drupal_get_path('module', 'gridui') . '/css/gridui.css');
+
+      if(GRIDUI_DEBUG) dsm('Adding gridui frame');
+      // Add a drawing frame to the form
+      $form['gridui'] = array('#markup' => '<div id="gridui-frame"></div>');
+
+      // Add the already present items to the drawing frame
+    }
+  }
+
+?>

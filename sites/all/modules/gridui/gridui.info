@@ -1,0 +1,4 @@
+name = Grid UI
+description = Enable users to position content on a grid in the admin
+package = GridUI 
+core = 7.x 
