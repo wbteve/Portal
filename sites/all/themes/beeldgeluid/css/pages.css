@@ -366,6 +366,10 @@ ul.links li {
   padding: 0 10px;
 }
 
+.node-type-media .content .content {
+  padding: 0;
+}
+
 .node-type-media #comments {
   margin: 0;
   float: left;
@@ -388,9 +392,36 @@ ul.links li {
 .node-type-media #comments .comment,
 .node-type-media #comments  #comment-form {
   padding: 10px 20px 20px 20px;
-  background-color: #C7C2BA;
+  background-color: #8a8783;
   margin: 0;
   float: left;
+}
+
+.node-type-media #comments .comment h3.comment-title {
+  margin: 0.5em 0 0 0;
+  font-size: 1.0em;
+}
+
+.node-type-media #comments .comment h3.comment-title a {
+  color :#fff;
+}
+
+.node-type-media #comments .comment .submitted {
+  color: #c7c2ba;
+  margin: 0.5em 0 0 0;
+}
+
+.node-type-media #comments .comment .submitted a {
+  color: #fff;
+}
+
+.node-type-media #comments .comment p {
+  margin-top: 0.5em;
+}
+
+.node-type-media #comment-form a,
+.node-type-media #comments .comment ul.links a {
+  color: #fff;
 }
 
 /*
