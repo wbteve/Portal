@@ -15,7 +15,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #e00034;
-
+  text-rendering: optimizeLegibility;
 }
 
 
@@ -97,9 +97,14 @@ div#site-name /* The name of the website */ {
 
 
 body.front #main-wrapper ,
-body.page-search #main-wrapper {
+body.page-search #main-wrapper,
+body.node-type-media #main-wrapper {
   background-color: #4A4A4A;
   color: #fff;
+}
+
+body#tinymce {
+  background-color: #f8f6f5;
 }
 
 #main {
@@ -118,6 +123,10 @@ body.page-search #main-wrapper {
 }
 
 .region-content-top /* Wrapper for any blocks placed in the "content top" region */ {
+}
+
+.breadcrumb-wrapper {
+  min-height: 1.67em;
 }
 
 .breadcrumb /* The path to the current page in the form of a list of links */ {
@@ -347,6 +356,41 @@ ul.links li {
 .page-blogs p,
 .page-taxonomy p {
   margin: 0;
+}
+
+/*
+ * dossiers media
+*/
+
+.node-type-media .content {
+  padding: 0 10px;
+}
+
+.node-type-media #comments {
+  margin: 0;
+  float: left;
+}
+
+.node-type-media #comments h2.title {
+  height: 28px;
+  width: 480px;
+  padding: 2px 0 0 0;
+  background: #6f6e6b url('../images/bg_sprite_toggle_header.jpg') left top repeat-x;
+  margin: 0;
+  float: left;
+  cursor: pointer;
+}
+
+.node-type-media #comments h2.title.closed {
+  background-position: left -30px;
+}
+
+.node-type-media #comments .comment,
+.node-type-media #comments  #comment-form {
+  padding: 10px 20px 20px 20px;
+  background-color: #C7C2BA;
+  margin: 0;
+  float: left;
 }
 
 /*
