@@ -375,6 +375,7 @@ ul.links li {
   float: left;
 }
 
+.node-type-media .field-group-format .field-group-format-toggler,
 .node-type-media #comments h2.title {
   height: 28px;
   width: 480px;
@@ -383,18 +384,39 @@ ul.links li {
   margin: 0;
   float: left;
   cursor: pointer;
+  text-align: center;
 }
 
+.node-type-media .field-group-format .field-group-format-toggler a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+  display: block;
+}
+
+.node-type-media .field-group-format.collapsed .field-group-format-toggler,
 .node-type-media #comments h2.title.closed {
   background-position: left -30px;
 }
 
+.node-type-media .field-group-format-wrapper,
 .node-type-media #comments .comment,
 .node-type-media #comments  #comment-form {
-  padding: 10px 20px 20px 20px;
+  padding: 10px 20px 20px 20px!important;
   background-color: #8a8783;
   margin: 0;
   float: left;
+  width: 440px!important;
+}
+
+.node-type-media .field-group-format-wrapper a {
+  color: #fff;
+}
+
+.node-type-media .field-name-field-media-description {
+  font-size: 11px;
+  line-height: 15px;
 }
 
 .node-type-media #comments .comment h3.comment-title {
@@ -422,6 +444,11 @@ ul.links li {
 .node-type-media #comment-form a,
 .node-type-media #comments .comment ul.links a {
   color: #fff;
+}
+
+.node-type-media .field-label {
+  display: inline-block;
+  width: 100px;
 }
 
 /*
