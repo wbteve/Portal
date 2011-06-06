@@ -89,11 +89,12 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   
   // $variables['theme_hook_suggestions'][] = 'page__'. $variables['node']->type;
   if (isset($variables['node']->type) && $variables['node']->type == 'blog') {
-    if(!empty($variables['node']->field_blog[$language->language][0]['tid'])){
+    if (!empty($variables['node']->field_blog[$language->language][0]['tid'])) {
       $term = taxonomy_term_load($variables['node']->field_blog[$language->language][0]['tid']);
       $variables['title'] = $term->name. ' blog';
       $variables['$head_title_array'][0] = $term->name. ' blog';
-    }else{
+    }
+    else {
       $variables['title'] = '';
       $variables['$head_title_array'][0] = '';
     }
@@ -152,7 +153,7 @@ function beeldgeluid_preprocess_block(&$variables, $hook) {
 
 /**
  * Theme the way an 'all day' label will look.
- * Return an empty string to disable the '(all day)' suffix. 
+ * In this theme, we return an empty string to disable the '(all day)' suffix. 
  */
 function beeldgeluid_date_all_day_label() {
   return '';
