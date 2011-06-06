@@ -4,7 +4,8 @@
 
   function gridui_form_alter(&$form, &$form_state, $form_id) {
 
-    if(GRIDUI_DEBUG) dsm('Doing form_alter');
+    if(GRIDUI_DEBUG) dsm('Doing gridui_form_alter');
+    if(GRIDUI_DEBUG) dsm($form);
 
     if($form_id == "dossier_node_form") {
       if(GRIDUI_DEBUG) dsm('Injecting JavaScript');
@@ -19,7 +20,17 @@
       // Add a drawing frame to the form
       $form['gridui'] = array('#markup' => '<div id="gridui-frame"></div>');
 
-      // Add the already present items to the drawing frame
+      // Set position fields to be hidden
+      /*
+      foreach($form["field_referenced_content"]["nl"] as $key => $value) {
+        if(is_numeric($key)) {
+          if(GRIDUI_DEBUG) dsm("Hiding positions of {$key}");
+          $form["field_referenced_content"]["nl"][$key]["pos_x"]["#type"] = "hidden";
+          $form["field_referenced_content"]["nl"][$key]["pos_y"]["#type"] = "hidden";
+        }
+      }
+      */
+      
     }
   }
 
