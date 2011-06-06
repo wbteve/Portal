@@ -405,9 +405,18 @@ ul.links li {
 .node-type-media #comments  #comment-form {
   padding: 10px 20px 20px 20px!important;
   background-color: #8a8783;
+  color: #fff;
   margin: 0;
   float: left;
   width: 440px!important;
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.node-type-media span.date-display-single,
+.node-type-media .page-taxonomy .submitted {
+    color: #fff;
+    font-size: 11px;
 }
 
 .node-type-media .field-group-format-wrapper a {
