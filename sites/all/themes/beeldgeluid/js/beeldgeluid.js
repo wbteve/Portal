@@ -5,7 +5,7 @@
       $(this).nextAll('div,form').filter(":first").hide();
       $(this).click(function() {
         $(this).toggleClass('closed');
-        $(this).nextAll('div,form').filter(":first").slideToggle('slow');
+        $(this).nextAll('div,form').filter(":first").slideToggle('fast');
       });
     });
   });

@@ -451,6 +451,10 @@ ul.links li {
   width: 100px;
 }
 
+.node-type-media ul.links.inline {
+  display: none;
+}
+
 /*
  * Footer
  */
