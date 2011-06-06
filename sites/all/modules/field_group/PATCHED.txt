@@ -1,0 +1,1 @@
+MvG: field_group.js was patched for theming purposes. See http://drupal.org/node/1180126. 
