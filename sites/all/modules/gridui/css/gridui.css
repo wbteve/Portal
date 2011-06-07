@@ -2,7 +2,12 @@
   background: #ccc;
   border: 1px solid #808080;
   height: 320px;
+  margin: 0 0 0 425px;
   width: 750px;
+}
+
+#edit-field-referenced-content-nl-add-more {
+  margin-left: 35px;
 }
 
 .dossiergrid-item {
