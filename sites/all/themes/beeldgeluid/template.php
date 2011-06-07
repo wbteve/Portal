@@ -103,7 +103,7 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   
   
   // Check if the SEO header is set. If so, the page title must not be a <h1> because the SEO header will be <h1>.
-  if (isset($variables['node']->field_seo_h1[$variables['node']->language][0]['safe_value'])) {
+  if (isset($variables['node']->field_seo_h1[$variables['node']->language])) {
     $variables['page_title_tag'] = 'h2';
   };
   
