@@ -1,9 +1,14 @@
 #gridui-frame {
   background: #ccc;
   border: 1px solid #808080;
+  float: left;
   height: 320px;
-  margin: 0 0 0 425px;
+  margin: 0 0 0 35px;
   width: 750px;
+}
+
+.gridui-header {
+  cursor: pointer;
 }
 
 #edit-field-referenced-content-nl-add-more {
@@ -16,4 +21,15 @@
   font-size: 48px;
   overflow: hidden;
   text-align: right;
+}
+
+#field-referenced-content-values fieldset,
+#field-referenced-content-values--2 fieldset {
+  display: none;
+}
+
+#field-referenced-content-values,
+#field-referenced-content-values--2 {
+  float: left;
+  width: 400px
 }

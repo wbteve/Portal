@@ -52,6 +52,8 @@
   // Remove later
   var DG = new DossierGrid("#gridui-frame", 50, .5);
 
+  $("#gridui-frame").empty();
+
   // XXX: For now we will fill this based upon the fields in the "Referenced Content"
   // This step both adds all the elements to the frame and hides certain fields of the referenced content
   // as these are now handled by the gridui frame, also do some styling
@@ -71,14 +73,21 @@
 
     DG.add_media(element);
 
+    var $container = $($("td", $(this))[1]);
+
+    $container.prepend("<h2>Item #" + index  +"</h2>")
+      .addClass("gridui-header")
+      .click(function() {
+        $fieldset.toggle();
+      });
+
+
     $(".form-item-field-referenced-content-nl-" + index + "-pos-x").hide();
     $(".form-item-field-referenced-content-nl-" + index + "-pos-y").hide();
 
-    $("#field-referenced-content-values").css({"float": "left",
-                                               "width": "300px"});
-
-    $("#field-referenced-content-values + .clearfix").removeClass("clearfix");
-
   });
+
+
+  $("#field-referenced-content-values + .clearfix").removeClass("clearfix");
 
 }(jQuery));
