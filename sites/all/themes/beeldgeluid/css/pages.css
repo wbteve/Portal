@@ -156,7 +156,7 @@ h3.title /* Comment title */ {
   margin: 0;
 }
 
-h1.title {
+h1.title, #page-title {
   font-family: 'BebasNeue';
   font-size: 48px;
   line-height: 40px;
@@ -474,4 +474,19 @@ ul.links li {
  * Page bottom
  */
 .region-bottom /* Wrapper for any blocks placed in the page bottom region */ {
+}
+
+/*
+ * Content bottom
+ */
+.region-content-bottom {
+  background-color: #4A4A4A;
+  color: #C7C2BA;
+}
+
+.region-content-bottom .block {
+  margin: 0 auto;
+  overflow: hidden;
+  padding: 16px 0;
+  width: 740px;
 }

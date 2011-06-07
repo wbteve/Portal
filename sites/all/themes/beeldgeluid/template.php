@@ -99,8 +99,17 @@ function beeldgeluid_preprocess_html(&$variables, $hook) {
 function beeldgeluid_preprocess_page(&$variables, $hook) {
   global $language;
   
+  $variables['page_title_tag'] = 'h1';
+  
+  
+  // Check if the SEO header is set. If so, the page title must not be a <h1> because the SEO header will be <h1>.
+  if (isset($variables['node']->field_seo_h1[$variables['node']->language][0]['safe_value'])) {
+    $variables['page_title_tag'] = 'h2';
+  };
+  
   // $variables['theme_hook_suggestions'][] = 'page__'. $variables['node']->type;
   if (isset($variables['node']->type) && $variables['node']->type == 'blog') {
+    $variables['page_title_tag'] = 'h2';
     if (!empty($variables['node']->field_blog[$language->language][0]['tid'])) {
       $term = taxonomy_term_load($variables['node']->field_blog[$language->language][0]['tid']);
       $variables['title'] = $term->name. ' blog';

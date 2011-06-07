@@ -1,0 +1,64 @@
+<?php
+/**
+ * @file bg_blocks.module
+ * Provide various custom blocks for Beeld & Geluid.
+ */
+
+/**
+ * Implementation of hook_block_info().
+ */
+function bg_blocks_block_info() {
+  $blocks['seo_content'] = array(
+    'info' => t('SEO Content'),
+    'status' => TRUE,
+    'region' => 'content_bottom',
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'node/*',
+  );
+
+  return $blocks;
+}
+
+
+/**
+ * Implementation of hook_block_configure().
+ */
+function bg_blocks_block_configure($delta = '') {
+
+}
+
+
+/**
+ * Implementation of hook_block_save().
+ */
+function bg_blocks_block_save($delta = '', $edit = array()) {
+
+}
+
+
+/**
+ * Implementation of hook_block_view().
+ */
+function bg_blocks_block_view($delta = '') {
+  // The $delta parameter tells us which block is being requested.
+  switch ($delta) {
+    case 'seo_content':
+      $block['subject'] = '';
+      $block['content'] = bg_blocks_seo_content();
+      break;
+  }
+  return $block;
+}
+
+function bg_blocks_seo_content() {
+  $output = '';
+  if ($node = menu_get_object()) {
+    if (isset($node->field_seo_h1[$node->language][0]['safe_value'])) {
+      $output .= '<h1 class="title">' . $node->field_seo_h1[$node->language][0]['safe_value'] . '</h1>';
+    }
+    if (isset($node->field_seo_content[$node->language][0]['safe_value'])) {
+      $output .= $node->field_seo_content[$node->language][0]['safe_value'];
+    }
+  }
+  return $output;
+}

@@ -119,10 +119,8 @@
       <?php print $breadcrumb; ?>
     </div>
     <?php print render($title_prefix); ?>
-    <?php if ($title && isset($node) && $node->type == 'blog'): ?>
-      <h2 class="title" id="page-title"><?php print $title; ?></h2>
-    <?php elseif ($title): ?>
-      <h1 class="title" id="page-title"><?php print $title; ?></h1>
+    <?php if ($title): ?>
+      <<?php print $page_title_tag; ?> class="title" id="page-title"><?php print $title; ?></<?php print $page_title_tag; ?>>
     <?php endif; ?>
     <?php print render($title_suffix); ?>
     <div id="content" class="column"><div class="section">

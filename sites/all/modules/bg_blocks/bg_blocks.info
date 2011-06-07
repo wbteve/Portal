@@ -1,0 +1,4 @@
+name = Beeld & Geluid Blokken
+description = Diverse custom blokken
+core = 7.x
+files[] = bg_blocks.module
