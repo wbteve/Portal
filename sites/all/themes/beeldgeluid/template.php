@@ -68,23 +68,18 @@
  *   The name of the template being rendered ("html" in this case.)
  */
 function beeldgeluid_preprocess_html(&$variables, $hook) {
-  if ($node = menu_get_object()) {
-    $variables['node'] = $node;
-  }
   
-  if (isset($variables['node']->field_seo_code_head[$node->language])) {
-    $variables['seo_code_head'] = $variables['node']->field_seo_code_head[$node->language][0]['value'];
-  }
-  else {
-    $variables['seo_code_head'] = '';
+  $variables['seo_code_head'] = '';
+  $variables['seo_code_body'] = '';
+  if ($node = menu_get_object()) {
+    if (isset($node->field_seo_code_head[$node->language])) {
+      $variables['seo_code_head'] = $node->field_seo_code_head[$node->language][0]['value'];
+    }
+    if (isset($node->field_seo_code_body[$node->language])) {
+      $variables['seo_code_body'] = $node->field_seo_code_body[$node->language][0]['value'];
+    }
   }
 
-  if (isset($variables['node']->field_seo_code_body[$node->language])) {
-    $variables['seo_code_body'] = $variables['node']->field_seo_code_body[$node->language][0]['value'];
-  }
-  else {
-    $variables['seo_code_body'] = '';
-  }
 }
 
 /**
@@ -100,26 +95,28 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   global $language;
   
   $variables['page_title_tag'] = 'h1';
-  
-  
-  // Check if the SEO header is set. If so, the page title must not be a <h1> because the SEO header will be <h1>.
-  if (isset($variables['node']->field_seo_h1[$variables['node']->language])) {
-    $variables['page_title_tag'] = 'h2';
-  };
-  
-  // $variables['theme_hook_suggestions'][] = 'page__'. $variables['node']->type;
-  if (isset($variables['node']->type) && $variables['node']->type == 'blog') {
-    $variables['page_title_tag'] = 'h2';
-    if (!empty($variables['node']->field_blog[$language->language][0]['tid'])) {
-      $term = taxonomy_term_load($variables['node']->field_blog[$language->language][0]['tid']);
-      $variables['title'] = $term->name. ' blog';
-      $variables['$head_title_array'][0] = $term->name. ' blog';
-    }
-    else {
-      $variables['title'] = '';
-      $variables['$head_title_array'][0] = '';
-    }
+  // Code that should only run when a node is being displayed.
+  if (isset($variables['node'])) {
+    // Check if the SEO header is set. If so, the page title must not be a <h1> because the SEO header will be <h1>.
+    if (isset($variables['node']->field_seo_h1[$variables['node']->language])) {
+      $variables['page_title_tag'] = 'h2';
+    };
+    
+    // $variables['theme_hook_suggestions'][] = 'page__'. $variables['node']->type;
+    if (isset($variables['node']->type) && $variables['node']->type == 'blog') {
+      $variables['page_title_tag'] = 'h2';
+      if (!empty($variables['node']->field_blog[$language->language][0]['tid'])) {
+        $term = taxonomy_term_load($variables['node']->field_blog[$language->language][0]['tid']);
+        $variables['title'] = $term->name. ' blog';
+        $variables['$head_title_array'][0] = $term->name. ' blog';
+      }
+      else {
+        $variables['title'] = '';
+        $variables['$head_title_array'][0] = '';
+      }
+    }    
   }
+  
 }
 
 /**
