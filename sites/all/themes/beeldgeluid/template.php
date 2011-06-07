@@ -67,13 +67,25 @@
  * @param $hook
  *   The name of the template being rendered ("html" in this case.)
  */
-/* -- Delete this line if you want to use this function
 function beeldgeluid_preprocess_html(&$variables, $hook) {
-  // The body tag's classes are controlled by the $classes_array variable. To
-  // remove a class from $classes_array, use array_diff().
-  //$variables['classes_array'] = array_diff($variables['classes_array'], array('class-to-remove'));
+  if ($node = menu_get_object()) {
+    $variables['node'] = $node;
+  }
+  
+  if (isset($variables['node']->field_seo_code_head[$node->language])) {
+    $variables['seo_code_head'] = $variables['node']->field_seo_code_head[$node->language][0]['value'];
+  }
+  else {
+    $variables['seo_code_head'] = '';
+  }
+
+  if (isset($variables['node']->field_seo_code_body[$node->language])) {
+    $variables['seo_code_body'] = $variables['node']->field_seo_code_body[$node->language][0]['value'];
+  }
+  else {
+    $variables['seo_code_body'] = '';
+  }
 }
-// */
 
 /**
  * Override or insert variables into the page templates.
@@ -100,7 +112,6 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
     }
   }
 }
-// */
 
 /**
  * Override or insert variables into the node templates.
