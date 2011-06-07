@@ -156,7 +156,7 @@ h3.title /* Comment title */ {
   margin: 0;
 }
 
-h1.title, #page-title {
+#page-title {
   font-family: 'BebasNeue';
   font-size: 48px;
   line-height: 40px;
@@ -480,13 +480,22 @@ ul.links li {
  * Content bottom
  */
 .region-content-bottom {
-  background-color: #4A4A4A;
-  color: #C7C2BA;
+  background-color: #F8F6F5;
+  color: #898682; /* average of #C7C2BA and #4A4A4A */
 }
 
 .region-content-bottom .block {
   margin: 0 auto;
   overflow: hidden;
-  padding: 16px 0;
-  width: 740px;
+  padding: 16px 0 16px 220px;
+  width: 520px;
+}
+
+#block-bg-blocks-seo-content h1.title {
+  font-size: 12px;
+  margin: 0 0 6px 0;
+}
+
+#block-bg-blocks-seo-content p {
+  margin: 6px 0 0 0;
 }
