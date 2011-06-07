@@ -41,17 +41,28 @@ class FeedsBVDCSVParser extends FeedsCSVParser {
     foreach($rows as &$row) {
       $row['bvd_file']    = 'barendenvandorp://' . $row['naam videofile'];
       $row['bvd_source']  = 'Barend en Van Dorp';
-
+      
+      list($hours, $minutes, $seconds) = explode(':', $row['lengte video (mm:ss)']);
+      $row['bvd_length']  = $hours * 3600 + $minutes * 60 + $seconds;
+      
+      // Parse tags
       $tags = explode(';', $row['onderwerpen']);
       foreach($tags as &$tag) {
-        $tag = trim($tag);
+        $tag = utf8_encode(trim($tag));
       }
-      $row['bvd_tags'] = $tags;
+      $row['bvd_tags'] = array_filter($tags, 'strlen');
 
-      // @TODO: Encode as UTF8 - see http://drupal.org/node/1140194
+      // Parse people
+      $people = explode(';', $row['sprekers'])
+              + explode(';', $row['uitvoerenden']);
+      foreach($people as $key => &$person) {
+        $person = utf8_encode(trim($person));
+      }
+      $row['bvd_people'] = array_filter($people, 'strlen');
+      
       $row['beschrijving website'] = utf8_encode($row['beschrijving website']);
     }
-
+    
     // Create a result object and return it.
     return new FeedsParserResult($rows, $source->feed_nid);
   }

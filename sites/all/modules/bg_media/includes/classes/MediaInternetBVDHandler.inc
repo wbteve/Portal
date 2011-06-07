@@ -17,7 +17,7 @@ class MediaInternetBVDHandler extends MediaInternetBaseHandler {
   }
 
   public function claim($embedCode) {
-    if (!is_null($this->uri)) {
+    if (!is_null($embedCode)) {
       return TRUE;
     }
   }
