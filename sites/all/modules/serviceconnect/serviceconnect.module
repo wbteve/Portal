@@ -596,7 +596,7 @@ function serviceconnect_increment_counter($name) {
  * @param string $service_name
  * @return array
  */
-function serviceconnect_register_form(&$form_state, $module, $token, $name, $terms_and_conditions = NULL, $service_name = 'serviceconnect') {
+function serviceconnect_register_form($form_state, $module, $token, $name, $terms_and_conditions = NULL, $service_name = 'serviceconnect') {
   $form = array();
 
   $form['#module'] = $module;
@@ -662,14 +662,14 @@ function serviceconnect_register_form_validate($form, &$form_state) {
     form_set_error('email', t('You must fill in a valid e-mail address.'));
   }
 
-  $sql = 'SELECT uid FROM {users} WHERE mail = \'%s\'';
-  $res = db_query($sql, $email);
+  $sql = 'SELECT uid FROM {users} WHERE mail = :mail';
+  $res = db_query($sql, array('mail' => $email));
   if ($res->numRows) {
     form_set_error('email', t('This e-mail address is already in use for another account.'));
   }
 
-  $sql = 'SELECT uid FROM {users} WHERE name = \'%s\'';
-  $res = db_query($sql, $username);
+  $sql = 'SELECT uid FROM {users} WHERE name = :username';
+  $res = db_query($sql, array('username' => $username));
   if ($res->numRows) {
     form_set_error('username', t('This username is already taken.'));
   }

@@ -139,9 +139,9 @@ function serviceconnect_hyves_menu() {
  */
 function serviceconnect_hyves_page_login($link_hyves_to_user = FALSE){
   if (!empty($_GET['sid']) && !empty($_GET['h']) && _serviceconnect_hyves_secret_hash($_GET['sid']) == $_GET['h']){
-    $sql = 'SELECT token FROM {serviceconnect_hyves_auth_session} WHERE sid = %d';
-    $res = db_query($sql, $_GET['sid']);
-    return _serviceconnect_hyves_page_oauth_callback(db_result($res), 2);
+    $sql = 'SELECT token FROM {serviceconnect_hyves_auth_session} WHERE sid = :sid';
+    $res = db_query($sql, array('sid' => $_GET['sid']))->fetchObject();
+    return _serviceconnect_hyves_page_oauth_callback($res->token, 2);
   } elseif (!empty($_GET['oauth_token'])) {
     return _serviceconnect_hyves_page_oauth_callback($_GET['oauth_token']);
   } else {
@@ -153,8 +153,9 @@ function serviceconnect_hyves_page_login($link_hyves_to_user = FALSE){
  * Process OAuth callback.
  */
 function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username = NULL, $email = NULL) {
+
   global $user;
-  
+
   try {
     $sql = 'SELECT s.sid, s.uid, s.link, s.token, s.token_secret, s.created, s.timestamp_difference, s.service_uid, s.expires
     FROM {serviceconnect_hyves_auth_session} s
@@ -169,7 +170,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
     $token_secret = $session->token_secret;
     $service_user_id = $session->service_uid;
     $expire_date = $session->expires;
-    
+
     if ($session->uid != (int) $user->uid) {
       // This is to prevent session fixation attack using to following flow:
       // 1) Alice clicks on login with Hyves, does not nothing on the Hyves page but
@@ -180,7 +181,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
       // see http://oauth.net/advisories/2009-1/ for details
       throw new Exception('Authorisation session was initiated by another user');
     }
-    
+
     try {
       if ($phase == 1) {
         // Request access token (note that $session->tokenis the _authorisation_ token)
@@ -188,27 +189,33 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
         $response = serviceconnect_hyves_call_auth_accesstoken($session->token, $session->token_secret, $session->timestamp_difference);
         extract($response); // Introduces $token, $token_secret, $service_user_id and $expire_date
         $sql = 'UPDATE {serviceconnect_hyves_auth_session}
-        SET token = :token, token_secret = :token_secret, service_uid = service_uid
-        WHERE sid = :session_sid';
-        db_query($sql, array('token' => $token, 'token_secret' => $token_secret, 'service_uid' => $service_user_id, 'session_sid', $session->sid));
+        SET token = :token,
+            token_secret = :token_secret,
+            service_uid = :service_uid
+        WHERE
+            sid = :session_sid';
+        db_query($sql, array('token' => $token,
+                             'token_secret' => $token_secret,
+                             'service_uid' => $service_user_id,
+                             'session_sid' => $session->sid));
         // Delete old sessions with the same token (this happens when the user still has a valid token)
-        $sql = 'DELETE FROM {serviceconnect_hyves_auth_session} WHERE token = \'%s\' AND sid != %d';
-        db_query($sql, $token, $session->sid);
+        $sql = 'DELETE FROM {serviceconnect_hyves_auth_session} WHERE token = :token AND sid != :sid';
+        db_query($sql, array('token' => $token, 'sid' => $session->sid));
       }
-      
+
       // Request user profile information
       module_load_include('inc', 'serviceconnect_hyves', 'calls/users.get');
       $profile = serviceconnect_hyves_call_users_get($service_user_id, $token, $token_secret);
     } catch (Exception $e){
-      drupal_set_message(t('Login with Hyves failed. You probably rejected permission.'), 'error');
+      drupal_set_message(t('Login with Hyves failed. You probably rejected permission.' . $e->getMessage()), 'error');
       watchdog('ServiceConnect', $e->getMessage().' (probably rejected permission)', array(), WATCHDOG_ALERT);
       drupal_goto('');
       return '';
     }
-    
+
     $first_use = FALSE;
     $scprofile = serviceconnect_get_uid_by_service_uid(SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id);
-    
+
     // Generate username / email form (only when not linking profile to current user).
     if (!$session->link || !user_is_logged_in()) {
       // Not a registered user yet (or unlinked)
@@ -283,19 +290,19 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
     }
     $sql = 'SELECT suh.profilepicture_mediaid, suh.friendscount
     FROM {serviceconnect_user_hyves} suh
-    WHERE suh.scpid = %d';
-    $res = db_query($sql, $scpid);
-    if ($rec = db_fetch_array($res)) {
-      $old_profilepicture_mediaid = $rec['profilepicture_mediaid'];
-      $old_friendscount = $rec['friendscount'];
+    WHERE suh.scpid = :scpid';
+    $res = db_query($sql, array('scpid' => $scpid))->fetchObject();
+    if ($res) {
+      $old_profilepicture_mediaid = $res->profilepicture_mediaid;
+      $old_friendscount = $res->friendscount;
       $sql = 'UPDATE {serviceconnect_user_hyves} SET
-      token = \'%s\',
-      token_secret = \'%s\',
-      profilepicture_mediaid = \'%s\',
-      friendscount = %d,
-      accepted_terms = CASE accepted_terms WHEN 1 THEN 1 ELSE %d END
-      WHERE scpid = %d';
-      db_query($sql, $token, $token_secret, $profile['profilepicture_mediaid'], $profile['friendscount'], $phase == 1 ? 0 : 1, $scpid);
+      token = :token,
+      token_secret = :token_secret,
+      profilepicture_mediaid = :pmid,
+      friendscount = :friendcount,
+      accepted_terms = CASE accepted_terms WHEN 1 THEN 1 ELSE :phase END
+      WHERE scpid = :scpid';
+      db_query($sql, array('token' => $token, 'token_secret' => $token_secret, 'pmid' => $profile['profilepicture_mediaid'], 'friendcount' => $profile['friendscount'], 'phase' => $phase == 1 ? 0 : 1, 'scpid' => $scpid));
     } else {
       $old_profilepicture_mediaid = '';
       $old_friendscount = 0;
@@ -535,8 +542,8 @@ function serviceconnect_hyves_get_active_token() {
   }
   $sql = 'SELECT suh.token, suh.token_secret
   FROM {serviceconnect_user_hyves} suh
-  WHERE suh.scpid = %d';
-  $res = db_query($sql, $scpid);
+  WHERE suh.scpid = :scpid';
+  $res = db_query($sql, array($scpid));
   return db_fetch_array($res);
 }
 
@@ -572,8 +579,8 @@ function serviceconnect_hyves_page_decline() {
     $scpid = $_GET['scpid'];
     if ($_GET['h'] == _serviceconnect_hyves_secret_hash($scpid)) {
       serviceconnect_clear_user_data($scpid);
-      $sql = 'DELETE FROM {serviceconnect_user_hyves} WHERE scpid = %d';
-      db_query($sql, $scpid);
+      $sql = 'DELETE FROM {serviceconnect_user_hyves} WHERE scpid = :scpid';
+      db_query($sql, array('scpid' => $scpid));
     }
   }
   drupal_goto('user');
