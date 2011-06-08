@@ -73,6 +73,21 @@ function bg_feeds_bvd_feature_feeds_importer_default() {
             'target' => 'field_media_tags',
             'unique' => FALSE,
           ),
+          7 => array(
+            'source' => 'afleveringsnummer',
+            'target' => 'field_media_episode',
+            'unique' => FALSE,
+          ),
+          8 => array(
+            'source' => 'bvd_people',
+            'target' => 'field_media_people',
+            'unique' => FALSE,
+          ),
+          9 => array(
+            'source' => 'bvd_length',
+            'target' => 'field_media_length',
+            'unique' => FALSE,
+          ),
         ),
         'update_existing' => '0',
         'input_format' => 'plain_text',

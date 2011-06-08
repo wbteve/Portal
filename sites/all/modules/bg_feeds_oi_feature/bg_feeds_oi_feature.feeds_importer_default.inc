@@ -88,6 +88,16 @@ function bg_feeds_oi_feature_feeds_importer_default() {
             'target' => 'field_media_license',
             'unique' => FALSE,
           ),
+          10 => array(
+            'source' => 'extent',
+            'target' => 'field_media_length',
+            'unique' => FALSE,
+          ),
+          11 => array(
+            'source' => 'contributor',
+            'target' => 'field_media_people',
+            'unique' => FALSE,
+          ),
         ),
         'update_existing' => '2',
         'input_format' => 'plain_text',
