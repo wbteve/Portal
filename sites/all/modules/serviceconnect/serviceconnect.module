@@ -596,9 +596,7 @@ function serviceconnect_increment_counter($name) {
  * @param string $service_name
  * @return array
  */
-function serviceconnect_register_form($form_state, $module, $token, $name, $terms_and_conditions = NULL, $service_name = 'serviceconnect') {
-  $form = array();
-
+function serviceconnect_register_form($form, $form_state, $module, $token, $name, $terms_and_conditions = NULL, $service_name = 'serviceconnect') {
   $form['#module'] = $module;
   $form['#oauth_token'] = $token;
   $form['#name'] = $name;
