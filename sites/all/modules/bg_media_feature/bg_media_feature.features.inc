@@ -24,7 +24,7 @@ function bg_media_feature_node_info() {
       'base' => 'node_content',
       'description' => t('Imported media from various sources'),
       'has_title' => '1',
-      'title_label' => t('Title'),
+      'title_label' => t('Titel'),
       'help' => '',
     ),
   );

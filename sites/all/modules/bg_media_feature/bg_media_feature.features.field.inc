@@ -55,6 +55,20 @@ function bg_media_feature_field_default_fields() {
           'type' => 'date_default',
           'weight' => '2',
         ),
+        'full' => array(
+          'label' => 'inline',
+          'module' => 'date',
+          'settings' => array(
+            'format_type' => 'long',
+            'fromto' => 'both',
+            'multiple_from' => '',
+            'multiple_number' => '',
+            'multiple_to' => '',
+            'show_repeat_rule' => 'show',
+          ),
+          'type' => 'date_default',
+          'weight' => '0',
+        ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
@@ -133,6 +147,13 @@ function bg_media_feature_field_default_fields() {
           'type' => 'text_default',
           'weight' => '5',
         ),
+        'full' => array(
+          'label' => 'hidden',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => '0',
+        ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
@@ -202,6 +223,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'text_default',
           'weight' => 8,
         ),
+        'full' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '6',
+        ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
@@ -257,6 +284,13 @@ function bg_media_feature_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'above',
+          'module' => 'bg_media',
+          'settings' => array(),
+          'type' => 'bg_media',
+          'weight' => '0',
+        ),
+        'full' => array(
+          'label' => 'hidden',
           'module' => 'bg_media',
           'settings' => array(),
           'type' => 'bg_media',
@@ -339,6 +373,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'number_integer',
           'weight' => 7,
         ),
+        'full' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '5',
+        ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
@@ -408,6 +448,13 @@ function bg_media_feature_field_default_fields() {
           'settings' => array(),
           'type' => 'text_default',
           'weight' => '6',
+        ),
+        'full' => array(
+          'label' => 'inline',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => '3',
         ),
         'teaser' => array(
           'label' => 'above',
@@ -483,6 +530,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'taxonomy_term_reference_link',
           'weight' => 9,
         ),
+        'full' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '4',
+        ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
@@ -557,6 +610,13 @@ function bg_media_feature_field_default_fields() {
           'type' => 'taxonomy_term_reference_link',
           'weight' => '1',
         ),
+        'full' => array(
+          'label' => 'inline',
+          'module' => 'taxonomy',
+          'settings' => array(),
+          'type' => 'taxonomy_term_reference_link',
+          'weight' => '1',
+        ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
@@ -622,6 +682,13 @@ function bg_media_feature_field_default_fields() {
           'settings' => array(),
           'type' => 'default',
           'weight' => '3',
+        ),
+        'full' => array(
+          'label' => 'inline',
+          'module' => 'link',
+          'settings' => array(),
+          'type' => 'default',
+          'weight' => '2',
         ),
         'teaser' => array(
           'label' => 'above',
@@ -705,6 +772,13 @@ function bg_media_feature_field_default_fields() {
           'settings' => array(),
           'type' => 'taxonomy_term_reference_link',
           'weight' => '4',
+        ),
+        'full' => array(
+          'label' => 'hidden',
+          'module' => 'taxonomy',
+          'settings' => array(),
+          'type' => 'taxonomy_term_reference_link',
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
