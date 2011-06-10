@@ -98,7 +98,8 @@ div#site-name /* The name of the website */ {
 
 body.front #main-wrapper ,
 body.page-search #main-wrapper,
-body.node-type-media #main-wrapper {
+body.node-type-media #main-wrapper,
+body.node-type-dossier #main-wrapper {
   background-color: #4A4A4A;
   color: #fff;
 }
