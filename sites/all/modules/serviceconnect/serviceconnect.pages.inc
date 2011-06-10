@@ -21,7 +21,7 @@ function serviceconnect_manage_linked_services_page($account) {
   $rows = array();
   $sql = 'SELECT scpid, service, service_profile_url, displayname, created, expires, last_login, login_attempts
   FROM {serviceconnect_user}
-  WHERE uid = :uid 
+  WHERE uid = :uid
   ORDER BY last_login DESC';
   $res = db_query($sql, array(':uid' => $account->uid));
   foreach($res as $rec) {
@@ -41,7 +41,7 @@ function serviceconnect_manage_linked_services_page($account) {
   }
   else {
     $output .= '<p>' . t('On this page you can manage the external services linked to your account.') . '</p>';
-    $output .= theme('table', $header, $rows);
+    $output .= theme('table', array('header' => $header, 'rows' => $rows));
   }
 
   $output .= '</div>';
