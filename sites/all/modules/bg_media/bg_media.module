@@ -1,5 +1,7 @@
 <?php
 define('BG_MEDIA_THEME_FUNCTION_PREFIX', 'bg_media');
+define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
+define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
 
 /**
  *  Implements hook_theme().
@@ -7,6 +9,16 @@ define('BG_MEDIA_THEME_FUNCTION_PREFIX', 'bg_media');
 function bg_media_theme($existing, $type, $theme, $path) {
   return array(
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_video' => array(
+      'variables' => array('file' => NULL),
+      'file' => 'bg_media.theme.inc',
+      'path' => $path . '/includes/themes',
+    ),
+    BG_MEDIA_THEME_FUNCTION_PREFIX . '_image' => array(
+      'variables' => array('file' => NULL),
+      'file' => 'bg_media.theme.inc',
+      'path' => $path . '/includes/themes',
+    ),
+    BG_MEDIA_THEME_FUNCTION_PREFIX . '_audio' => array(
       'variables' => array('file' => NULL),
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
@@ -55,11 +67,16 @@ function bg_media_stream_wrappers() {
  */
 function bg_media_field_formatter_info() {
   return array(
-    'bg_media' => array(
-      'label' => t('Beeld en Geluid: Media'),
+    BG_MEDIA_DISPLAY_TYPE_MEDIA => array(
+      'label'       => t('Beeld en Geluid: Media'),
       'field types' => array('file', 'media'),
       'description' => t('Display a Beeld en Geluid media.'),
-    )
+    ),
+    BG_MEDIA_DISPLAY_TYPE_THUMBNAIL => array(
+      'label'       => t('Beeld en Geluid: Media thumbnail'),
+      'field types' => array('file', 'media'),
+      'description' => t('Display a Beeld en Geluid media thumbnail.'),
+    ),
   );
 }
 
@@ -71,7 +88,7 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
 
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
   switch ($display['type']) {
-    case 'bg_media':
+    case BG_MEDIA_DISPLAY_TYPE_MEDIA:
       $theme_registry = array_keys(theme_get_registry());
 
       foreach($items as $item) {
@@ -86,64 +103,19 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
         }
       }
       break;
+
+    case BG_MEDIA_DISPLAY_TYPE_THUMBNAIL:
+      foreach($items as $item) {
+        $wrapper = file_stream_wrapper_get_instance_by_uri($item['uri']);
+        if($wrapper instanceof StreamWrapperInterface) {
+          $element[] = array(
+            '#theme' => 'image',
+            '#path' => $wrapper->getLocalThumbnailPath(),
+          );
+        }
+      }
+      break;
   }
-
-  return $element;
-}
-
-/**
- * Notice: File formatters are not used, but are a remenant of the previous branch 
- * which could be used in the future
- */
-
-/**
- * Implements hook_file_formatter_info().
- */
-function bg_media_file_formatter_info() {
-  $formatters['bg_media_video'] = array(
-    'label' => t('Beeld & Geluid video'),
-    'view callback' => 'bg_media_file_formatter_bg_media_video_view',
-    'settings callback' => 'bg_media_file_formatter_bg_media_video_settings',
-  );
-  $formatters['bg_media_image'] = array(
-    'label' => t('Beeld en geluid image'),
-    'view callback' => 'bg_media_file_formatter_bg_media_image_view',
-  );
-  
-  return $formatters;
-}
-
-/**
- * Implements hook_file_formatter_FORMATTER_view().
- */
-function bg_media_file_formatter_bg_media_video_view($file, $display, $langcode) {
-  $scheme = file_uri_scheme($file->uri);
-  
-  $formatter = "bg_media_{$scheme}_video_formatter";
-  
-  if(function_exists($formatter)) {
-    return $formatter($file);
-  }
-}
-
-function bg_media_openimages_video_formatter($file) {
-  // WYSIWYG does not yet support video inside a running editor instance.
-  $element = array(
-    '#theme' => 'bg_media_video',
-    '#file' => $file,
-  );
-  return $element;
-}
-
-/**
- * Implements hook_file_formatter_FORMATTER_view().
- */
-function bg_media_file_formatter_bg_media_image_view($file, $display, $langcode) {
-  $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
-  $element = array(
-    '#theme' => 'image',
-    '#path' => $wrapper->getLocalThumbnailPath(),
-  );
 
   return $element;
 }
