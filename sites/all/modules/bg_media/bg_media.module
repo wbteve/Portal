@@ -139,14 +139,11 @@ function bg_media_openimages_video_formatter($file) {
  * Implements hook_file_formatter_FORMATTER_view().
  */
 function bg_media_file_formatter_bg_media_image_view($file, $display, $langcode) {
-  $scheme = file_uri_scheme($file->uri);
-  if ($scheme == 'openimages') {
-    $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
-    $element = array(
-      '#theme' => 'image',
-      '#path' => $wrapper->getLocalThumbnailPath(),
-    );
+  $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
+  $element = array(
+    '#theme' => 'image',
+    '#path' => $wrapper->getLocalThumbnailPath(),
+  );
 
-    return $element;
-  }
+  return $element;
 }

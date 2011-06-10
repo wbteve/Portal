@@ -80,32 +80,7 @@ function feeds_oai_oi_ajax_callback($form, $form_state) {
   return $form['feeds']['FeedsOAIOIHTTPFetcher']['set'];
 }
 
-/**
- * Implementation of hook_file_insert
- * @param stdClass $file
- */
-function bg_feeds_file_insert($file) {
-  // File produced by source.
-  feeds_item_info_insert($file, $file->fid);
-}
-
-/**
- * Implementation of hook_file_update
- * @param stdClass $file
- */
-function bg_feeds_file_update($file) {
-  // File produced by source.
-  feeds_item_info_save($file, $file->fid);
-}
-
-/**
- * Implementation of hook_file_delete
- * @param stdClass $file
- */
-function bg_feeds_file_delete($file) {
-  // File produced by source.
-  db_delete('feeds_item')
-    ->condition('entity_type', 'file')
-    ->condition('entity_id', $file->fid)
-    ->execute();
+function bg_feeds_hms_to_seconds($time) {
+  list($hours, $minutes, $seconds) = explode(':', $time);
+  return $hours * 3600 + $minutes * 60 + $seconds;
 }

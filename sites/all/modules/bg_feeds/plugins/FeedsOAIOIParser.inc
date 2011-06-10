@@ -52,7 +52,10 @@ class FeedsOAIOIParser extends FeedsOAIParser {
           }
 
           $item['importSource'] = 'Open Images';
-
+          
+          $interval = new DateInterval($item['extent']);
+          $item['extent'] = bg_feeds_hms_to_seconds($interval->format('%H:%I:%S'));
+          
           $item['computedSource'] = "openimages://{$item['guid']}/{$item['type']}";
 
           // Set identifier to GUID because of missing identifiers in some records
