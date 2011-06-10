@@ -115,9 +115,9 @@ function serviceconnect_twitter_menu() {
 
 function serviceconnect_twitter_page_login($link_twitter_to_user = FALSE) {
   if (!empty($_GET['sid']) && !empty($_GET['h']) && _serviceconnect_twitter_secret_hash($_GET['sid']) == $_GET['h']){
-    $sql = 'SELECT token FROM {serviceconnect_twitter_auth_session} WHERE sid = %d';
-    $res = db_query($sql, $_GET['sid']);
-    return _serviceconnect_twitter_page_oauth_callback(db_result($res), 2);
+    $sql = 'SELECT token FROM {serviceconnect_twitter_auth_session} WHERE sid = :sid';
+    $res = db_query($sql, array('sid' => $_GET['sid']));
+    return _serviceconnect_twitter_page_oauth_callback($res->fetchObject()->token, 2);
   } elseif (!empty($_GET['oauth_token'])) {
     return _serviceconnect_twitter_page_oauth_callback($_GET['oauth_token']);
   } else {
@@ -131,9 +131,9 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
   try {
     $sql = 'SELECT s.sid, s.uid, s.link, s.token, s.token_secret, s.created, s.service_uid
     FROM {serviceconnect_twitter_auth_session} s
-    WHERE s.token = \'%s\'';
-    $res = db_query($sql, $token);
-    if (!$session = db_fetch_object($res)) {
+    WHERE s.token = :token';
+    $res = db_query($sql, array('token' => $token));
+    if (!$session = $res->fetchObject()) {
       throw new Exception('Session id not found');
     }
     $token_secret = $session->token_secret;
@@ -157,14 +157,14 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
         $response = serviceconnect_twitter_call_oauth_access_token($session->token, $session->token_secret);
         extract($response); // Introduces $token, $token_secret and $service_user_id
         $sql = 'UPDATE {serviceconnect_twitter_auth_session}
-        SET token = \'%s\', token_secret = \'%s\', service_uid = \'%s\'
-        WHERE sid = %d';
-        db_query($sql, $token, $token_secret, $service_user_id, $session->sid);
+        SET token = :token, token_secret = :token_secret, service_uid = :service_uid 
+        WHERE sid = :sid';
+        db_query($sql, array('token' => $token, 'token_secret' => $token_secret, 'service_uid' => $service_user_id, 'sid' => $session->sid));
         // Delete old sessions with the same token (this happens when the user still has a valid token)
-        $sql = 'DELETE FROM {serviceconnect_twitter_auth_session} WHERE token = \'%s\' AND sid != %d';
-        db_query($sql, $token, $session->sid);
+        $sql = 'DELETE FROM {serviceconnect_twitter_auth_session} WHERE token = :token AND sid != :sid';
+        db_query($sql, array('token' => $token, 'sid' => $session->sid));
       }
-      
+
       // Request user profile information
       module_load_include('inc', 'serviceconnect_twitter', 'calls/users.show');
       $profile = serviceconnect_twitter_call_users_show($service_user_id, $token, $token_secret);
@@ -175,7 +175,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
       drupal_goto('');
       return '';
     }
-    
+
     $first_use = FALSE;
     $scprofile = serviceconnect_get_uid_by_service_uid(SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id);
     
@@ -184,7 +184,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
       // Not a registered user yet (or unlinked)
       if (!$scprofile && $phase == 1) {
         $h = _serviceconnect_twitter_secret_hash($session->sid);
-        drupal_goto($_GET['q'], "sid={$session->sid}&h=$h");
+        drupal_goto($_GET['q'], array('query' => array('sid' => $session->sid, 'h' => $h)));
         return '';
       }
       elseif (!$scprofile && $phase == 2) {
@@ -256,19 +256,19 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
     // Save record in serviceconnect_user_twitter
     $sql = 'SELECT sut.profile_image_url, sut.friendscount
     FROM {serviceconnect_user_twitter} sut
-    WHERE sut.scpid = %d';
-    $res = db_query($sql, $scpid);
-    if ($rec = db_fetch_array($res)) {
-      $old_profile_image_url = $rec['profile_image_url'];
-      $old_friendscount = $rec['friendscount'];
+    WHERE sut.scpid = :scpid';
+    $res = db_query($sql, array('scpid' => $scpid));
+    if ($rec = $res->fetchObject()) {
+      $old_profile_image_url = $rec->profile_image_url;
+      $old_friendscount = $rec->friendscount;
       $sql = 'UPDATE {serviceconnect_user_twitter} SET
-      token = \'%s\',
-      token_secret = \'%s\',
-      name = \'%s\',
-      profile_image_url = \'%s\',
-      friendscount = %d
-      WHERE scpid = %d';
-      db_query($sql, $token, $token_secret, $profile['name'], $profile['profile_image_url'], $profile['friendscount'], $scpid);
+      token = :token,
+      token_secret = :token_secret,
+      name = :name,
+      profile_image_url = :piu,
+      friendscount = :friendscount
+      WHERE scpid = :scpid';
+      db_query($sql, array('token' => $token, 'token_secret' => $token_secret, 'name' => $profile['name'], 'piu' => $profile['profile_image_url'], 'friendscount' => $profile['friendscount'], 'scpid' => $scpid));
     } else {
       $old_profile_image_url = '';
       $old_friendscount = 0;
@@ -283,6 +283,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
       drupal_write_record('serviceconnect_user_twitter', $sut);
     }
   } catch (Exception $e){
+    dsm($e->getMessage());
     global $_serviceconnect_twitter_last_response;
     if ($_serviceconnect_twitter_last_response->code == 502) {
       drupal_set_message(t('Unable to login with Twitter. Twitter seems to be over capacity at the moment.'), 'error');
@@ -365,9 +366,8 @@ function _serviceconnect_twitter_page_new($link_twitter_to_user = FALSE){
     }
     
     // Redirect to the Twitter authorisation page
-    $query = 'oauth_token='.urlencode($session->token);
     $url = variable_get(SERVICECONNECT_TWITTER_VAR_USER_AUTHORIZATION_URL, SERVICECONNECT_TWITTER_VAR_USER_AUTHORIZATION_URL_DEFAULT);
-    drupal_goto($url, $query);
+    drupal_goto($url, array('query' => array('oauth_token' => $session->token)));
   } catch (Exception $e){
     drupal_set_message(t('Unable to login with Twitter'), 'error');
     watchdog('ServiceConnect', $e->getMessage(), array(), WATCHDOG_ALERT);
@@ -404,14 +404,14 @@ function _serviceconnect_twitter_values_from_xml($document){
 
 function _serviceconnect_twitter_request($params, $url, $method = 'POST', $token = '', $token_secret = '') {
   module_load_include('php', 'serviceconnect', 'oauth.lib');
-  
+
   // We use this for the test connection page
   global $_serviceconnect_twitter_last_response;
   $_serviceconnect_twitter_last_response = NULL;
-  
+
   $key = variable_get(SERVICECONNECT_TWITTER_VAR_CONSUMER_KEY, '');
   $secret = variable_get(SERVICECONNECT_TWITTER_VAR_CONSUMER_SECRET, '');
-  
+
   try {
     $consumer = new OAuthConsumer($key, $secret);
     $token = new OAuthToken($token, $token_secret);
@@ -427,21 +427,21 @@ function _serviceconnect_twitter_request($params, $url, $method = 'POST', $token
     $params['oauth_signature_method'] = 'HMAC-SHA1';
     $params['oauth_version'] = '1.0';
     $request = OAuthRequest::from_consumer_and_token($consumer, $token, $method, $url, $params);
-    
+
     $signature_method = new OAuthSignatureMethod_HMAC_SHA1();
     $request->sign_request($signature_method, $consumer, $token);
-    
+
     $headers = array();
     $header = explode('Authorization: ', $request->to_header(), 2);
     $headers['Authorization'] = $header[1];
     //$headers['Content-Type'] = 'application/x-www-form-urlencoded';
     //$query = $request->to_postdata();
-    $response = drupal_http_request($url, $headers, $method);
+    $response = drupal_http_request($url, array('headers' => $headers, 'method' => $method));
     $_serviceconnect_twitter_last_response = $response;
     if ($response->code != 200){
       return FALSE;
     }
-    
+
     return $response->data;
   } catch (OAuthException $e){
     // Display the detailed error only for users with administer serviceconnect permission
