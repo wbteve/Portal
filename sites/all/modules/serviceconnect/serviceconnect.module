@@ -153,7 +153,7 @@ function serviceconnect_login_with_new_user($service, $service_uid, $username, $
   _drupal_session_write('serviceconnect', 'keep-session');
 
   serviceconnect_increment_counter('new ' . $service . ' user');
-  
+
   $userinfo = array(
     'name' => $username,
     'pass' => user_password(),
@@ -163,11 +163,14 @@ function serviceconnect_login_with_new_user($service, $service_uid, $username, $
      // "authname_$module" => $name,
     'access' => REQUEST_TIME 
   );
+
   $account = user_save('', $userinfo);
+
   // Terminate if an error occured during user_save().
   if (!$account) {
     throw new Exception('Unable to create new account');
   }
+
   return $account->uid;
 }
 
@@ -181,7 +184,7 @@ function serviceconnect_login_with_new_user($service, $service_uid, $username, $
  */
 function serviceconnect_login_with_existing_user($scpid, $uid, $expires) {
   global $user;
-  
+
   // Make sure there is a session, login will fail otherwise (required for Pressflow).
   drupal_session_regenerate();
 
@@ -189,7 +192,7 @@ function serviceconnect_login_with_existing_user($scpid, $uid, $expires) {
   _drupal_session_write('serviceconnect', 'keep-session');
 
   serviceconnect_increment_counter('login with existing user');
-  
+
   // Update service profile statistics
   $sql = 'UPDATE {serviceconnect_user} SET
   login_attempts = login_attempts + 1,
@@ -198,7 +201,7 @@ function serviceconnect_login_with_existing_user($scpid, $uid, $expires) {
   expires = :expires 
   WHERE scpid = :scpid';
   db_query($sql, array('request_time' => REQUEST_TIME, 'expires' => $expires, 'scpid' => $scpid));
-  
+
   $existing_user = user_load(array('uid' => $uid));
   if (isset($existing_user->uid)) {
     $user = $existing_user;
@@ -220,11 +223,11 @@ function serviceconnect_login_with_existing_user($scpid, $uid, $expires) {
  * @param int $expires
  * @return int
  */
-function serviceconnect_link_service($service, $service_uid, $service_profile_url, $displayname, $expires = NULL) {
+function serviceconnect_link_service($uid, $service, $service_uid, $service_profile_url, $displayname, $expires = NULL) {
   global $user;
   serviceconnect_increment_counter('linking user to ' . $service);
   $_serviceconnect_user = new stdClass();
-  $_serviceconnect_user->uid = $user->uid;
+  $_serviceconnect_user->uid = $uid;
   $_serviceconnect_user->service = $service;
   $_serviceconnect_user->service_uid = $service_uid;
   $_serviceconnect_user->service_profile_url = $service_profile_url;
@@ -291,6 +294,7 @@ function serviceconnect_download_profilepicture($url, $account = NULL) {
  * @return string
  */
 function serviceconnect_first_use($service) {
+  // XXX
   global $user;
   if (variable_get(SERVICECONNECT_VAR_REDIRECT_AFTER_FIRST_USE, SERVICECONNECT_VAR_REDIRECT_AFTER_FIRST_USE_DEFAULT)) {
     return 'user/' . $user->uid . '/edit';

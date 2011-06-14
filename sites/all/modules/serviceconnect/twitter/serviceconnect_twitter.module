@@ -127,7 +127,7 @@ function serviceconnect_twitter_page_login($link_twitter_to_user = FALSE) {
 
 function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $username = NULL, $email = NULL) {
   global $user;
-  
+
   try {
     $sql = 'SELECT s.sid, s.uid, s.link, s.token, s.token_secret, s.created, s.service_uid
     FROM {serviceconnect_twitter_auth_session} s
@@ -138,7 +138,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
     }
     $token_secret = $session->token_secret;
     $service_user_id = $session->service_uid;
-    
+
     if ($session->uid != (int) $user->uid) {
       // This is to prevent session fixation attack using to following flow:
       // 1) Alice clicks on login with Twitter, does not nothing on the Twitter page but
@@ -149,7 +149,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
       // see http://oauth.net/advisories/2009-1/ for details
       throw new Exception('Authorisation session was initiated by another user');
     }
-    
+
     try {
       if ($phase == 1) {
         // Request access token (note that $session->token is the _authorisation_ token)
@@ -178,7 +178,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
 
     $first_use = FALSE;
     $scprofile = serviceconnect_get_uid_by_service_uid(SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id);
-    
+
     // Generate username / email form (only when not linking profile to current user).
     if (!$session->link || !user_is_logged_in()) {
       // Not a registered user yet (or unlinked)

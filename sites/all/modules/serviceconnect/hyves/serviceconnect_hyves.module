@@ -84,26 +84,26 @@ function serviceconnect_hyves_form_alter(&$form, &$form_state, $form_id) {
  */
 function serviceconnect_hyves_menu() {
   $menu = array();
-  
+
   $menu[SERVICECONNECT_HYVES_PATH_LOGIN] = array(
     'page callback' => 'serviceconnect_hyves_page_login',
     'access arguments' => array(SERVICECONNECT_HYVES_PERM_LOGIN),
     'type' => MENU_CALLBACK,
   );
-  
+
   $menu[SERVICECONNECT_HYVES_PATH_LINK] = array(
     'page callback' => 'serviceconnect_hyves_page_login',
     'page arguments' => array(TRUE),
     'access arguments' => array(SERVICECONNECT_HYVES_PERM_LINK),
     'type' => MENU_CALLBACK,
   );
-  
+
   $menu[SERVICECONNECT_HYVES_PATH_DECLINE] = array(
     'page callback' => 'serviceconnect_hyves_page_decline',
     'access arguments' => array(SERVICECONNECT_HYVES_PERM_LOGIN),
     'type' => MENU_CALLBACK
   );
-  
+
   $menu[SERVICECONNECT_HYVES_PATH_ADMIN] = array(
     'title' => 'Hyves',
     'page callback' => 'drupal_get_form',
@@ -112,7 +112,7 @@ function serviceconnect_hyves_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'serviceconnect_hyves.admin.inc',
   );
-  
+
   $menu[SERVICECONNECT_HYVES_PATH_ADMIN_SETTINGS] = array(
     'title' => 'Settings',
     'page callback' => 'drupal_get_form',
@@ -121,7 +121,7 @@ function serviceconnect_hyves_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'serviceconnect_hyves.admin.inc',
   );
-  
+
   $menu[SERVICECONNECT_HYVES_PATH_ADMIN_TEST] = array(
     'title' => 'Test connection',
     'page callback' => 'drupal_get_form',
@@ -130,7 +130,7 @@ function serviceconnect_hyves_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'serviceconnect_hyves.admin.inc',
   );
-  
+
   return $menu;
 }
 
@@ -216,7 +216,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
     $first_use = FALSE;
     $scprofile = serviceconnect_get_uid_by_service_uid(SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id);
 
-    // Generate username / email form (only when not linking profile to current user).
+    // Generate username / email form
     if (!$session->link || !user_is_logged_in()) {
       // Not a registered user yet (or unlinked)
       if (!$scprofile && $phase == 1) {
@@ -225,6 +225,11 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
         return '';
       }
       elseif (!$scprofile && $phase == 2) {
+        $username = $profile['displayname'] . "-" . substr(md5($profile['displayname'] . time()), 0, 5);
+        $email = "{$username}@nvt.nl";
+        _serviceconnect_hyves_page_oauth_callback($token, 3, $username, $email);
+        return '';
+        /*
         return drupal_get_form(
           'serviceconnect_register_form',
           'serviceconnect_hyves',
@@ -233,6 +238,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
           variable_get(SERVICECONNECT_HYVES_VAR_TERMS, ''),
           SERVICECONNECT_HYVES_SERVICE_NAME
         );
+        */
       }
     }
 
@@ -254,8 +260,8 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
           }
         } else {
           // This is the usual migration, no Hyves account is linked to the Drupal account yet
-          $scpid = serviceconnect_link_service(SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id,
-            $profile['service_profile_url'], $profile['displayname'], $expire_date);
+          $scpid = serviceconnect_link_service($user->uid, SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id,
+          $profile['service_profile_url'], $profile['displayname'], $expire_date);
           drupal_set_message(t('Your Hyves profile is now linked to your account'));
           $first_use = TRUE;
         }
@@ -266,8 +272,8 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
         } else {
           // We are already logged in, but want to login with another account via Hyves
           $uid = serviceconnect_login_with_new_user(SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id, $username, $email);
-          $scpid = serviceconnect_link_service(SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id,
-            $profile['service_profile_url'], $profile['displayname'], $expire_date);
+          $scpid = serviceconnect_link_service($uid, SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id,
+          $profile['service_profile_url'], $profile['displayname'], $expire_date);
           drupal_set_message(t('Succesfully logged in with Hyves'));
           $first_use = TRUE;
         }
@@ -277,14 +283,17 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
         serviceconnect_login_with_existing_user($scprofile->scpid, $scprofile->uid, $expire_date);
         drupal_set_message(t('Succesfully logged in with Hyves'));
       } else {
+        $username = $profile['displayname'] . "-" . substr(md5($profile['displayname'] . time()), 0, 5);
+        $email = "{$username}@nvt.nl";
+
         $uid = serviceconnect_login_with_new_user(SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id, $username, $email);
-        $scpid = serviceconnect_link_service(SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id,
+        $scpid = serviceconnect_link_service($uid, SERVICECONNECT_HYVES_SERVICE_NAME, $service_user_id,
           $profile['service_profile_url'], $profile['displayname'], $expire_date);
         drupal_set_message(t('Succesfully logged in with Hyves'));
         $first_use = TRUE;
       }
     }
-    
+
     if (empty($scpid)) {
       $scpid = $scprofile->scpid;
     }
@@ -306,7 +315,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
     } else {
       $old_profilepicture_mediaid = '';
       $old_friendscount = 0;
-      
+
       $suh = new stdClass();
       $suh->scpid = $scpid;
       $suh->token = $token;
@@ -321,12 +330,13 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
       drupal_write_record('serviceconnect_user_hyves', $suh);
     }
   } catch (Exception $e){
+    dsm($e->getMessage());
     drupal_set_message(t('Unable to login with Hyves'), 'error');
     watchdog('ServiceConnect', $e->getMessage(), array(), WATCHDOG_ALERT);
     drupal_goto('');
     return '';
   }
-  
+
   // We are now logged in, import profile information from Hyves
   try {
     // Import information into profile fields
@@ -338,7 +348,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
       SERVICECONNECT_HYVES_VAR_CITYNAME_PROFILE_FIELD => $profile['cityname'],
       SERVICECONNECT_HYVES_VAR_LINK_PROFILE_FIELD => $profile['service_profile_url'],
     );
-    
+
     switch ($profile['gender']) {
       case 'male':
         $gender = variable_get(SERVICECONNECT_HYVES_VAR_GENDER_PROFILE_FIELD_MALE, 'male');
@@ -351,7 +361,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
         break;
     }
     $profile_fields[SERVICECONNECT_HYVES_VAR_GENDER_PROFILE_FIELD] = $gender;
-    
+
     $birthday = explode('-', $profile['birthday']);
     $birthday = array(
       'day' => (int) $birthday[2],
@@ -375,7 +385,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
       }
     }
     serviceconnect_save_profile($fields);
-    
+
     // Invoke hook_serviceconnect_hyves_update_profile
     module_invoke_all(
       'serviceconnect_hyves_update_profile',
@@ -385,14 +395,14 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
       $birthday,
       $profile['cityname']
     );
-    
+
     // Import new friends (if any and enabled)
     if ($old_friendscount != $profile['friendscount'] && $rtid = variable_get(SERVICECONNECT_HYVES_VAR_FRIENDS_RELATIONSHIP_TYPE, '')) {
       module_load_include('inc', 'serviceconnect_hyves', 'calls/friends.get');
       $friends = serviceconnect_hyves_call_friends_get($token, $token_secret);
       $imported = serviceconnect_import_user_relationships(SERVICECONNECT_HYVES_SERVICE_NAME, $friends, $rtid);
     }
-    
+
     $redirect = '';
     if ($first_use && !$session->link){
       $redirect = serviceconnect_first_use(t(SERVICECONNECT_HYVES_SERVICE_NAME));

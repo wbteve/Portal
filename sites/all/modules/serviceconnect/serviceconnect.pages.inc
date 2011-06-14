@@ -52,26 +52,25 @@ function serviceconnect_manage_linked_services_page($account) {
 /**
  * Unlink service form.
  */
-function serviceconnect_unlink_service_form($form_state, $account, $scpid) {
-  $form = array();
+function serviceconnect_unlink_service_form($form_state, &$form, $account, $scpid) {
   $form['#uid'] = $account->uid;
   $form['#scpid'] = $scpid;
-  
+
   $form['info'] = array(
     '#value' => '<p>' . t('Are you sure you want to unlink the external service profile from this user?') . '</p>',
   );
-  
+
   if (isset($account->internal_name) && preg_match('/^.+\\.[0-9a-f]{32,40}$/', $account->internal_name)) {
     // This account is created with an external service, check if this is the last linked service
-    $sql = 'SELECT COUNT(*) FROM {serviceconnect_user} WHERE uid = %d';
-    $linked_services = db_result(db_query($sql, $account->uid));
+    $sql = 'SELECT COUNT(*) AS cnt FROM {serviceconnect_user} WHERE uid = :uid';
+    $linked_services = db_query($sql, array('uid' => $account->uid))->fetchObject()->cnt;
     if ($linked_services == 1) {
       $form['warning'] = array(
         '#value' => '<p>' . t('Warning: this is the only linked service to this user and this user does not have a username and password. This user cannot login anymore after unlinking this external profile!') . '</p>',
       );
     }
   }
-  
+
   $form['buttons'] = array();
   $form['buttons']['submit'] = array(
     '#type' => 'submit',
@@ -80,16 +79,15 @@ function serviceconnect_unlink_service_form($form_state, $account, $scpid) {
   $form['buttons']['cancel'] = array(
     '#value' => l(t('Cancel'), str_replace('%user', $account->uid, SERVICECONNECT_PATH_MANAGE_SERVICES)),
   );
-  
-  return $form;
+
 }
 
 /**
  * Unlink service form submit callback.
  */
 function serviceconnect_unlink_service_form_submit($form, &$form_state) {
-  $sql = 'DELETE FROM {serviceconnect_user} WHERE uid = %d AND scpid = %d';
-  db_query($sql, $form['#uid'], $form['#scpid']);
+  $sql = 'DELETE FROM {serviceconnect_user} WHERE uid = :uid AND scpid = :scpid';
+  db_query($sql, array('uid' => $form['#uid'], 'scpid' => $form['#scpid']));
   drupal_set_message(t('The external profile is now unlinked from this user.'));
   $form_state['redirect'] = str_replace('%user', $form['#uid'], SERVICECONNECT_PATH_MANAGE_SERVICES);
 }
