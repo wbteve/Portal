@@ -160,18 +160,18 @@ function serviceconnect_login_with_new_user($service, $service_uid, $username, $
     'mail' => $email,
     'init' => $username,
     'status' => 1,
-     // "authname_$module" => $name,
     'access' => REQUEST_TIME 
   );
 
-  $account = user_save('', $userinfo);
+  $user = user_save('', $userinfo);
 
   // Terminate if an error occured during user_save().
-  if (!$account) {
+  if (!$user) {
     throw new Exception('Unable to create new account');
   }
 
-  return $account->uid;
+  return $user->uid;
+
 }
 
 /**
