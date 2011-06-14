@@ -17,6 +17,17 @@ function strongarm_stream_wrappers() {
   // weighted even lower than strongarm (which is a superlightweight -1000)
   // rely on $_GET['q'] or 'site_frontpage' in hook_init().
   $_GET['q'] = request_path();
+
+  // The above workaround conflicts with the language prefix language selection
+  // method because it reintroduces the path prefix which had previously been
+  // removed by locale_language_from_url().
+  // We need to strip possible language prefix from path that can exist for
+  // multilingual sites.
+  if (function_exists('language_url_split_prefix')) {
+    global $language_url;
+    list ($language, $_GET['q']) = language_url_split_prefix($_GET['q'], array($language_url));
+  }
+
   drupal_path_initialize();
 }
 

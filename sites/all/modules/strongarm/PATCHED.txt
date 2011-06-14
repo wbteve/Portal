@@ -1,2 +1,4 @@
-MvG: stongarm.module was patched with http://drupal.org/node/1062452#comment-4327034.
-Without the patch, it breaks language path prefixes. 
+MvG: stongarm.module was patched with:
+- http://drupal.org/node/1062452#comment-4327034
+- http://drupal.org/files/issues/strongarm-lang_pref-998070_0.patch
+Without the patches, it breaks language path prefixes. 
