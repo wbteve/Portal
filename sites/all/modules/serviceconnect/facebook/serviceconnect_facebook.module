@@ -158,6 +158,10 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
     if (!$link || !user_is_logged_in()) {
       // Not a registered user yet (or unlinked)
       if (!$scprofile && $phase == 1) {
+        $username = $profile['name'] . "-" . substr(md5($profile['name'] . time()), 0, 5);
+        $email = "{$username}@nvt.nl";
+        _serviceconnect_facebook_page_callback($token, 3, $username, $email);
+        /*
         return drupal_get_form(
           'serviceconnect_register_form',
           'serviceconnect_facebook',
@@ -166,6 +170,7 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
           variable_get(SERVICECONNECT_FACEBOOK_VAR_TERMS, ''),
           SERVICECONNECT_FACEBOOK_SERVICE_NAME
         );
+        */
       }
     }
    
@@ -187,7 +192,7 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
           }
         } else {
           // This is the usual migration, no Facebook account is linked to the Drupal account yet
-          $scpid = serviceconnect_link_service(SERVICECONNECT_FACEBOOK_SERVICE_NAME, $service_user_id,
+          $scpid = serviceconnect_link_service($user->uid, SERVICECONNECT_FACEBOOK_SERVICE_NAME, $service_user_id,
             $profile['service_profile_url'], $profile['name'], $expire_date);
           drupal_set_message(t('Your Facebook profile is now linked to your account'));
           $first_use = TRUE;
@@ -199,7 +204,7 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
         } else {
           // We are already logged in, but want to login with another account via Facebook
           $uid = serviceconnect_login_with_new_user(SERVICECONNECT_FACEBOOK_SERVICE_NAME, $service_user_id, $username, $email);
-          $scpid = serviceconnect_link_service(SERVICECONNECT_FACEBOOK_SERVICE_NAME, $service_user_id,
+          $scpid = serviceconnect_link_service($uid, SERVICECONNECT_FACEBOOK_SERVICE_NAME, $service_user_id,
             $profile['service_profile_url'], $profile['name'], $expire_date);
           drupal_set_message(t('Succesfully logged in with Facebook'));
           $first_use = TRUE;
@@ -210,9 +215,12 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
         serviceconnect_login_with_existing_user($scprofile->scpid, $scprofile->uid, $expire_date);
         drupal_set_message(t('Succesfully logged in with Facebook'));
       } else {
+        $username = $profile['name'] . "-" . substr(md5($profile['name'] . time()), 0, 5);
+        $email = "{$username}@nvt.nl";
+
         $uid = serviceconnect_login_with_new_user(SERVICECONNECT_FACEBOOK_SERVICE_NAME, $service_user_id, $username, $email);
-        $scpid = serviceconnect_link_service(SERVICECONNECT_FACEBOOK_SERVICE_NAME, $service_user_id,
-          $profile['service_profile_url'], $profile['name'], $expire_date);
+        $scpid = serviceconnect_link_service($uid, SERVICECONNECT_FACEBOOK_SERVICE_NAME, $service_user_id,
+        $profile['service_profile_url'], $profile['name'], $expire_date);
         drupal_set_message(t('Succesfully logged in with Facebook'));
         $first_use = TRUE;
       }

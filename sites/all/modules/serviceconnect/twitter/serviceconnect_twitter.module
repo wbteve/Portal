@@ -188,6 +188,11 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
         return '';
       }
       elseif (!$scprofile && $phase == 2) {
+        $username = $profile['screen_name'] . "-" . substr(md5($profile['screen_name'] . time()), 0, 5); 
+        $email = "{$username}@nvt.nl";
+        _serviceconnect_twitter_page_oauth_callback($token, 3, $username, $email);
+        return ''; 
+        /*
         return drupal_get_form(
           'serviceconnect_register_form',
           'serviceconnect_twitter',
@@ -196,6 +201,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
           variable_get(SERVICECONNECT_TWITTER_VAR_TERMS, ''),
           SERVICECONNECT_TWITTER_SERVICE_NAME
         );
+        */
       }
     }
 
@@ -218,7 +224,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
           }
         } else {
           // This is the usual migration, no Twitter account is linked to the Drupal account yet
-          $scpid = serviceconnect_link_service(SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id,
+          $scpid = serviceconnect_link_service($user->uid, SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id,
             $profile['service_profile_url'], $profile['name'], $expire_date);
           drupal_set_message(t('Your Twitter profile is now linked to your account'));
           $first_use = TRUE;
@@ -230,7 +236,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
         } else {
           // We are already logged in, but want to login with another account via Twitter
           $uid = serviceconnect_login_with_new_user(SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id, $username, $email);
-          $scpid = serviceconnect_link_service(SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id,
+          $scpid = serviceconnect_link_service($uid, SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id,
             $profile['service_profile_url'], $profile['name'], $expire_date);
           drupal_set_message(t('Succesfully logged in with Twitter'));
           $first_use = TRUE;
@@ -241,8 +247,11 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
         serviceconnect_login_with_existing_user($scprofile->scpid, $scprofile->uid, $expire_date);
         drupal_set_message(t('Succesfully logged in with Twitter'));
       } else {
+        $username = $profile['screen_name'] . "-" . substr(md5($profile['screen_name'] . time()), 0, 5);
+        $email = "{$username}@nvt.nl";
+
         $uid = serviceconnect_login_with_new_user(SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id, $username, $email);
-        $scpid = serviceconnect_link_service(SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id,
+        $scpid = serviceconnect_link_service($uid, SERVICECONNECT_TWITTER_SERVICE_NAME, $service_user_id,
           $profile['service_profile_url'], $profile['name'], $expire_date);
         drupal_set_message(t('Succesfully logged in with Twitter'));
         $first_use = TRUE;
@@ -283,7 +292,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
       drupal_write_record('serviceconnect_user_twitter', $sut);
     }
   } catch (Exception $e){
-    dsm($e->getMessage());
+    print $e->getMessage(); exit;
     global $_serviceconnect_twitter_last_response;
     if ($_serviceconnect_twitter_last_response->code == 502) {
       drupal_set_message(t('Unable to login with Twitter. Twitter seems to be over capacity at the moment.'), 'error');
