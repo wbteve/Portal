@@ -75,12 +75,13 @@
 
     var $container = $($("td", $(this))[1]);
 
-    $container.prepend("<h2>Item #" + index  +"</h2>")
-      .addClass("gridui-header")
-      .click(function() {
-        $fieldset.toggle();
-      });
+    var $title = $("<h2>Item #" + index + "</h2>")
+                   .addClass("gridui-header")
+                   .click(function() {
+                     $fieldset.toggle();
+                   });
 
+    $container.prepend($title);
 
     $(".form-item-field-referenced-content-nl-" + index + "-pos-x").hide();
     $(".form-item-field-referenced-content-nl-" + index + "-pos-y").hide();
