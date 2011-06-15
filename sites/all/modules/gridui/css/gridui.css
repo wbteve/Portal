@@ -1,5 +1,8 @@
 #gridui-frame {
-  background: #ccc;
+  background-color: #ccc;
+  background-image: url('/sites/all/modules/gridui/img/line.png');
+  background-position: top center;
+  background-repeat: repeat-y;
   border: 1px solid #ccc;
   float: left;
   height: 320px;
