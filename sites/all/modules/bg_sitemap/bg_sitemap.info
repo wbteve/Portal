@@ -1,0 +1,5 @@
+name = Beeld en Geluid Sitemap
+description = Custom visual sitemap.
+package = "Beeld en Geluid"
+core = 7.x
+

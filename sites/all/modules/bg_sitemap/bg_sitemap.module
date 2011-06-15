@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * Implements hook_menu.
+ */
+function bg_sitemap_menu() {
+  $items['sitemap'] = array(
+    'title' => 'Sitemap', 
+    'page callback' => 'bg_sitemap_page', 
+    'access arguments' => array('access content'), 
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+  return $items;
+}
+
+function bg_sitemap_page() {
+  global $language;
+  
+  $menu_name = 'menu-sitemap';
+  if (!empty($language->prefix)) {
+    $menu_name .= '-' . $language->prefix;
+  }
+  
+  // Use menu_tree_output(menu_tree_all_data()) instead of menu_tree().
+  // menu_tree() calls menu_tree_page_data() internally, which hides collapsed
+  // menu items. In this case, we want all items to be displayed.
+  $tree = menu_tree_output(menu_tree_all_data($menu_name));
+  
+  return array(
+    'sitemap' => array(
+      'tree' => $tree,
+      '#prefix' => '<div id="bg-sitemap">',
+      '#suffix' => '</div>',
+    ),
+  );
+}
+
