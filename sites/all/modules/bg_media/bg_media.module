@@ -107,7 +107,7 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
     case BG_MEDIA_DISPLAY_TYPE_THUMBNAIL:
       foreach($items as $item) {
         $wrapper = file_stream_wrapper_get_instance_by_uri($item['uri']);
-        if($wrapper instanceof StreamWrapperInterface) {
+        if($wrapper instanceof StreamWrapperInterface && method_exists($wrapper, 'getLocalThumbnailPath')) {
           $element[] = array(
             '#theme' => 'image',
             '#path' => $wrapper->getLocalThumbnailPath(),
