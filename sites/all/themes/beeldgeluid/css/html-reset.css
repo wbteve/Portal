@@ -27,7 +27,6 @@
 body {
   font-size: 100%; /* Fixes exaggerated text resizing in IE6 and IE7 */
   color: #4A4A4A;
-  overflow-x: hidden;
 }
 
 #skip-to-nav,

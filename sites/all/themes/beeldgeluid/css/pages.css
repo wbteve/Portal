@@ -466,6 +466,18 @@ ul.links li {
 }
 
 /*
+ * Dossiers
+*/
+/* temp */
+.node-type-dossier .dossier-element {
+  border: 1px dashed #C7C2BA;
+}
+
+.node-type-dossier .field-name-field-referenced-content {
+  position: relative;
+}
+
+/*
  * Footer
  */
 .region-footer {
