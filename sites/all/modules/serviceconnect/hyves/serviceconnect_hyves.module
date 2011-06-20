@@ -279,7 +279,7 @@ function _serviceconnect_hyves_page_oauth_callback($token, $phase = 1, $username
         }
       }
     } else {
-      if ($scprofile->uid) {
+      if (is_object($scprofile) && $scprofile->uid) {
         serviceconnect_login_with_existing_user($scprofile->scpid, $scprofile->uid, $expire_date);
         drupal_set_message(t('Succesfully logged in with Hyves'));
       } else {

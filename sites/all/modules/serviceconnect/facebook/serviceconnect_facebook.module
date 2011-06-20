@@ -211,7 +211,7 @@ function _serviceconnect_facebook_page_callback($phase = 1, $username = NULL, $e
         }
       }
     } else {
-      if ($scprofile->uid) {
+      if (is_object($scprofile) && $scprofile->uid) {
         serviceconnect_login_with_existing_user($scprofile->scpid, $scprofile->uid, $expire_date);
         drupal_set_message(t('Succesfully logged in with Facebook'));
       } else {

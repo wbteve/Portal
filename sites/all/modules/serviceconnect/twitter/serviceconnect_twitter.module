@@ -243,7 +243,7 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
         }
       }
     } else {
-      if ($scprofile->uid) {
+      if (is_object($scprofile) && $scprofile->uid) {
         serviceconnect_login_with_existing_user($scprofile->scpid, $scprofile->uid, $expire_date);
         drupal_set_message(t('Succesfully logged in with Twitter'));
       } else {
@@ -288,7 +288,6 @@ function _serviceconnect_twitter_page_oauth_callback($token, $phase = 1, $userna
       $sut->token_secret = $token_secret;
       $sut->name = $profile['name'];
       $sut->profile_image_url = $profile['profile_image_url'];
-      $sut->friendscount = $profile['friendscount'];
       drupal_write_record('serviceconnect_user_twitter', $sut);
     }
   } catch (Exception $e){
