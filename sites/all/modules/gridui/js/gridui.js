@@ -33,8 +33,8 @@
                                 y = ui.position.top;
 
                             // Translate to grid units
-                            var x_gu = x / _this.gridstep / _this.zoom,
-                                y_gu = y / _this.gridstep / _this.zoom;
+                            var x_gu = Math.round(x / _this.gridstep / _this.zoom),
+                                y_gu = Math.round(y / _this.gridstep / _this.zoom);
 
                             // Set values in form fields
                             $("#" + id + "-pos-x").val(x_gu);
