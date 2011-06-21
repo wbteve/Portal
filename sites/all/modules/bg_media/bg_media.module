@@ -30,6 +30,22 @@ function bg_media_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ *  Implements hook_library().
+ */
+function bg_media_library() {
+  // SWFObject
+  $libraries['swfobject'] = array(
+    'title'   => 'SWFObject',
+    'website' => 'http://code.google.com/p/swfobject/',
+    'version' => '2.2',
+    'js'      => array(
+      drupal_get_path('module', 'bg_media') . '/includes/js/swfobject.js' => array(),
+    ),
+  );
+  return $libraries;
+}
+
+/**
  * Implements hook_media_internet_providers();
  */
 function bg_media_media_internet_providers() {

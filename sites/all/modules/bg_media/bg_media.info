@@ -11,3 +11,4 @@ files[] = includes/classes/MediaInternetOIHandler.inc
 dependencies[] = media
 dependencies[] = file_entity
 dependencies[] = videojs
+dependencies[] = flowplayer
