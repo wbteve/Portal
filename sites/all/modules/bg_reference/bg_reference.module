@@ -10,14 +10,14 @@ define('UNIT_SIZE_HEIGHT', 200);
 
 function bg_reference_menu() {
   $items = array();
-  
+
   $items['bg-reference/autocomplete'] = array(
     'page callback'   => '_bg_reference_autocomplete',
     'page arguments'  => array(2, 3),
     'access callback' => TRUE,
     'type'            => MENU_CALLBACK,
   );
-  
+
   return $items;
 }
 
@@ -31,9 +31,9 @@ function bg_reference_theme() {
 
 function theme_bg_reference($variables) {
   extract($variables);
-  
+
   $classes = array($element['#data']['type']);
-  
+
   switch($element['#data']['type']) {
     case CONTENT_TYPE_BANNER:
     case CONTENT_TYPE_EVENT:
@@ -41,20 +41,20 @@ function theme_bg_reference($variables) {
       $node = node_load($match['nid'], $match['vid']);
       $content = drupal_render(node_view($node));
       break;
-    
+
     case CONTENT_TYPE_MEDIA:
-      
+
       break;
-    
+
     case CONTENT_TYPE_SEARCH_RESULT:
-      
+
       break;
-    
+
     case CONTENT_TYPE_TEXT:
       $content = $element['#data']['content'];
       break;
   }
-  
+
   // Set style
   $left_position  = $element['#data']['pos_x'] * UNIT_SIZE_WIDTH;
   $top_position   = $element['#data']['pos_y'] * UNIT_SIZE_HEIGHT;
@@ -68,7 +68,7 @@ function theme_bg_reference($variables) {
 /***************************************************************
  * Field Type API hooks
  ***************************************************************/
- 
+
 /**
  * Implement hook_field_info().
  */
@@ -98,31 +98,31 @@ function bg_reference_field_schema($field) {
       'not null'  => TRUE
     ),
     'pos_x' => array(
-      'type' => 'int', 
-      'unsigned' => FALSE, 
-      'not null' => TRUE, 
+      'type' => 'int',
+      'unsigned' => FALSE,
+      'not null' => TRUE,
       'default' => 0,
     ),
     'pos_y' => array(
-      'type' => 'int', 
-      'unsigned' => FALSE, 
-      'not null' => TRUE, 
+      'type' => 'int',
+      'unsigned' => FALSE,
+      'not null' => TRUE,
       'default' => 0,
     ),
     'width' => array(
-      'type' => 'int', 
-      'unsigned' => TRUE, 
-      'not null' => TRUE, 
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
       'default' => 1,
     ),
     'height' => array(
-      'type' => 'int', 
-      'unsigned' => TRUE, 
-      'not null' => TRUE, 
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
       'default' => 1,
     ),
   );
-  
+
   return array('columns' => $columns);
 }
 
@@ -130,7 +130,7 @@ function bg_reference_field_schema($field) {
  * Implement hook_field_validate().
  */
 function bg_reference_field_validate($obj_type, $object, $field, $instance, $langcode, &$items, &$errors) {
-  
+
 }
 
 /**
@@ -144,7 +144,7 @@ function bg_reference_field_is_empty($item, $field) {
 /***********************************************************************
  *  Field Type API: Formatter
  **********************************************************************/
- 
+
 /**
  * Implement hook_field_formatter_info().
  */
@@ -162,7 +162,7 @@ function bg_reference_field_formatter_info() {
  */
 function bg_reference_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
   $element = array();
-  
+
   if($display['type'] == 'bg_reference_default') {
     foreach ($items as $delta => $item) {
       $element[$delta] = array(
@@ -171,13 +171,13 @@ function bg_reference_field_formatter_view($object_type, $object, $field, $insta
       );
     }
   }
-  
+
   return $element;
 }
 /**************************************************************************
  * Field Type API: Widget
  **************************************************************************/
- 
+
 /**
  * Implement hook_field_widget_info().
  */
@@ -195,7 +195,7 @@ function bg_reference_field_widget_info() {
  *
  * This widget displayed three text fields\, one each for red, green,
  * and blue. However, the field type defines a single text column,
- * rgb, which needs an HTML color spec. Define an element validate 
+ * rgb, which needs an HTML color spec. Define an element validate
  * handler that converts our r, g, and b fields into a simulaed single
  * 'rgb' form element.
  */
@@ -203,14 +203,14 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
   $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
   $type       = isset($items[$delta]['type']) ? $items[$delta]['type'] : CONTENT_TYPE_TEXT;
   $value      = isset($items[$delta]['content']) ? $items[$delta]['content'] : '';
-  
+
   $ajax_settings = array(
     'event'     => 'change',
     'method'    => 'html',
     'callback'  => 'bg_reference_ajax_callback',
     'wrapper'   => $wrapper_id,
   );
-  
+
   $element = array(
     '#type' => 'fieldset',
     // Cinvert during validation.
@@ -268,11 +268,11 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
       '#default_value' => isset($items[$delta]['height']) ? $items[$delta]['height'] : 1,
     ),
   );
-  
+
   $element['wrapper'] = array_merge($element['wrapper'], _bg_reference_get_form($type, $value));
-  
+
   asort($element['type']['#options']);
-  
+
   return $element;
 }
 
@@ -283,7 +283,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
  */
 function _bg_reference_get_form($type, $value) {
   $element = array();
-  
+
   switch($type) {
     case CONTENT_TYPE_BANNER:
       $element['ref_' .CONTENT_TYPE_BANNER] = array(
@@ -294,7 +294,7 @@ function _bg_reference_get_form($type, $value) {
         '#default_value'      => check_plain($value),
       );
       break;
-    
+
     case CONTENT_TYPE_EVENT:
       $element['ref_' . CONTENT_TYPE_EVENT] = array(
         '#type'               => 'textfield',
@@ -304,10 +304,17 @@ function _bg_reference_get_form($type, $value) {
         '#default_value'      => check_plain($value),
       );
       break;
-    
+
     case CONTENT_TYPE_MEDIA:
+      $element['ref_' . CONTENT_TYPE_MEDIA] = array(
+        '#type'               => 'textfield',
+        '#title'              => t('Media'),
+        '#attributes'         => array('class' => array('bg_reference_media')),
+        '#autocomplete_path'  => 'bg-reference/autocomplete/' . CONTENT_TYPE_MEDIA,
+        '#default_value'      => check_plain($value),
+      );
       break;
-    
+
     case CONTENT_TYPE_SEARCH_RESULT:
       $element['ref_' . CONTENT_TYPE_SEARCH_RESULT] = array(
         '#type'               => 'textfield',
@@ -316,7 +323,7 @@ function _bg_reference_get_form($type, $value) {
         '#default_value'      => check_plain($value),
       );
       break;
-    
+
     case CONTENT_TYPE_TEXT:
       $element['ref_' . CONTENT_TYPE_TEXT] = array(
         '#type'               => 'text_format',
@@ -327,7 +334,7 @@ function _bg_reference_get_form($type, $value) {
       );
       break;
   }
-  
+
   return $element;
 }
 
@@ -338,29 +345,29 @@ function _bg_reference_validate($element, &$form_state) {
   if(preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]/', $element['type']['#name'], $field)) {
     if (isset($form_state['values'][$field['name']][$field['langcode']][$field['delta']])) {
       $values = $form_state['values'][$field['name']][$field['langcode']][$field['delta']];
-      
+
       if(!empty($values['content'])) {
         // Validate x position
         if(!_bg_reference_is_int($values['pos_x'])) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_x", t('X position should be an integer value'));
         }
-        
+
         // Validate y position
         if(!_bg_reference_is_int($values['pos_y'])) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_y", t('Y position should be an integer value'));
         }
-        
+
         // Validate width
         if(!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && $values['width'] <= 0)) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][width", t('Width should be a positive integer value larger than zero'));
         }
-        
+
         // Validate height
         if(!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && $values['height'] <= 0)) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a positive integer value larger than zero'));
         }
       }
-      
+
       form_set_value($element, $values, $form_state);
     }
   }
@@ -379,21 +386,21 @@ function _bg_reference_is_int($value) {
 function bg_reference_ajax_callback($form, $form_state) {
   if (!empty($form_state['triggering_element']) && preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]\[(?P<subfield>\w+)\]/', $form_state['triggering_element']['#name'], $field)) {
     $type     = $form_state['values'][$field['name']][$field['langcode']][$field['delta']][$field['subfield']];
-    
+
     $value    = $form_state['values'][$field['name']][$field['langcode']][$field['delta']]['content'];
     $wrapper  = &$form[$field['name']][$field['langcode']][$field['delta']]['wrapper'];
-    
+
     foreach($wrapper as $key => $value) {
       if(preg_match('/^ref_.*/', $key)) {
         unset($wrapper[$key]);
       }
     }
-    
+
     $wrapper = array_merge($wrapper, _bg_reference_get_form($type, ''));
-    
+
     // Rebuild form
     form_builder($form['#form_id'], $form, $form_state);
-    
+
     // Return element
     return $wrapper['ref_' . $type];
   }
@@ -405,6 +412,7 @@ function _bg_reference_autocomplete($bundle, $string = '') {
     $result = db_select('node')
       ->fields('node', array('nid', 'vid', 'title'))
       ->condition('type', $bundle)
+      ->condition('status', 1)
       ->condition('title', db_like($string) . '%', 'LIKE')
       ->range(0, 10)
       ->execute();
