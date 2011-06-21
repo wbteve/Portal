@@ -28,6 +28,12 @@
   text-align: center;
 }
 
+.dossiergrid-item-inner {
+  border-left: 1px solid #fff;
+  border-top: 1px solid #fff;
+  height: 100%;
+}
+
 #field-referenced-content-values fieldset,
 #field-referenced-content-values--2 fieldset {
   display: none;

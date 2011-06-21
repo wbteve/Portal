@@ -69,7 +69,7 @@
                    y_pos: $("#" + id + "-pos-y").val(),
                    bgcolor: "#000",
                    image: "",
-                   html: index};
+                   html: '<div class="dossiergrid-item-inner">' + index + '</div>'};
 
     DG.add_media(element);
 
