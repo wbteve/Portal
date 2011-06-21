@@ -8,7 +8,7 @@
  *  Create an instance like this:
  *  $open_images = new ResourceOpenImagesStreamWrapper('openimages://identifier');
  */
-class MediaOpenImagesStreamWrapper extends MediaReadOnlyStreamWrapper {
+class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
   protected $base_url = 'http://www.openbeelden.nl/';
   protected $type;
   protected $identifier;

@@ -10,16 +10,19 @@ function bg_media_theme($existing, $type, $theme, $path) {
   return array(
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_video' => array(
       'variables' => array('file' => NULL),
+      'template' => 'bg_media.video',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
     ),
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_image' => array(
       'variables' => array('file' => NULL),
+      'template' => 'bg_media.image',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
     ),
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_audio' => array(
       'variables' => array('file' => NULL),
+      'template' => 'bg_media.audio',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
     ),
@@ -107,7 +110,7 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
     case BG_MEDIA_DISPLAY_TYPE_THUMBNAIL:
       foreach($items as $item) {
         $wrapper = file_stream_wrapper_get_instance_by_uri($item['uri']);
-        if($wrapper instanceof StreamWrapperInterface && method_exists($wrapper, 'getLocalThumbnailPath')) {
+        if($wrapper instanceof BGMediaStreamWrapper) {
           $element[] = array(
             '#theme' => 'image',
             '#path' => $wrapper->getLocalThumbnailPath(),
