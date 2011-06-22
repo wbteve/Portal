@@ -34,13 +34,11 @@
   height: 100%;
 }
 
-#field-referenced-content-values fieldset,
-#field-referenced-content-values--2 fieldset {
+.field-multiple-table fieldset {
   display: none;
 }
 
-#field-referenced-content-values,
-#field-referenced-content-values--2 {
+.field-multiple-table {
   float: left;
   width: 400px
 }

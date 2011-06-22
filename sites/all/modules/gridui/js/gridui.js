@@ -1,4 +1,5 @@
 (function($) {
+  // Remove later
   function DossierGrid(frame, gridstep, zoom) {
     this.$frame = $(frame);
     this.elements = [];
@@ -10,7 +11,6 @@
   }
 
   DossierGrid.prototype.add_media = function(element) {
-
     var _this = this;
     var index = this.elements.push(element);
 
@@ -18,8 +18,8 @@
     var $item = $('<div />')
       .attr("id", "dossiergrid-item-" + index)
       .addClass("dossiergrid-item")
-      .css({"width": element.x_size * this.gridstep * this.zoom, 
-            "height": element.y_size * this.gridstep * this.zoom, 
+      .css({"width": element.x_size * this.gridstep * this.zoom,
+            "height": element.y_size * this.gridstep * this.zoom,
             "background-color": element.bgcolor,
             "position": "absolute"})
       .draggable({"containment": "parent",
@@ -46,49 +46,53 @@
             "left": element.x_pos * this.gridstep * this.zoom})
       .html(element.html);
 
+    $("#dossiergrid-item-" + index).remove();
+
     this.$frame.append($item);
   }
 
-  // Remove later
-  var DG = new DossierGrid("#gridui-frame", 50, .5);
 
-  $("#gridui-frame").empty();
+  Drupal.behaviors.gridui_reference = {
+    attach: function(context) {
+      var DG = new DossierGrid("#gridui-frame", 50, .5);
 
-  // XXX: For now we will fill this based upon the fields in the "Referenced Content"
-  // This step both adds all the elements to the frame and hides certain fields of the referenced content
-  // as these are now handled by the gridui frame, also do some styling
-  $("tr", "tbody", "#field-referenced-content-values").each(function() {
-    var $fieldset = $("fieldset", $(this));
-    var id = $fieldset.attr("id");
+      $("tr.draggable").each(function() {
+        if(!$(this).hasClass("gridui-processed")) {
+          $(this).addClass("gridui-processed");
+          var $fieldset = $("fieldset", $(this));
+          var id = $fieldset.attr("id").split(/-/);
+          var id = id.slice(0, 6).join('-');
 
-    var index = parseInt(id.split(/-/)[id.split(/-/).length-1]);
+          var index = parseInt(id.split(/-/)[5]);
 
-    var element = {x_size: $("#" + id + "-width").val(),
-                   y_size: $("#" +  id + "-height").val(),
-                   x_pos: $("#" + id + "-pos-x").val(),
-                   y_pos: $("#" + id + "-pos-y").val(),
-                   bgcolor: "#000",
-                   image: "",
-                   html: '<div class="dossiergrid-item-inner">' + index + '</div>'};
+          var element = {x_size: $(".bg_reference_width", $fieldset).val(),
+                         y_size: $(".bg_reference_height", $fieldset).val(),
+                         x_pos: $(".bg_reference_pos_x", $fieldset).val(),
+                         y_pos: $(".bg_reference_pos_y", $fieldset).val(),
+                         bgcolor: "#000",
+                         image: "",
+                         html: '<div class="dossiergrid-item-inner">' + (index+1) + '</div>'};
 
-    DG.add_media(element);
+          DG.add_media(element);
 
-    var $container = $($("td", $(this))[1]);
+          var $container = $($("td", $(this))[1]);
 
-    var $title = $("<h2>Item #" + index + "</h2>")
-                   .addClass("gridui-header")
-                   .click(function() {
-                     $fieldset.toggle();
-                   });
+          var $title = $("<h2>Item #" + (index+1) + "</h2>")
+                         .addClass("gridui-header")
+                         .click(function() {
+                           $fieldset.toggle();
+                         });
 
-    $container.prepend($title);
+          $container.prepend($title);
 
-    $(".form-item-field-referenced-content-nl-" + index + "-pos-x").hide();
-    $(".form-item-field-referenced-content-nl-" + index + "-pos-y").hide();
+          $(".form-item-field-referenced-content-nl-" + index + "-pos-x").hide();
+          $(".form-item-field-referenced-content-nl-" + index + "-pos-y").hide();
 
-  });
+        }
 
+      });
 
-  $("#field-referenced-content-values + .clearfix").removeClass("clearfix");
-
+      $(".field-multiple-table + .clearfix").removeClass("clearfix");
+    }
+  }
 }(jQuery));
