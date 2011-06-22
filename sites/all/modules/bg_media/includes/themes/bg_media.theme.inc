@@ -13,6 +13,9 @@ function bg_media_preprocess_bg_media_video(&$vars) {
   $wrapper = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
   $js_path = base_path() . drupal_get_path('module', 'bg_media') . '/includes/js';
 
+  if($wrapper instanceof MediaYouTubeStreamWrapper) {
+    $vars['video'] = theme('media_youtube_video', array('uri' => $vars['file']->uri, 'width' => 480, 'height' => 360));
+  }
   if($wrapper instanceof MediaBVDStreamWrapper) {
     drupal_add_library('bg_media', 'swfobject');
     drupal_add_js($js_path . '/bg_media.js');
@@ -51,7 +54,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
       ),
     ), 'setting');
 
-    $vars['rtmp_video'] = '<div id="' . BG_MEDIA_FALLBACK_PLAYER_ID . '"></div>';
+    $vars['video'] = '<div id="' . BG_MEDIA_FALLBACK_PLAYER_ID . '"></div>';
   }
   else if($wrapper instanceof BGMediaStreamWrapper) {
     $fallback_video_url = null;
