@@ -2,6 +2,7 @@
 define('BG_MEDIA_THEME_FUNCTION_PREFIX', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
+define('BG_MEDIA_FALLBACK_PLAYER_ID', 'fallback-video-player');
 
 /**
  *  Implements hook_theme().
@@ -39,7 +40,18 @@ function bg_media_library() {
     'website' => 'http://code.google.com/p/swfobject/',
     'version' => '2.2',
     'js'      => array(
-      drupal_get_path('module', 'bg_media') . '/includes/js/swfobject.js' => array(),
+      drupal_get_path('module', 'bg_media') . '/includes/js/swfobject/swfobject.js' => array(),
+    ),
+  );
+  $libraries['videojs'] = array(
+    'title'   => 'VideoJS',
+    'website' => 'http://videojs.com/',
+    'version' => '2.0.2',
+    'js'      => array(
+      drupal_get_path('module', 'bg_media') . '/includes/js/video-js/video.js' => array(),
+    ),
+    'css'     => array(
+      drupal_get_path('module', 'bg_media') . '/includes/js/video-js/video-js.css' => array(),
     ),
   );
   return $libraries;

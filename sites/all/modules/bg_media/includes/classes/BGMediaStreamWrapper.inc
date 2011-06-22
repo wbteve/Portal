@@ -12,7 +12,7 @@ abstract class BGMediaStreamWrapper extends MediaReadOnlyStreamWrapper {
     return NULL;
   }
 
-  public function getMediaForDisplay() {
+  public function getMultiExternalUrl() {
     $media = array(get_object_vars(file_uri_to_object($this->getExternalUrl())));
     return $media;
   }

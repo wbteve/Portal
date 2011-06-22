@@ -15,7 +15,7 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
   protected $qualified_media = array(
     'image' => array('image/jpeg', 'image/png'),
     'audio' => array('audio/mp3'),
-    'video' => array('video/mp4', 'video/ogg'),
+    'video' => array('video/mp4', 'video/webm', 'video/ogg'),
   );
 
   /**
@@ -42,13 +42,13 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
 
   /**
    * Override parent::realpath()
-   * 
+   *
    * Return NULL because the file does not really exist
    */
   public function realpath() {
     return NULL;
   }
-  
+
   static public function getMimeType($uri, $mappers = NULL) {
     return 'video/ogg';
   }
@@ -56,7 +56,7 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
   public function getExternalUrl() {
     $media  = NULL;
     $cid    = $this->uri;
-    
+
     if($cache = cache_get($cid, 'cache_media')) {
       $media = $cache->data;
     }
@@ -65,8 +65,30 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
 
       if($oai_oi_record) {
         $media = $this->getMedia($oai_oi_record, $this->type);
-        
+
         if($media) {
+          cache_set($cid, $media, 'cache_media', strtotime('+1 day'));
+        }
+      }
+    }
+
+    return $media;
+  }
+
+  public function getMultiExternalUrl() {
+    $media  = NULL;
+    $cid    = 'multi' . $this->uri;
+
+    if($cache = cache_get($cid, 'cache_media')) {
+      $media = $cache->data;
+    }
+    else if(!is_null($this->type)) {
+      $oai_oi_record = $this->getOriginalRecord($this->identifier);
+
+      if($oai_oi_record) {
+        $media = $this->getMedia($oai_oi_record, $this->type);
+
+        if(!empty($media)) {
           cache_set($cid, $media, 'cache_media', strtotime('+1 day'));
         }
       }
@@ -85,16 +107,16 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
 
       if($oai_oi_record) {
         $media = $this->getMedia($oai_oi_record, 'image');
-        
-        if($media) {
-          @copy($media, $local_path);
+
+        if(!empty($media)) {
+          @copy($media[0], $local_path);
         }
       }
     }
-    
+
     return $local_path;
   }
-  
+
   public function getOriginalRecord($identifier) {
     $url = $this->base_url . 'feeds/oai/?' .
       http_build_query(array(
@@ -111,23 +133,24 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
       require_once(drupal_get_path('module', 'bg_feeds') . '/bg_feeds.inc');
 
       $xml = simplexml_load_string($result->data);
-      
+
       return $xml->GetRecord->record;
     }
-    
+
     return FALSE;
   }
-  
+
   /**
    * Select file depending on requested type
-   * 
+   *
    * @param unknown_type $oai_oi_record
    * @param unknown_type $type
    */
   public function getMedia($oai_oi_record, $type) {
+    $candidates = array();
     $media = $oai_oi_record->metadata->children('oai_oi', TRUE)->children('oi', TRUE)->medium;
 
-    if(phpversion() >= '5.3.0'){ 
+    if(phpversion() >= '5.3.0'){
       $media_amount = $media->count();
     }
     else {
@@ -139,9 +162,9 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
       foreach($this->qualified_media[$type] as $qualified_mime_type) {
         for($i = $media_amount; $i >= 0; $i--) {
           $mime_type = file_get_mimetype( (string)$media[$i] );
-          
+
           if($mime_type == $qualified_mime_type) {
-            return (string)$media[$i];
+            $candidates[] = (string)$media[$i];
           }
         }
       }
@@ -151,14 +174,14 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
       foreach($this->qualified_media[$type] as $qualified_mime_type) {
         for($i = 0; $i < $media_amount; $i++) {
           $mime_type = file_get_mimetype( (string)$media[$i] );
-          
+
           if($mime_type == $qualified_mime_type) {
-            return (string)$media[$i];
+            $candidates[] = (string)$media[$i];
           }
         }
       }
     }
 
-    return FALSE;
+    return $candidates;
   }
 }
