@@ -17,7 +17,6 @@ function bg_media_theme($existing, $type, $theme, $path) {
     ),
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_image' => array(
       'variables' => array('file' => NULL),
-      'template' => 'bg_media.image',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
     ),
