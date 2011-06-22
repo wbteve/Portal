@@ -40,9 +40,8 @@ class MediaInternetOIHandler extends MediaInternetBaseHandler {
   }
 
   public function claim($embedCode) {
-    if (!is_null($this->uri)) {
-      return TRUE;
-    }
+    $scheme = parse_url($embedCode, PHP_URL_SCHEME);
+    return $scheme == 'openimages';
   }
 
   public function validate() {

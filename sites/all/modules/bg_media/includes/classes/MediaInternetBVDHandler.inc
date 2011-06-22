@@ -17,9 +17,8 @@ class MediaInternetBVDHandler extends MediaInternetBaseHandler {
   }
 
   public function claim($embedCode) {
-    if (!is_null($embedCode)) {
-      return TRUE;
-    }
+    $scheme = parse_url($embedCode, PHP_URL_SCHEME);
+    return $scheme == 'barendenvandorp';
   }
 
   public function validate() {
