@@ -95,3 +95,31 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     $vars['height'] = 360;
   }
 }
+
+/**
+ * Preprocess function for theme('bg_media_audio').
+ */
+function bg_media_preprocess_bg_media_audio(&$vars) {
+
+}
+
+/**
+ * Preprocess function for theme('bg_media_image').
+ */
+function bg_media_preprocess_bg_media_image(&$vars) {
+  $wrapper = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
+
+  if($wrapper instanceof BGMediaStreamWrapper) {
+    $vars['image_uri'] = $wrapper->getLocalThumbnailPath();
+  }
+}
+
+/**
+ * Theme function for theme('bg_media_audio').
+ */
+function theme_bg_media_image(&$vars) {
+  return theme('image_style', array(
+    'style_name'  => 'media',
+    'path'        => $vars['image_uri'],
+  ));
+}
