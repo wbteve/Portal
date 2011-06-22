@@ -11,15 +11,54 @@
  */
 function bg_media_preprocess_bg_media_video(&$vars) {
   $wrapper = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
+  $js_path = base_path() . drupal_get_path('module', 'bg_media') . '/includes/js';
 
-  if($wrapper instanceof BGMediaStreamWrapper) {
-    $js_path = base_path() . drupal_get_path('module', 'bg_media') . '/includes/js';
+  if($wrapper instanceof MediaBVDStreamWrapper) {
+    drupal_add_library('bg_media', 'swfobject');
+    drupal_add_js($js_path . '/bg_media.js');
+
+    $config = drupal_json_encode(
+      array(
+        'playlist'  => array(
+          array(
+            'url'     => file_create_url($wrapper->getLocalThumbnailPath()),
+          ),
+          array(
+            'url'       => $wrapper->getExternalPath(),
+            'provider'  => 'rtmp',
+            'autoPlay'  => false,
+          )
+        ),
+        'plugins'   => array(
+          'rtmp'  => array(
+            'url'               => $js_path . '/flowplayer/flowplayer.rtmp/flowplayer.rtmp-3.2.3.swf',
+            'netConnectionUrl'  => $wrapper->getBaseUrl(),
+          )
+        )
+      )
+    );
+    $config = str_replace("\"", "'", $config);
+
+    drupal_add_js(array(
+      'bgMedia' => array(
+        'playerId'      => BG_MEDIA_FALLBACK_PLAYER_ID,
+        'playerSwf'     => $js_path . '/flowplayer/flowplayer-3.2.7.swf',
+        'playerWidth'   => 480,
+        'playerHeight'  => 360,
+        'playerFlVars'  => array(
+          'config' => $config
+        ),
+      ),
+    ), 'setting');
+
+    $vars['rtmp_video'] = '<div id="' . BG_MEDIA_FALLBACK_PLAYER_ID . '"></div>';
+  }
+  else if($wrapper instanceof BGMediaStreamWrapper) {
     $fallback_video_url = null;
 
     // Add the videojs library to the page.
     drupal_add_library('bg_media', 'videojs');
     drupal_add_library('bg_media', 'swfobject');
-    drupal_add_js($js_path . '/flowplayer/example/flowplayer-3.2.6.min.js');
     drupal_add_js($js_path . '/bg_media.js');
     drupal_add_js(array(
       'bgMedia' => array(

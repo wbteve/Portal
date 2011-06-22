@@ -10,7 +10,9 @@
         Drupal.settings.bgMedia.playerParams,
         Drupal.settings.bgMedia.playerAttr,
         function(e) {
-          VideoJS.setup();
+          if(typeof(VideoJS) != 'undefined') {
+            VideoJS.setup();
+          }
         }
       );
   });

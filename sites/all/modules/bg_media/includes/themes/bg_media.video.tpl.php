@@ -1,4 +1,6 @@
-<?php if(!empty($videos)) : ?>
+<?php if(isset($rtmp_video)) : ?>
+  <?php echo $rtmp_video; ?>
+<?php elseif(!empty($videos)) : ?>
   <div class="video-js-box <?php print variable_get('videojs_skin', 'default'); ?>" id="media">
     <video id="media-video" class="video-js" width="<?php echo $width; ?>" height="<?php echo $height; ?>" controls="controls" preload="auto" poster="<?php echo $thumbnail; ?>">
       <?php foreach ($videos as $video): ?>
