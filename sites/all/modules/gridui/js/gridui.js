@@ -1,9 +1,9 @@
 (function($) {
-  // Remove later
   function DossierGrid(frame, gridstep, zoom) {
     this.$frame = $(frame);
     this.elements = [];
-    this.gridstep = gridstep;
+    this.gridstep = {'x': Drupal.settings.bg_reference.unitSizeWidth,
+                     'y': Drupal.settings.bg_reference.unitSizeHeight};
     this.zoom = zoom;
 
     // Set some properties on the element
@@ -11,6 +11,7 @@
   }
 
   DossierGrid.prototype.add_media = function(element) {
+
     var _this = this;
     var index = this.elements.push(element);
 
@@ -18,12 +19,12 @@
     var $item = $('<div />')
       .attr("id", "dossiergrid-item-" + index)
       .addClass("dossiergrid-item")
-      .css({"width": element.x_size * this.gridstep * this.zoom,
-            "height": element.y_size * this.gridstep * this.zoom,
+      .css({"width": element.x_size * this.gridstep.x * this.zoom,
+            "height": element.y_size * this.gridstep.y * this.zoom,
             "background-color": element.bgcolor,
             "position": "absolute"})
       .draggable({"containment": "parent",
-                  "grid": [this.gridstep * this.zoom, this.gridstep * this.zoom],
+                  "grid": [this.gridstep.x * this.zoom, this.gridstep.y * this.zoom],
                   "snap": true,
                   "stop": function(event, ui) {
                             // Use the starting position of this grid node to calculate the new position (according to the grid + scale)
@@ -33,8 +34,8 @@
                                 y = ui.position.top;
 
                             // Translate to grid units
-                            var x_gu = Math.round(x / _this.gridstep / _this.zoom),
-                                y_gu = Math.round(y / _this.gridstep / _this.zoom);
+                            var x_gu = Math.round(x / _this.gridstep.x / _this.zoom),
+                                y_gu = Math.round(y / _this.gridstep.y / _this.zoom);
 
                             // Set values in form fields
                             $("#" + id + "-pos-x").val(x_gu);
@@ -42,8 +43,8 @@
 
                             console.log($("#" + id + "-pos-x").val());
                           }})
-      .css({"top": element.y_pos * this.gridstep * this.zoom,
-            "left": element.x_pos * this.gridstep * this.zoom})
+      .css({"top": element.y_pos * this.gridstep.y * this.zoom,
+            "left": element.x_pos * this.gridstep.x * this.zoom})
       .html(element.html);
 
     $("#dossiergrid-item-" + index).remove();
