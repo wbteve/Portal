@@ -5,8 +5,12 @@ define('CONTENT_TYPE_SEARCH_RESULT', 'search_result');
 define('CONTENT_TYPE_BANNER', 'banner');
 define('CONTENT_TYPE_EVENT', 'agenda');
 
-define('UNIT_SIZE_WIDTH', 100);
-define('UNIT_SIZE_HEIGHT', 200);
+define('UNIT_SIZE_WIDTH', 120);
+define('UNIT_SIZE_HEIGHT', 80);
+
+function bg_reference_init() {
+  drupal_add_js(array('bg_reference' => array('unitSizeWidth' => UNIT_SIZE_WIDTH, 'unitSizeHeight' => UNIT_SIZE_HEIGHT)), 'setting');
+}
 
 function bg_reference_menu() {
   $items = array();
@@ -37,8 +41,8 @@ function theme_bg_reference($variables) {
   switch($element['#data']['type']) {
     case CONTENT_TYPE_BANNER:
     case CONTENT_TYPE_EVENT:
-      preg_match('/\[nid:(?P<nid>\d+)\] \[vid:(?P<vid>\d+)\]/', $element['#data']['content'], $match);
-      $node = node_load($match['nid'], $match['vid']);
+      preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
+      $node = node_load($match['nid']);
       $content = drupal_render(node_view($node));
       break;
 
@@ -410,14 +414,14 @@ function _bg_reference_autocomplete($bundle, $string = '') {
   $matches = array();
   if ($string) {
     $result = db_select('node')
-      ->fields('node', array('nid', 'vid', 'title'))
+      ->fields('node', array('nid', 'title'))
       ->condition('type', $bundle)
       ->condition('status', 1)
       ->condition('title', db_like($string) . '%', 'LIKE')
       ->range(0, 10)
       ->execute();
     foreach ($result as $node) {
-      $matches["{$node->title} [nid:{$node->nid}] [vid:{$node->vid}]"] = check_plain($node->title);
+      $matches["{$node->title} [nid:{$node->nid}]"] = check_plain($node->title);
     }
   }
 
