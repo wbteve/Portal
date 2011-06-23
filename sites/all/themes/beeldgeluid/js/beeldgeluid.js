@@ -1,3 +1,4 @@
+/*
 (function ($) {
   $(function() {
     $('#comments h2.title').each(function() {
@@ -28,3 +29,4 @@
     }
   });
 }(jQuery));
+*/
