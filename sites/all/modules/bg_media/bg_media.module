@@ -10,7 +10,7 @@ define('BG_MEDIA_FALLBACK_PLAYER_ID', 'fallback-video-player');
 function bg_media_theme($existing, $type, $theme, $path) {
   return array(
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_video' => array(
-      'variables' => array('file' => NULL),
+      'variables' => array('file' => NULL, 'width' => 480, 'height' => 360),
       'template' => 'bg_media.video',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',

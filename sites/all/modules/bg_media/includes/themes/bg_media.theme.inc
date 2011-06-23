@@ -14,7 +14,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
   $js_path = base_path() . drupal_get_path('module', 'bg_media') . '/includes/js';
 
   if($wrapper instanceof MediaYouTubeStreamWrapper) {
-    $vars['video'] = theme('media_youtube_video', array('uri' => $vars['file']->uri, 'width' => 480, 'height' => 360));
+    $vars['video'] = theme('media_youtube_video', array('uri' => $vars['file']->uri, 'width' => $vars['width'], 'height' => $vars['height']));
   }
   if($wrapper instanceof MediaBVDStreamWrapper) {
     drupal_add_library('bg_media', 'swfobject');
@@ -46,8 +46,8 @@ function bg_media_preprocess_bg_media_video(&$vars) {
       'bgMedia' => array(
         'playerId'      => BG_MEDIA_FALLBACK_PLAYER_ID,
         'playerSwf'     => $js_path . '/flowplayer/flowplayer-3.2.7.swf',
-        'playerWidth'   => 480,
-        'playerHeight'  => 360,
+        'playerWidth'   => $vars['width'],
+        'playerHeight'  => $vars['height'],
         'playerFlVars'  => array(
           'config' => $config
         ),
@@ -67,8 +67,8 @@ function bg_media_preprocess_bg_media_video(&$vars) {
       'bgMedia' => array(
         'playerId'      => BG_MEDIA_FALLBACK_PLAYER_ID,
         'playerSwf'     => $js_path . '/flowplayer/flowplayer-3.2.7.swf',
-        'playerWidth'   => 480,
-        'playerHeight'  => 360,
+        'playerWidth'   => $vars['width'],
+        'playerHeight'  => $vars['height'],
         'playerAttr'    => array(
           'class'         => 'vjs-flash-fallback'
         ),
@@ -131,10 +131,6 @@ function bg_media_preprocess_bg_media_video(&$vars) {
         ),
       ),
     ), 'setting');
-
-    // set the width and height
-    $vars['width']  = 480;
-    $vars['height'] = 360;
   }
 }
 
