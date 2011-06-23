@@ -475,6 +475,9 @@ ul.links li {
 
 .node-type-dossier .field-name-field-referenced-content {
   position: relative;
+  width: 1440px;
+  height: 480px;
+  left: 570px;
 }
 
 /*
