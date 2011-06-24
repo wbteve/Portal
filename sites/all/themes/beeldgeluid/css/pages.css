@@ -127,7 +127,7 @@ body#tinymce {
 }
 
 .breadcrumb-wrapper {
-  min-height: 1.67em;
+  min-height: 20px;
 }
 
 .breadcrumb /* The path to the current page in the form of a list of links */ {
@@ -166,7 +166,7 @@ h3.title /* Comment title */ {
   text-align: center;
   text-transform: uppercase;
   padding-top: 2px; /* Add padding-top to prevent characters from being cut off at the top.*/
-  margin: -2px 0 20px 0; /* Negative top margin to compensate for the padding-top. */
+  margin: -2px 0 10px 0; /* Negative top margin to compensate for the padding-top. */
 }
 
 .node-type-blog h2#page-title {
@@ -463,21 +463,6 @@ ul.links li {
 
 .node-type-media ul.links.inline {
   display: none;
-}
-
-/*
- * Dossiers
-*/
-/* temp */
-.node-type-dossier .dossier-element {
-  border: 1px dashed #C7C2BA;
-}
-
-.node-type-dossier .field-name-field-referenced-content {
-  position: relative;
-  width: 1440px;
-  height: 480px;
-  left: 570px;
 }
 
 /*

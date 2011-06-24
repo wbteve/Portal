@@ -136,6 +136,7 @@ p, blockquote, pre,
 ul, ol, dl,
 hr, table, fieldset {
   margin: 1.5em 0;
+  font-weight: normal;
 }
 
 /* Headings */
