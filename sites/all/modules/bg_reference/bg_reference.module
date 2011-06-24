@@ -43,15 +43,15 @@ function theme_bg_reference($variables) {
     case CONTENT_TYPE_EVENT:
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
       $node = node_load($match['nid']);
-      $content = drupal_render(node_view($node));
+      $content = drupal_render(node_view($node, 'dossier'));
       break;
 
     case CONTENT_TYPE_MEDIA:
-
+      $content = '';
       break;
 
     case CONTENT_TYPE_SEARCH_RESULT:
-
+      $content = '';
       break;
 
     case CONTENT_TYPE_TEXT:

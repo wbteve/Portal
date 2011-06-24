@@ -19,8 +19,9 @@
     var $item = $('<div />')
       .attr("id", "dossiergrid-item-" + index)
       .addClass("dossiergrid-item")
-      .css({"width": element.x_size * this.gridstep.x * this.zoom,
-            "height": element.y_size * this.gridstep.y * this.zoom,
+      .css({"width": element.x_size * this.gridstep.x * this.zoom -2, 
+            "height": element.y_size * this.gridstep.y * this.zoom -2,
+            "border": "1px solid #fff",
             "background-color": element.bgcolor,
             "position": "absolute"})
       .draggable({"containment": "parent",
@@ -60,6 +61,13 @@
       $("tr.draggable").each(function() {
         if(!$(this).hasClass("gridui-processed")) {
           $(this).addClass("gridui-processed");
+
+          var newItem = $(this).find('.bg_reference_content').val() == '';
+          console.log(newItem);
+          if (newItem) {
+            $(this).addClass("gridui-new-item");
+          }
+
           var $fieldset = $("fieldset", $(this));
           var id = $fieldset.attr("id").split(/-/);
           var id = id.slice(0, 6).join('-');
@@ -70,15 +78,16 @@
                          y_size: $(".bg_reference_height", $fieldset).val(),
                          x_pos: $(".bg_reference_pos_x", $fieldset).val(),
                          y_pos: $(".bg_reference_pos_y", $fieldset).val(),
-                         bgcolor: "#000",
+                         bgcolor: newItem ? "#666": "#000",
                          image: "",
-                         html: '<div class="dossiergrid-item-inner">' + (index+1) + '</div>'};
+                         html: (index+1)};
 
           DG.add_media(element);
 
           var $container = $($("td", $(this))[1]);
 
-          var $title = $("<h2>Item #" + (index+1) + "</h2>")
+          var newItemText = newItem ? ' <span class="new-item-text">(' + Drupal.t('New') + ')</span>' : '';
+          var $title = $("<h2>Item #" + (index+1) + newItemText + "</h2>")
                          .addClass("gridui-header")
                          .click(function() {
                            $fieldset.toggle();

@@ -1,13 +1,13 @@
 #gridui-frame {
   background-color: #ccc;
-  background-image: url('/sites/all/modules/gridui/img/line.png');
+  background-image: url('/sites/all/modules/gridui/img/gridui-grid.gif');
   background-position: top center;
   background-repeat: repeat-y;
   border: 1px solid #ccc;
   float: left;
   height: 320px;
-  margin: 0 0 0 35px;
-  width: 750px;
+  margin: 28px 0 0 35px;
+  width: 720px;
 }
 
 .gridui-header {
@@ -15,12 +15,10 @@
 }
 
 #edit-field-referenced-content-nl-add-more {
-  margin-left: 35px;
+  margin: 1em 0 0 35px;
 }
 
 .dossiergrid-item {
-  border-bottom: 1px solid #fff;
-  border-right: 1px solid #fff;
   color: #fff;
   cursor: pointer;
   font-size: 16px;
@@ -29,8 +27,6 @@
 }
 
 .dossiergrid-item-inner {
-  border-left: 1px solid #fff;
-  border-top: 1px solid #fff;
   height: 100%;
 }
 
@@ -38,7 +34,7 @@
   display: none;
 }
 
-.field-multiple-table {
+.field-widget-bg-referencefield {
   float: left;
   width: 400px
 }
