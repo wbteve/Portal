@@ -1,0 +1,32 @@
+/*
+ * Dossier styling
+ */
+ 
+/* temp & debug */
+.node-type-dossier .dossier-element {
+  border: 1px dashed #C7C2BA;
+}
+/* end temp & debug */
+
+.node-type-dossier .field-name-field-referenced-content {
+  position: relative;
+  width: 1440px;
+  height: 480px;
+  left: -570px;
+}
+
+.dossier-element {
+  background: #4a4a4a;
+}
+
+.view-mode-dossier h2.node-title,
+.view-mode-dossier h2.node-title a {
+  font-family: 'BebasNeue';
+  text-transform: uppercase;
+  color: #fff;
+  font-size: 16px;
+}
+
+.node-agenda-view-mode-dossier {
+  padding: 10px;
+}
