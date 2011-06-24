@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function bg_dossier_entity_info_alter(&$entity_info) {
+  $entity_info['node']['view modes']['dossier'] = array(
+    'label' => t('In dossier'),
+    'custom settings' => TRUE,
+  );
+} 
