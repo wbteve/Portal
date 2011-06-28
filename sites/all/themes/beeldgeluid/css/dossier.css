@@ -61,7 +61,7 @@
   margin-left: 140px;
 }
 
-.node-type-dossier #collapse-content .field-name-body .field-item {
+.node-type-dossier #collapse-content .field-name-body {
   position: absolute;
   background-color: #8A8783;
   color: #FFFFFF;
