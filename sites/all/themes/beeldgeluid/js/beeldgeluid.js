@@ -1,4 +1,3 @@
-/*
 (function ($) {
   $(function() {
     $('#comments h2.title').each(function() {
@@ -10,6 +9,16 @@
       });
     });
     
+    if ($('.node-type-dossier #collapse-content .field-name-body .field-item').html().length != 0) {
+      $('.node-type-dossier #collapse-content .field-name-body').hide();
+      $('.node-type-dossier h1#page-title').addClass('closed');
+      $('.node-type-dossier h1#page-title').click(function() {
+        $(this).toggleClass('closed').toggleClass('open');
+        $('.node-type-dossier #collapse-content .field-name-body').slideToggle('fast');
+      });
+    }
+    
+    /*
     if($('.node-type-dossier').length != 0) {
       var totalHeight = 0;
       var totalWidth = 0;
@@ -27,6 +36,6 @@
       }
       $('.field-name-field-referenced-content').css('marginLeft', marginLeft);
     }
+    */
   });
 }(jQuery));
-*/

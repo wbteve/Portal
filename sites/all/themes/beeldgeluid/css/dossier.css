@@ -6,7 +6,7 @@
   position: relative;
   width: 1440px;
   height: 480px;
-  left: -570px;
+  left: -490px;
 }
 
 .dossier-element {
@@ -37,4 +37,35 @@
 
 .dossier-element-media h2.node-title {
   display: none;
+}
+
+/* collapsible content */
+
+.node-type-dossier h1#page-title.closed {
+  padding-bottom: 10px;
+  background: transparent url('../images/arrow_collapse_down.png') center bottom no-repeat;
+  cursor: pointer;
+}
+
+.node-type-dossier h1#page-title.open {
+  padding-bottom: 10px;
+  background: transparent url('../images/arrow_collapse_up.png') center bottom no-repeat;
+  cursor: pointer;
+}
+
+.node-type-dossier #content {
+  margin-left: 140px;
+}
+
+.node-type-dossier #collapse-content .field-name-body .field-item {
+  position: absolute;
+  background-color: #8A8783;
+  color: #FFFFFF;
+  float: left;
+  font-size: 11px;
+  line-height: 15px;
+  margin: 0;
+  padding: 10px 20px 20px !important;
+  width: 440px !important;
+  z-index: 1000;
 }
