@@ -18,7 +18,10 @@
 
       if(GRIDUI_DEBUG) dsm('Adding gridui frame');
       // Add a drawing frame to the form
-      $form['gridui'] = array('#markup' => '<div id="gridui-frame"></div><br clear="all">');
+      $form['gridui'] = array(
+        '#markup' => '<div id="gridui-frame"></div><br clear="all">',
+        '#weight' => ((int)$form['field_referenced_content']['#weight'] + .1),
+      );
 
       // Set position fields to be hidden
       /*

@@ -63,7 +63,6 @@
           $(this).addClass("gridui-processed");
 
           var newItem = $(this).find('.bg_reference_content').val() == '';
-          console.log(newItem);
           if (newItem) {
             $(this).addClass("gridui-new-item");
           }
@@ -85,6 +84,7 @@
           DG.add_media(element);
 
           var $container = $($("td", $(this))[1]);
+          //console.log($container);
 
           var newItemText = newItem ? ' <span class="new-item-text">(' + Drupal.t('New') + ')</span>' : '';
           var $title = $("<h2>Item #" + (index+1) + newItemText + "</h2>")

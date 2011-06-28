@@ -3,7 +3,6 @@
   background-image: url('/sites/all/modules/gridui/img/gridui-grid.gif');
   background-position: top center;
   background-repeat: repeat-y;
-  border: 1px solid #ccc;
   float: left;
   height: 320px;
   margin: 28px 0 0 35px;
@@ -37,4 +36,14 @@
 .field-widget-bg-referencefield {
   float: left;
   width: 400px
+}
+
+#edit-field-referenced-content input.form-text {
+  width: 300px;
+}
+
+#edit-field-referenced-content td.field-multiple-drag {
+  width: 20px;
+  vertical-align: top;
+  padding-top: 18px;
 }
