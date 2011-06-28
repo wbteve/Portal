@@ -36,7 +36,7 @@ function bg_reference_theme() {
 function theme_bg_reference($variables) {
   extract($variables);
 
-  $classes = array($element['#data']['type']);
+  $classes = array('dossier-element', 'dossier-element-' . $element['#data']['type']);
 
   switch($element['#data']['type']) {
     case CONTENT_TYPE_BANNER:
@@ -45,17 +45,24 @@ function theme_bg_reference($variables) {
       $node = node_load($match['nid']);
       $content = drupal_render(node_view($node, 'dossier'));
       break;
-
+      
     case CONTENT_TYPE_MEDIA:
-      $content = '';
+      preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
+      $node = node_load($match['nid']);
+      $content = drupal_render(node_view($node));
       break;
 
     case CONTENT_TYPE_SEARCH_RESULT:
-      $content = '';
+      $search = apachesolr_search_run('naam', array('q' => check_plain('polygoon')));
+      $list['items'] = array();
+      foreach ($search as $result) {
+        $list['items'][] = l($result['title'], $result['link']);
+      }
+      $content = '<div class="dossier-element-search-inner">' . theme('item_list', $list) . '</div>';
       break;
 
     case CONTENT_TYPE_TEXT:
-      $content = $element['#data']['content'];
+      $content = '<div class="dossier-element-text-inner">' . $element['#data']['content'] . '</div>';
       break;
   }
 
@@ -64,9 +71,10 @@ function theme_bg_reference($variables) {
   $top_position   = $element['#data']['pos_y'] * UNIT_SIZE_HEIGHT;
   $width          = $element['#data']['width'] * UNIT_SIZE_WIDTH;
   $height         = $element['#data']['height'] * UNIT_SIZE_HEIGHT;
-  $style          = "position: absolute; overflow: hidden; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px;";
+  $color_back     = !empty($element['#data']['color_back']) ? " background-color: #{$element['#data']['color_back']}" : '';
+  $style          = "position: absolute; overflow: hidden; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px;{$color_back};";
 
-  return '<div class="dossier-element ' . implode(' ', $classes) . '" style="' . $style . '">' . $content . '</div>';
+  return '<div class="' . implode(' ', $classes) . '" style="' . $style . '">' . $content . '</div>';
 }
 
 /***************************************************************
@@ -124,6 +132,12 @@ function bg_reference_field_schema($field) {
       'unsigned' => TRUE,
       'not null' => TRUE,
       'default' => 1,
+    ),
+    'color_back' => array(
+      'type'      => 'varchar',
+      'length'    => 32,
+      'not null'  => FALSE,
+      'default'   => '',
     ),
   );
 
@@ -196,12 +210,6 @@ function bg_reference_field_widget_info() {
 
 /**
  * Implement hook_field_widget().
- *
- * This widget displayed three text fields\, one each for red, green,
- * and blue. However, the field type defines a single text column,
- * rgb, which needs an HTML color spec. Define an element validate
- * handler that converts our r, g, and b fields into a simulaed single
- * 'rgb' form element.
  */
 function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
   $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
@@ -217,7 +225,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
 
   $element = array(
     '#type' => 'fieldset',
-    // Cinvert during validation.
+    // Convert during validation.
     '#element_validate' => array('_bg_reference_validate'),
     // TODO: This should not be necessary.
     '#langcode' => $langcode,
@@ -270,6 +278,13 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
       '#title'      => t('Height'),
       '#attributes' => array('class' => array('bg_reference_height')),
       '#default_value' => isset($items[$delta]['height']) ? $items[$delta]['height'] : 1,
+    ),
+   'color_back' => array(
+      '#type'          => 'textfield',
+      '#title'         => t('Background color'),
+      '#attributes'    => array('class' => array('bg_reference_color_back')),
+      '#default_value' => $items[$delta]['color_back'],
+      '#field_prefix'  => '#',
     ),
   );
 
@@ -333,7 +348,7 @@ function _bg_reference_get_form($type, $value) {
         '#type'               => 'text_format',
         '#title'              => t('Text'),
         '#attributes'         => array('class' => array('bg_reference_text')),
-        '#format'             => filter_default_format(),
+        '#format'             => 'dossier_text', //filter_default_format(),
         '#default_value'      => $value,
       );
       break;
@@ -352,23 +367,28 @@ function _bg_reference_validate($element, &$form_state) {
 
       if(!empty($values['content'])) {
         // Validate x position
-        if(!_bg_reference_is_int($values['pos_x'])) {
+        if (!_bg_reference_is_int($values['pos_x'])) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_x", t('X position should be an integer value'));
         }
 
         // Validate y position
-        if(!_bg_reference_is_int($values['pos_y'])) {
+        if (!_bg_reference_is_int($values['pos_y'])) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_y", t('Y position should be an integer value'));
         }
 
         // Validate width
-        if(!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && $values['width'] <= 0)) {
+        if (!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && $values['width'] <= 0)) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][width", t('Width should be a positive integer value larger than zero'));
         }
 
         // Validate height
-        if(!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && $values['height'] <= 0)) {
+        if (!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && $values['height'] <= 0)) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a positive integer value larger than zero'));
+        }
+        
+        // Validate background color
+        if (!empty($values['color_back']) && (!ctype_xdigit($values['color_back']) || (strlen($values['color_back']) != 3 && strlen($values['color_back']) != 6))) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][color_back", t('Not a valid color number'));
         }
       }
 
