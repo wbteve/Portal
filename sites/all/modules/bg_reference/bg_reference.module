@@ -52,7 +52,6 @@ function theme_bg_reference($variables) {
       break;
       
     case CONTENT_TYPE_MEDIA:
-      //dsm(get_defined_vars());
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
       $node = node_load($match['nid']);
       $node_array = node_view($node);
@@ -65,7 +64,6 @@ function theme_bg_reference($variables) {
           ),
         ));
       }
-      dsm($node_array);
       $content = drupal_render($node_array['field_media_file']);
       break;
 
@@ -313,7 +311,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
       '#type'          => 'textfield',
       '#title'         => t('Background color'),
       '#attributes'    => array('class' => array('bg_reference_color_back')),
-      '#default_value' => $items[$delta]['color_back'],
+      '#default_value' => isset($items[$delta]['color_back']) ? $items[$delta]['color_back'] : '',
       '#field_prefix'  => '#',
     ),
   );
@@ -360,7 +358,7 @@ function _bg_reference_get_form($type, $value) {
         '#title'              => t('Media'),
         '#attributes'         => array('class' => array('bg_reference_media')),
         '#autocomplete_path'  => 'bg-reference/autocomplete/' . CONTENT_TYPE_MEDIA,
-        '#default_value'      => check_plain($value),
+        '#default_value'      => $value,
       );
       break;
 
