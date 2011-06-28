@@ -53,12 +53,26 @@ function theme_bg_reference($variables) {
       break;
 
     case CONTENT_TYPE_SEARCH_RESULT:
-      $search = apachesolr_search_run('naam', array('q' => check_plain('polygoon')));
+      module_load_install('apachesolr');
+      foreach (apachesolr_requirements('runtime') as $requirement) {
+        $status = $requirement['severity'] == REQUIREMENT_ERROR ? 'error' : 'status';
+        if ($status == 'error') {
+          $solr_error = true;
+          break;
+        }
+      }
+      if (!$solr_error) {
+      $search = apachesolr_search_run('naam', array('q' => $element['#data']['content']));
       $list['items'] = array();
       foreach ($search as $result) {
         $list['items'][] = l($result['title'], $result['link']);
       }
-      $content = '<div class="dossier-element-search-inner">' . theme('item_list', $list) . '</div>';
+      $search_title = '<h2>' . t('More') . ' "' . $element['#data']['content'] . '"</h2>';
+      $content = '<div class="dossier-element-search-inner">' . $title . theme('item_list', $list) . '</div>';
+      }
+      else {
+        $content = '<h2>' . t('More') . ' "' . $element['#data']['content'] . '"</h2><p>Solr server unavailable.</p>';
+      }
       break;
 
     case CONTENT_TYPE_TEXT:
