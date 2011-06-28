@@ -30,15 +30,22 @@
   margin: 0 0 10px 0;
 }
 
+.dossier-element p,
+.dossier-element a,
 .dossier-element span.date-display-single {
   color: #fff;
 }
 
 .node-agenda-view-mode-dossier,
-.dossier-element-text-inner {
+.dossier-element-text-inner,
+.dossier-element-search_result-inner {
   padding: 10px;
 }
 
+.dossier-element-search_result .item-list ul {
+  padding: 0 0 0 15px;
+  margin: 0;
+}
 .dossier-element-media h2.node-title {
   display: none;
 }

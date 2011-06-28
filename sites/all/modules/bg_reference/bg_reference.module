@@ -36,7 +36,12 @@ function bg_reference_theme() {
 function theme_bg_reference($variables) {
   extract($variables);
 
-  $classes = array('dossier-element', 'dossier-element-' . $element['#data']['type']);
+  $classes = array(
+    'dossier-element',
+    'dossier-element-' . $element['#data']['type'],
+    'dossier-element-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+    'dossier-element-' . $element['#data']['type'] . '-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+  );
 
   switch($element['#data']['type']) {
     case CONTENT_TYPE_BANNER:
@@ -47,32 +52,43 @@ function theme_bg_reference($variables) {
       break;
       
     case CONTENT_TYPE_MEDIA:
+      //dsm(get_defined_vars());
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
       $node = node_load($match['nid']);
-      $content = drupal_render(node_view($node));
+      $node_array = node_view($node);
+      if ($element['#data']['width'] < 4 || $element['#data']['height'] < 4) {
+        $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
+          'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
+          'label' => 'hidden',
+          'settings' => array(
+            'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+          ),
+        ));
+      }
+      dsm($node_array);
+      $content = drupal_render($node_array['field_media_file']);
       break;
 
     case CONTENT_TYPE_SEARCH_RESULT:
+      $searchterm = check_plain($element['#data']['content']);
+      $search_title = '<h2>' . l(t('Search results for "@searchterm"', array('@searchterm' => $searchterm)), 'zoek/' . $searchterm) . '</h2>';
+      
+      // Check if Solr server is available, eg. for development environments.
       module_load_install('apachesolr');
       foreach (apachesolr_requirements('runtime') as $requirement) {
         $status = $requirement['severity'] == REQUIREMENT_ERROR ? 'error' : 'status';
         if ($status == 'error') {
-          $solr_error = true;
-          break;
+          $content = '<div class="dossier-element-search_result-inner">' . $search_title . '<p>Solr server unavailable.</p></div>';
+          break 2;
         }
       }
-      if (!$solr_error) {
-      $search = apachesolr_search_run('naam', array('q' => $element['#data']['content']));
+      
+      $search = apachesolr_search_run('dossier_search', array('q' => $searchterm));
       $list['items'] = array();
       foreach ($search as $result) {
         $list['items'][] = l($result['title'], $result['link']);
       }
-      $search_title = '<h2>' . t('More') . ' "' . $element['#data']['content'] . '"</h2>';
-      $content = '<div class="dossier-element-search-inner">' . $title . theme('item_list', $list) . '</div>';
-      }
-      else {
-        $content = '<h2>' . t('More') . ' "' . $element['#data']['content'] . '"</h2><p>Solr server unavailable.</p>';
-      }
+      $content = '<div class="dossier-element-search_result-inner">' . $search_title . theme('item_list', $list) . '</div>';
       break;
 
     case CONTENT_TYPE_TEXT:
