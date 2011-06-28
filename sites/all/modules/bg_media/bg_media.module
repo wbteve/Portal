@@ -10,7 +10,7 @@ define('BG_MEDIA_FALLBACK_PLAYER_ID', 'fallback-video-player');
 function bg_media_theme($existing, $type, $theme, $path) {
   return array(
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_video' => array(
-      'variables' => array('file' => NULL, 'width' => 480, 'height' => 360),
+      'variables' => array('file' => NULL, 'width' => 480, 'height' => 320),
       'template' => 'bg_media.video',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
@@ -129,6 +129,8 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
           $element[] = array(
             '#theme' => $theme_function,
             '#file' => $item['file'],
+            '#width' => 480,
+            '#height' => 320, 
           );
         }
       }
@@ -136,11 +138,13 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
 
     case BG_MEDIA_DISPLAY_TYPE_THUMBNAIL:
       foreach($items as $item) {
-        $wrapper = file_stream_wrapper_get_instance_by_uri($item['uri']);
-        if($wrapper instanceof BGMediaStreamWrapper) {
+        dsm(get_defined_vars());
+        $wrapper = file_stream_wrapper_get_instance_by_uri($item['file']->uri);
+        if ($wrapper instanceof BGMediaStreamWrapper) {
           $element[] = array(
-            '#theme' => 'image',
+            '#theme' => 'image_style',
             '#path' => $wrapper->getLocalThumbnailPath(),
+            '#style_name' => $display['settings']['style_name'],
           );
         }
       }
