@@ -1,12 +1,6 @@
 /*
  * Dossier styling
  */
- 
-/* temp & debug */
-.node-type-dossier .dossier-element {
-  border: 1px dashed #C7C2BA;
-}
-/* end temp & debug */
 
 .node-type-dossier .field-name-field-referenced-content {
   position: relative;
@@ -16,17 +10,31 @@
 }
 
 .dossier-element {
-  background: #4a4a4a;
+  background: #8B8783;
 }
 
-.view-mode-dossier h2.node-title,
-.view-mode-dossier h2.node-title a {
+.dossier-element h2,
+.dossier-element h2 a {
   font-family: 'BebasNeue';
   text-transform: uppercase;
   color: #fff;
-  font-size: 16px;
+  font-size: 20px;
+  margin: 0 0 10px 0;
 }
 
-.node-agenda-view-mode-dossier {
+.dossier-element-text p {
+  margin: 0 0 10px 0;
+}
+
+.dossier-element span.date-display-single {
+  color: #fff;
+}
+
+.node-agenda-view-mode-dossier,
+.dossier-element-text-inner {
   padding: 10px;
+}
+
+.dossier-element-media h2.node-title {
+  display: none;
 }

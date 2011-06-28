@@ -38,7 +38,7 @@ body {
 
   /* Use a 12px base font size with a 20px line height */
   font-size: 0.75em; /* 16px x .75 = 12px */
-  line-height: 1.67em; /* 12px x 1.67 = 20px */
+  line-height: 1.6667em; /* 12px x 1.67 = 20px */
 }
 
 #admin-menu {
