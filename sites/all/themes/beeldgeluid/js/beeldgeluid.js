@@ -11,10 +11,16 @@
     
     if ($('.node-type-dossier #collapse-content .field-name-body .field-item').html().length != 0) {
       $('.node-type-dossier #collapse-content .field-name-body').hide();
-      $('.node-type-dossier h1#page-title').addClass('closed');
-      $('.node-type-dossier h1#page-title').click(function() {
-        $(this).toggleClass('closed').toggleClass('open');
+      $('.node-type-dossier h1#page-title').addClass('closed').click(function() {
+        var $this = $(this);
+        $this.toggleClass('closed').toggleClass('open');
         $('.node-type-dossier #collapse-content .field-name-body').slideToggle('fast');
+        if ($this.hasClass('closed')) {
+          $('.field-name-field-referenced-content').fadeTo('fast', 1);
+        }
+        else {
+          $('.field-name-field-referenced-content').fadeTo('fast', .3);      
+        }
       });
     }
     
