@@ -1,6 +1,10 @@
 /*
  * Dossier styling
  */
+ 
+.node-type-dossier #main {
+  padding-bottom: 40px;
+}
 
 .node-type-dossier .field-name-field-referenced-content {
   position: relative;
