@@ -359,13 +359,9 @@ ul.links li {
   margin: 0;
 }
 
-/*
- * dossiers media
-*/
-
-.node-type-media .content {
-  padding: 0 10px;
-}
+/**
+ * media page
+ */
 
 .node-type-media .content .content {
   padding: 0;
@@ -488,8 +484,8 @@ ul.links li {
 .region-content-bottom .block {
   margin: 0 auto;
   overflow: hidden;
-  padding: 16px 0 16px 220px;
-  width: 520px;
+  padding: 16px 20px 16px 240px;
+  width: 460px;
 }
 
 #block-bg-blocks-seo-content h1.title {
