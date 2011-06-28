@@ -52,19 +52,26 @@ function theme_bg_reference($variables) {
       break;
       
     case CONTENT_TYPE_MEDIA:
+      $classes[] = 'node-type-media';
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
-      $node = node_load($match['nid']);
-      $node_array = node_view($node);
-      if ($element['#data']['width'] < 4 || $element['#data']['height'] < 4) {
-        $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
-          'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
-          'label' => 'hidden',
-          'settings' => array(
-            'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
-          ),
-        ));
+      if (is_numeric($match['nid'])) {
+        $node = node_load($match['nid']);
+        $node_array = node_view($node);
+        if ($element['#data']['width'] < 4 || $element['#data']['height'] < 4) {
+          // Replace media player with smaller media thumbnail.
+          $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
+            'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
+            'label' => 'hidden',
+            'settings' => array(
+              'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+            ),
+          ));
+          $content = drupal_render($node_array['field_media_file']);
+        } 
+        else {
+          $content = drupal_render($node_array);
+        }
       }
-      $content = drupal_render($node_array['field_media_file']);
       break;
 
     case CONTENT_TYPE_SEARCH_RESULT:
