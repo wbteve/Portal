@@ -465,7 +465,7 @@ function _bg_reference_autocomplete($bundle, $string = '') {
       ->fields('node', array('nid', 'title'))
       ->condition('type', $bundle)
       ->condition('status', 1)
-      ->condition('title', db_like($string) . '%', 'LIKE')
+      ->condition('title', '%' . db_like($string) . '%', 'LIKE')
       ->range(0, 10)
       ->execute();
     foreach ($result as $node) {
