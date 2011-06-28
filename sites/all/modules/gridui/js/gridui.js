@@ -42,7 +42,6 @@
                             $("#" + id + "-pos-x").val(x_gu);
                             $("#" + id + "-pos-y").val(y_gu);
 
-                            console.log($("#" + id + "-pos-x").val());
                           }})
       .css({"top": element.y_pos * this.gridstep.y * this.zoom,
             "left": element.x_pos * this.gridstep.x * this.zoom})
@@ -84,7 +83,6 @@
           DG.add_media(element);
 
           var $container = $($("td", $(this))[1]);
-          //console.log($container);
 
           var newItemText = newItem ? ' <span class="new-item-text">(' + Drupal.t('New') + ')</span>' : '';
           var $title = $("<h2>Item #" + (index+1) + newItemText + "</h2>")
