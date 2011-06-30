@@ -106,8 +106,7 @@ function theme_bg_reference($variables) {
   $top_position   = $element['#data']['pos_y'] * UNIT_SIZE_HEIGHT;
   $width          = $element['#data']['width'] * UNIT_SIZE_WIDTH;
   $height         = $element['#data']['height'] * UNIT_SIZE_HEIGHT;
-  $color_back     = !empty($element['#data']['color_back']) ? " background-color: #{$element['#data']['color_back']}" : '';
-  $style          = "position: absolute; overflow: hidden; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px;{$color_back};";
+  $style          = "position: absolute; overflow: hidden; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px; background-color: {$element['#data']['color_back']};";
 
   return '<div class="' . implode(' ', $classes) . '" style="' . $style . '">' . $content . '</div>';
 }
@@ -315,11 +314,19 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
       '#default_value' => isset($items[$delta]['height']) ? $items[$delta]['height'] : 1,
     ),
    'color_back' => array(
-      '#type'          => 'textfield',
+      '#type'          => 'select',
       '#title'         => t('Background color'),
       '#attributes'    => array('class' => array('bg_reference_color_back')),
-      '#default_value' => isset($items[$delta]['color_back']) ? $items[$delta]['color_back'] : '',
-      '#field_prefix'  => '#',
+      '#default_value' => isset($items[$delta]['color_back']) ? $items[$delta]['color_back'] : '#8b8784',
+      '#options'       => array(
+        '#8b8784' => '#8b8784',
+        '#e00034' => '#e00034',
+        '#009fda' => '#009fda',
+        '#fce300' => '#fce300',
+        '#c7c2ba' => '#c7c2ba',
+        '#ff5800' => '#ff5800',
+        '#92d400' => '#92d400',
+      ), 
     ),
   );
 
@@ -420,11 +427,7 @@ function _bg_reference_validate($element, &$form_state) {
         if (!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && $values['height'] <= 0)) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a positive integer value larger than zero'));
         }
-        
-        // Validate background color
-        if (!empty($values['color_back']) && (!ctype_xdigit($values['color_back']) || (strlen($values['color_back']) != 3 && strlen($values['color_back']) != 6))) {
-          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][color_back", t('Not a valid color number'));
-        }
+
       }
 
       form_set_value($element, $values, $form_state);

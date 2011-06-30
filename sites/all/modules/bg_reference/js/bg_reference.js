@@ -18,6 +18,15 @@
           }
         });
       });
+      
+      // Apply color to color_back select options.
+      $('select.bg_reference_color_back').each(function(index) {
+        $(this).css({'color': '#fff', 'background-color': $(this).val()});
+      }).change(function(event){
+        $(this).css('background-color', $(this).val());
+      }).find('option').css('color', '#fff').each(function(index) {
+        $(this).css('background-color', $(this).val());
+      });
     }
   }
   
