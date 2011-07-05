@@ -93,6 +93,17 @@ function beeldgeluid_preprocess_html(&$variables, $hook) {
 
 function beeldgeluid_preprocess_page(&$variables, $hook) {
   global $language;
+  global $user;
+  
+  // Hide tabs for normal users
+  $show_tabs = false;
+  foreach($user->roles as $roleid => $rolename){
+    if($roleid != 2){
+      $show_tabs = true;
+      break;
+    }
+  }
+  if(!$show_tabs) unset($variables['tabs']);
   
   $variables['page_title_tag'] = 'h1';
   // Code that should only run when a node is being displayed.
