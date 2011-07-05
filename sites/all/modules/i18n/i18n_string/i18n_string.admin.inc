@@ -122,7 +122,7 @@ function i18n_string_admin_settings() {
     '#title' => t('Translatable text formats'),
     '#options' => $format_list,
     '#type' => 'checkboxes',
-    '#default_value' => i18n_string_allowed_formats(),
+    '#default_value' => variable_get('i18n_string_allowed_formats', array(filter_fallback_format())),
     '#description' => t('Only the strings that have the text formats selected will be allowed by the translation system. All the others will be deleted next time the strings are refreshed.'),
   );
   $form['array_filter'] = array('#type' => 'value', '#value' => TRUE);
@@ -141,9 +141,9 @@ function i18n_string_admin_settings() {
  */
 function i18n_string_refresh_group($group, $delete = FALSE) {
   $result = FALSE;
-
-
-  if ($strings = module_invoke_all('i18n_string_list', $group)) {
+  
+  // Compile all strings for this group
+  if ($strings = i18n_string_group_string_list($group)) {
     i18n_string_refresh_string_list($strings);
     $result = TRUE;
   }
@@ -201,7 +201,7 @@ function i18n_string_refresh_string_list($strings) {
       foreach ($type_strings as $id => $object_strings) {
         foreach ($object_strings as $key => $string) {
           if (is_array($string)) {
-            $format = $string['format'];
+            $format = isset($string['format']) ? $string['format'] : NULL;
             $string = $string['string'];
           }
           else {
@@ -249,6 +249,41 @@ function i18n_string_refresh_batch($groups, $delete = FALSE) {
 }
 
 /**
+ * Refresh strings for enabled modules
+ */
+function i18n_string_refresh_enabled_modules($modules) {
+  // Check if any of the modules has strings to update
+  $count = 0;
+  foreach ($modules as $module) {
+    if ($strings = i18n_string_module_string_list($module)) {
+      $count += i18n_string_refresh_string_list($strings);
+     
+    }
+    // Call module refresh if exists
+    module_invoke($module, 'i18n_string_refresh', 'all');
+  }
+  if ($count) {
+    drupal_set_message(format_plural($count, 'Refresed one string for enabled modules.', 'Refreshed @count strings for the enabled modules.'));
+  }
+}
+
+/**
+ * Purge uninstalled modules.
+ */
+function i18n_string_refresh_uninstalled_modules($modules) {
+  foreach ($modules as $module) {
+    // If the module defines any textgroup, purge all strings.
+    module_load_include('i18n.inc', $module);
+    if ($string_info = module_invoke($module, 'i18n_string_info')) {
+      foreach ($string_info as $group => $group_info) {
+        i18n_string_refresh_reset($group);
+        i18n_string_refresh_cleanup($group);
+      }
+    }
+  }
+}
+
+/**
  * Prepare group for refreshing
  */
 function _i18n_string_batch_refresh_prepare($group, &$context) {
@@ -263,7 +298,7 @@ function _i18n_string_batch_refresh_prepare($group, &$context) {
  */
 function _i18n_string_batch_refresh_list($group, &$context) {
   $count = 0;
-  if ($strings = module_invoke_all('i18n_string_list', $group)) {
+  if ($strings = i18n_string_group_string_list($group)) {
     $count = i18n_string_refresh_string_list($strings);
     $context['results'][$group]['result'] = TRUE;
   }
@@ -281,7 +316,6 @@ function _i18n_string_batch_refresh_callback($group, &$context) {
     $context['results'][$group]['result'] = TRUE;
   }
 }
-
 
 /**
  * Batch callback, delete old strings
@@ -305,5 +339,53 @@ function _i18n_string_batch_refresh_summary($group, &$context) {
   else {
     drupal_set_message(t("Cannot refresh strings for %group.", array('%group' => i18n_string_group_info($group, 'title'))), 'warning');
   }
+}
 
+/**
+ * Get all strings for a text group
+ */
+function i18n_string_group_string_list($group) {
+  // Add strings provided by all modules on hook_string_list().
+  // Note that i18n_string module itself will also collect all strings for this group's objects
+  $strings = module_invoke_all('i18n_string_list', $group);
+  // Invoke hook_i18n_string_list_TEXTGROUP_alter()
+  drupal_alter('i18n_string_list_' . $group, $strings);
+  return $strings;
+}
+
+/**
+ * Get all strings from a module.
+ */
+function i18n_string_module_string_list($module) {
+  $strings = array();
+  // Try loading i18n.inc for the module
+  module_load_include('i18n.inc', $module);
+  // If the module defines any textgroup, get all strings for this group
+  if ($groups = module_invoke($module, 'i18n_string_info')) {
+    foreach ($groups as $group) {
+      $strings = array_merge_recursive($strings, i18n_string_group_string_list($group));
+    }   
+  }
+  else {
+    $groups = array();
+  }
+  // The module may implement i18n_string_list()
+  if ($string_list = module_invoke($module, 'i18n_string_list', 'all')) {
+    foreach ($string_list as $group => $group_strings) {
+      if (!in_array($group, $groups)) {
+        $strings[$group] = $group_strings;
+      }
+    }
+  }
+  // If the module defines any object that has strings in another textgroup
+  if ($object_types = module_invoke($module, 'i18n_object_info')) {
+    foreach ($object_types as $type => $type_info) {
+      if (($group = i18n_string_object_info($type, 'textgroup')) && !in_array($group, $groups)) {
+        if ($group_strings = i18n_string_object_type_string_list($type)) {
+          $strings = array_merge_recursive($strings, $group_strings);
+        }
+      }
+    }
+  }
+  return $strings;
 }

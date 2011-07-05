@@ -43,43 +43,6 @@ function i18n_menu_menu() {
     'access arguments' => array('administer menu'),
     'type' => MENU_CALLBACK,
   );
-  $items['admin/structure/menu/manage/%menu/translate'] = array(
-    'title' => 'Translate',
-    'page callback' => 'i18n_string_object_translate_page',
-    'page arguments' => array('menu', 4),
-    'access callback' => 'i18n_menu_translation_menu_access',
-    'access arguments' => array(4),
-    'file' => 'i18n_menu.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/structure/menu/manage/%menu/translate/%language'] = array(
-    'title' => 'Translate',
-    'page callback' => 'i18n_string_object_translate_page',
-    'page arguments' => array('menu', 4, 6),
-    'access callback' => 'i18n_menu_translation_menu_access',
-    'access arguments' => array(4),
-    'file' => 'i18n_menu.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
-
-  $items['admin/structure/menu/item/%menu_link/translate'] = array(
-    'title' => 'Translate',
-    'page callback' => 'i18n_menu_translation_item_page',
-    'page arguments' => array(4),
-    'access callback' => 'i18n_menu_translation_item_access',
-    'access arguments' => array(4),
-    'file' => 'i18n_menu.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/structure/menu/item/%menu_link/translate/%language'] = array(
-    'title' => 'Translate',
-    'page callback' => 'i18n_menu_translation_item_page',
-    'page arguments' => array(4, 6),
-    'access callback' => 'i18n_menu_translation_item_access',
-    'access arguments' => array(4),
-    'file' => 'i18n_menu.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
   return $items;
 }
 
@@ -93,31 +56,20 @@ function i18n_menu_menu_alter(&$items) {
 }
 
 /**
- * Menu access callback
- */
-function i18n_menu_translation_menu_access($menu) {
-  return user_access('administer menu') && user_access('translate interface') && !i18n_menu_mode($menu['menu_name'], I18N_MODE_LANGUAGE);
-}
-
-/**
- * Menu access callback
- */
-function i18n_menu_translation_item_access($item) {
-  $menu = menu_load($item['menu_name']);
-  return user_access('administer menu') && ($menu['i18n_mode'] & I18N_MODE_TRANSLATE) && user_access('translate interface');
-}
-
-/**
  * Implements hook_block_view()
  */
 function i18n_menu_block_view_alter(&$data, $block) {
   if (($block->module == 'menu' || $block->module == 'system') && (i18n_menu_mode($block->delta) & I18N_MODE_MULTIPLE)) {
     $menus = menu_get_menus();
     if (isset($menus[$block->delta])) {
-      if (!$block->title) {
+      if (empty($block->title)) {
         $data['subject'] = i18n_string_plain(array('menu', 'menu', $block->delta, 'title'), $menus[$block->delta]);
       }
       $data['content'] = i18n_menu_translated_tree($block->delta);
+      // Add contextual links for this block.
+      if (!empty($data['content'])) {
+        $data['content']['#contextual_links']['menu'] = array('admin/structure/menu/manage', array($block->delta));
+      }
     }
   }
 }
@@ -188,7 +140,7 @@ function i18n_menu_menu_update($menu) {
   }
 
   // Non translatable menu.
-  if (!i18n_menu_mode($menu['menu_name'], I18N_MODE_TRANSLATE)) {
+  if (!($menu['i18n_mode'] & I18N_MODE_TRANSLATE)) {
     $tsids = db_select('menu_links')
       ->fields('menu_links', array('i18n_tsid'))
       ->groupBy('i18n_tsid')
@@ -248,21 +200,17 @@ function i18n_menu_menu_link_update($link) {
       if (!empty($link['translation_set'])) {
         // Translation set comes as parameter, we may be creating a translation, add link to the set
         $translation_set = $link['translation_set'];
-        $translation_set->add_item($link);
-        $translation_set->save(TRUE);   
+        $translation_set
+          ->add_item($link)
+          ->save(TRUE);   
       }
     }
     elseif ($link['language'] === LANGUAGE_NONE && !empty($link['original_item']['i18n_tsid'])) {
       if ($translation_set = i18n_translation_set_load($link['original_item']['i18n_tsid'])) {
-        $translation_set->remove_item(NULL, $link['original_item']['language']);
+        $translation_set->remove_language($link['original_item']['language']);
         // If there are no links left in this translation set, delete the set.
         // Otherwise update the set.
-        if ($translation_set->get_translations()) {
-          $translation_set->update(TRUE);
-        }
-        else {
-          $translation_set->delete();
-        }
+        $translation_set->update_delete();
       }
       $fields['i18n_tsid'] = 0;
     }
@@ -280,10 +228,7 @@ function i18n_menu_menu_link_update($link) {
   }
   // Update translatable strings if any
   if (isset($link['options']['attributes']['title']) && !empty($link['customized']) && i18n_menu_mode($link['menu_name'], I18N_MODE_LOCALIZE) && !i18n_object_langcode($link)) {
-    i18n_string_update(array('menu', 'item', $link['mlid']), array(
-      'title' => $link['link_title'],
-      'description' => $link['options']['attributes']['title'],
-    ));
+    i18n_string_object_update('menu_link', $link);
   }
 }
 
@@ -296,16 +241,11 @@ function i18n_menu_menu_link_delete($link) {
     if ($translation_set = i18n_translation_set_load($link['i18n_tsid'])) {
       $translation_set->get_translations();
 
-      unset($translation_set->translations[$link['language']]);
+      $translation_set->remove_language($link['language']);
 
       // If there are no links left in this translation set, delete the set.
       // Otherwise update the set.
-      if (empty($translation_set->translations)) {
-        $translation_set->delete();
-      }
-      else {
-        $translation_set->save(TRUE);
-      }
+      $translation_set->update_delete();
     }
   }
 
@@ -317,11 +257,11 @@ function i18n_menu_menu_link_delete($link) {
  */
 function i18n_menu_mode($name, $mode = NULL) {
   $menu = menu_load($name);
-  if (isset($mode)) {
-    return $menu ? $menu['i18n_mode'] & $mode : FALSE;
+  if (!$menu || !isset($menu['i18n_mode'])) {
+    return isset($mode) ? FALSE : I18N_MODE_NONE;
   }
   else {
-    return $menu ? $menu['i18n_mode'] : I18N_MODE_NONE;
+    return isset($mode) ? $menu['i18n_mode'] & $mode : $menu['i18n_mode'];
   }
 }
 
@@ -603,8 +543,8 @@ function i18n_menu_form_menu_edit_item_alter(&$form, &$form_state) {
       }
       else {
         // Create object and stick the source information in the translation set
-        $translation_set = i18n_translation_set_build('menu_link');
-        $translation_set->add_item($source_item);     
+        $translation_set = i18n_translation_set_build('menu_link')
+          ->add_item($source_item);     
       }
       $form['link_path']['#default_value'] = $source_item['link_path'];
 
@@ -704,17 +644,19 @@ function i18n_menu_item_get_language($item) {
  * to match the translated item's menu settings.
  */
 function i18n_menu_form_node_form_alter(&$form, &$form_state, $form_id) {
-  $node = $form['#node'];
-  $link = $form['#node']->menu;
-  if (!empty($link['mlid'])) {
-    $form['menu']['link']['language'] = array('#type' => 'value', '#value' => $link['language']);
+  if (isset($form['menu'])) {
+    $node = $form['#node'];
+    $link = $form['#node']->menu;
+    if (!empty($link['mlid'])) {
+      $form['menu']['link']['language'] = array('#type' => 'value', '#value' => $link['language']);
+    }
+    else {
+      // Set menu language to node language.
+      $form['menu']['link']['language'] = array('#type' => 'value', '#value' => $node->language);
+    }
+    // Customized must be set to 1 to save language.
+    $form['menu']['link']['customized'] = array('#type' => 'value', '#value' => 1);
   }
-  else {
-    // Set menu language to node language.
-    $form['menu']['link']['language'] = array('#type' => 'value', '#value' => $node->language);
-  }
-  // Customized must be set to 1 to save language.
-  $form['menu']['link']['customized'] = array('#type' => 'value', '#value' => 1);
 }
 
 /**

@@ -57,25 +57,6 @@ define('I18N_STRING_STATUS_UPDATE', 1);
 define('I18N_STRING_STATUS_DELETE', 2);
 
 /**
- * Get textgroup handler
- */
-function i18n_string_textgroup($textgroup) {
-  $groups = &drupal_static(__FUNCTION__);
-  if (!isset($groups[$textgroup])) {
-    $class = i18n_string_group_info($textgroup, 'class', 'i18n_string_default');
-    $groups[$textgroup] = new $class($textgroup);
-  }
-  return $groups[$textgroup];
-}
-
-/**
- * Get list of allowed formats for text translation
- */
-function i18n_string_allowed_formats() {
-  return variable_get('i18n_string_allowed_formats', array(filter_fallback_format()));
-}
-
-/**
  * Implements hook_help().
  */
 function i18n_string_help($path, $arg) {
@@ -143,7 +124,7 @@ function i18n_string_menu() {
     'title' => 'Save string',
     'page callback' => 'i18n_string_l10n_client_save_string',
     'access arguments' => array('use on-page translation'),
-    'file' => 'i18n_string.inc',
+    'file' => 'i18n_string.pages.inc',
     'type' => MENU_CALLBACK,
   );
   return $items;
@@ -155,10 +136,49 @@ function i18n_string_menu() {
 function i18n_string_hook_info() {
   $hooks['i18n_string_info'] =
   $hooks['i18n_string_list'] =
-  $hooks['i18n_string_refresh'] = array(
+  $hooks['i18n_string_refresh'] = 
+  $hooks['i18n_string_objects'] = array(
     'group' => 'i18n',
   );
   return $hooks;
+}
+
+/**
+ * Implements hook_locale().
+ *
+ * Provide the information from i18n_string groups to locale module
+ */
+function i18n_string_locale($op = 'groups') {
+  if ($op == 'groups') {
+    $groups = array();
+    foreach (i18n_string_group_info() as $name => $info) {
+      $groups[$name] = $info['title'];
+    }
+    return $groups;
+  }
+}
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function i18n_string_modules_enabled($modules) {
+  module_load_include('admin.inc', 'i18n_string');
+  i18n_string_refresh_enabled_modules($modules);
+}
+
+/**
+ * Implements hook_modules_uninstalled().
+ */
+function i18n_string_modules_uninstalled($modules) {
+  module_load_include('admin.inc', 'i18n_string');
+  i18n_string_refresh_uninstalled_modules($modules);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter()
+ */
+function i18n_string_form_l10n_client_form_alter(&$form, &$form_state) {
+  $form['#action'] = url('i18n_string/save');
 }
 
 /**
@@ -235,11 +255,8 @@ function i18n_string_translate_edit_form_validate($form, &$form_state) {
     $copy_state['values']['textgroup'] = 'default';
     locale_translate_edit_form_validate($form, $copy_state);
   }
-  else {
-    $formats = filter_formats();
-    if (!filter_access($formats[$context->format])) {
-      form_set_error('translations', t('You are not allowed to translate or edit texts with this text format.'));
-    }
+  elseif (!i18n_string_translate_access($context)) {
+    form_set_error('translations', t('You are not allowed to translate or edit texts with this text format.'));
   }
 }
 
@@ -282,9 +299,7 @@ function i18n_string_locale_translate_import_form_submit($form, &$form_state) {
  * the following to your settings.php
  *
  * @param $langcode
- * @param $reset
- *   Whether to reset the internal cache for the translated langcode.
- *
+ *   Optional language code to check. It will default to current request language.
  * @code
  *   // Enable translation of specific language. Language code is 'xx'
  *   $conf['i18n_string_translate_langcode_xx'] = TRUE;
@@ -292,12 +307,21 @@ function i18n_string_locale_translate_import_form_submit($form, &$form_state) {
  *   $conf['i18n_string_translate_langcode_yy'] = FALSE;
  * @endcode
  */
-function i18n_string_translate_langcode($langcode, $reset = FALSE) {
-  $translate = &drupal_static(__FUNCTION__ , array(), $reset);
+function i18n_string_translate_langcode($langcode = NULL) {
+  $translate = &drupal_static(__FUNCTION__);
+  $langcode = isset($langcode) ? $langcode : i18n_langcode();
   if (!isset($translate[$langcode])) {
     $translate[$langcode] = variable_get('i18n_string_translate_langcode_' . $langcode, language_default('language') != $langcode);
   }
   return $translate[$langcode];
+}
+
+/**
+ * Create string class from string name
+ */
+function i18n_string_build($name, $string = NULL) {
+  list ($group, $context) = i18n_string_context($name);
+  return i18n_string_textgroup($group)->build_string($context, $string);
 }
 
 /**
@@ -319,7 +343,7 @@ function i18n_string_update($name, $string, $options = array()) {
   }
   else {
     list($textgroup, $context) = i18n_string_context($name);
-    return i18n_string_textgroup($textgroup)->update($context, $string, $options);
+    return i18n_string_textgroup($textgroup)->context_update($context, $string, $options);
   }
 }
 
@@ -335,7 +359,32 @@ function i18n_string_update($name, $string, $options = array()) {
  *  'profile:field:oldfield:*' -> 'profile:field:newfield:*'
  */
 function i18n_string_update_context($oldname, $newname) {
-  return i18n_string_default::update_context($oldname, $newname);
+  module_load_install('i18n_string');
+  return i18n_string_install_update_context($oldname, $newname);
+}
+
+/**
+ * Get textgroup handler
+ */
+function i18n_string_textgroup($textgroup) {
+  $groups = &drupal_static(__FUNCTION__);
+  if (!isset($groups[$textgroup])) {
+    $class = i18n_string_group_info($textgroup, 'class', 'i18n_string_textgroup_default');
+    $groups[$textgroup] = new $class($textgroup);
+  }
+  return $groups[$textgroup];
+}
+
+/**
+ * Check whether a string format is allowed for translation.
+ */
+function i18n_string_allowed_format($format_id = NULL) {
+  if (!$format_id) {
+    return TRUE;
+  }
+  else {
+    return in_array($format_id, variable_get('i18n_string_allowed_formats', array(filter_fallback_format())));
+  }
 }
 
 /**
@@ -380,24 +429,13 @@ function i18n_string_element_mark(&$element) {
   }
 }
 
+
 /**
- * Translate / update multiple strings
- *
- * @param $strings
- *   Array of name => string pairs
+ * Get source string object.
  */
-function i18n_string_multiple($operation, $name, $strings, $options = array()) {
-  $result = array();
-  // Strings may be an array of properties, we need to shift it
-  if ($operation == 'remove') {
-    $strings = array_flip($strings);
-  }
-  foreach ($strings as $key => $string) {
-    list($textgroup, $context) = i18n_string_context($name, $key);
-    array_unshift($context, $textgroup);
-    $result[$key] = call_user_func('i18n_string_' . $operation, $context, $string, $options);
-  }
-  return $result;
+function i18n_string_get_source($name) {
+  list ($textgroup, $context) = i18n_string_context($name);
+  return i18n_string_textgroup($textgroup)->build_string($context)->get_source();
 }
 
 /**
@@ -427,40 +465,31 @@ function i18n_string_group_info($group = NULL, $property = NULL, $default = NULL
   }
 }
 
+
 /**
- * Implements hook_locale().
+ * Translate / update multiple strings
  *
- * Provide the information from i18n_string groups to locale module
+ * @param $strings
+ *   Array of name => string pairs
  */
-function i18n_string_locale($op = 'groups') {
-  if ($op == 'groups') {
-    $groups = array();
-    foreach (i18n_string_group_info() as $name => $info) {
-      $groups[$name] = $info['title'];
-    }
-    return $groups;
+function i18n_string_multiple($operation, $name, $strings, $options = array()) {
+  $result = array();
+  // Strings may be an array of properties, we need to shift it
+  if ($operation == 'remove') {
+    $strings = array_flip($strings);
   }
+  foreach ($strings as $key => $string) {
+    list($textgroup, $context) = i18n_string_context($name, $key);
+    array_unshift($context, $textgroup);
+    $result[$key] = call_user_func('i18n_string_' . $operation, $context, $string, $options);
+  }
+  return $result;
 }
 
 /**
  * @ingroup i18napi
  * @{
  */
-
-/**
- * Implements hook_modules_enabled()
- */
-function i18n_string_modules_enabled($modules) {
-  module_load_include('admin.inc', 'i18n_string');
-  // Check if any of the modules has strings to update
-  foreach ($modules as $module) {
-    if ($strings = module_invoke($module, 'i18n_string_list', 'all')) {
-      i18n_string_refresh_string_list($strings);
-    }
-    // Call module refresh if exists
-    module_invoke($module, 'i18n_string_refresh', 'all');
-  }
-}
 
 /**
  * Get translation for user defined string.
@@ -479,20 +508,22 @@ function i18n_string_modules_enabled($modules) {
  *   - 'callback' Callback to apply to the result (both to translated or untranslated string
  */
 function i18n_string_translate($name, $string, $options = array()) {
-  $options['langcode'] = i18n_langcode(isset($options['langcode']) ? $options['langcode'] : NULL);
   if (is_array($string)) {
     return i18n_string_translate_list($name, $string, $options);
   }
-  elseif (i18n_string_translate_langcode($options['langcode'])) {
-    list($textgroup, $context) = i18n_string_context($name);
-    $translation = i18n_string_textgroup($textgroup)->translate($context, $string, $options);
-    // Add for l10n client if available, we pass translation object that contains the format
-    i18n_string_l10n_client_add($translation, $options);
-    return i18n_string_format($translation, $options);
-  }
   else {
-    // If we don't want to translate to this language, format and return
-    return i18n_string_format($string, $options);
+    $options['langcode'] = $langcode = isset($options['langcode']) ? $options['langcode'] : i18n_langcode();
+    if (i18n_string_translate_langcode($langcode)) {
+      list($textgroup, $context) = i18n_string_context($name);
+      $translation = i18n_string_textgroup($textgroup)->context_translate($context, $string, $options);
+      // Add for l10n client if available, we pass translation object that contains the format
+      i18n_string_l10n_client_add($translation, $langcode);
+      return $translation->format_translation($langcode, $options);
+    }
+    else {
+      // If we don't want to translate to this language, format and return
+      return i18n_string_format($string, $options);
+    }
   }
 }
 
@@ -500,55 +531,41 @@ function i18n_string_translate($name, $string, $options = array()) {
  * Check user access to translate a specific string.
  * 
  * If the string has a format the user is not allowed to edit, it will return FALSE
+ * 
+ * @param $string_format;
+ *   String object or $format_id
  */
-function i18n_string_translate_access($i18nstring, $account = NULL) {
-  return empty($i18nstring->format) || in_array($i18nstring->format, i18n_string_allowed_formats()) && filter_access($i18nstring->format, $account);
+function i18n_string_translate_access($string_format, $account = NULL) {
+  $format_id = is_object($string_format) ? i18n_object_field($string_format, 'format') : $string_format;
+  return empty($format_id) || i18n_string_allowed_format($format_id) && ($format = filter_format_load($format_id)) && filter_access($format, $account) ;
 }
 
 /**
  * Format the resulting translation or the default string applying callbacks
  *
- * There's a hidden variable, 'i18n_string_debug', that when set to TRUE will display additional info
+ * @param $string
+ *   Text string.
+ * @param $options
+ *   Array of options for string formatting:
+ *   - 'format', text format to apply to the string, defaults to none.
+ *   - 'sanitize', whether to apply the text format, defaults to TRUE.
+ *   - 'cache', text format parameter.
+ *   - 'langcode', text format parameter, defaults to current page language.
  */
-function i18n_string_format($i18nstring, $options = array()) {
-  static $debug;
-  if (!isset($debug)) {
-    $debug = variable_get('i18n_string_debug', FALSE);
-  }
-  $options += array('sanitize' => TRUE, 'cache' => FALSE);
-  if (is_string($i18nstring)) {
-    $string = $i18nstring;
-  }
-  elseif (!empty($i18nstring->translation)) {
-    $string = $i18nstring->translation;
-    if (!empty($i18nstring->format)) {
-      $options += array('format' => $i18nstring->format);
-    }
-    if (isset($options['filter'])) {
-      $string = call_user_func($options['filter'], $string);
-    }
-  }
-  else {
-    $string = isset($i18nstring->source) ? $i18nstring->source : '';
-  }
-  // Apply filter and callback to any of the strings
+function i18n_string_format($string, $options = array()) {
+  $options += array('langcode' => i18n_langcode(), 'format' => FALSE, 'sanitize' => TRUE, 'cache' => FALSE);
+  // Apply format and callback 
   if ($string) {
-    if (!empty($options['format']) && !empty($options['sanitize'])) {
+    if ($options['format'] && $options['sanitize']) {
       $string = check_markup($string, $options['format'], $options['langcode'], $options['cache']);
     }
     if (isset($options['callback'])) {
       $string = call_user_func($options['callback'], $string);
     }
   }
-  // Add debug information if enabled
-  if ($debug && is_object($i18nstring)) {
-    $info = array($i18nstring->textgroup, $i18nstring->context);
-    if (!empty($i18nstring->format)) {
-      $info[] = $i18nstring->format;
-    }
-    $string .= ' [' . implode(':', $info) . ']';
-  }
-  return $string;
+  // Finally, apply prefix and suffix
+  $options += array('prefix' => '', 'suffix' => '');
+  return $options['prefix'] . $string . $options['suffix'];
 }
 
 /**
@@ -591,21 +608,23 @@ function i18n_string_plain($name, $default, $options = array()) {
  *   - 'index' => field that will be mapped to the array key (defaults to 'property')
  */
 function i18n_string_translate_list($name, $strings, $options = array()) {
-  $options['langcode'] = i18n_langcode(isset($options['langcode']) ? $options['langcode'] : NULL);
+  $options['langcode'] = $langcode = isset($options['langcode']) ? $options['langcode'] : i18n_langcode();
   // If language is default, just return
-  if (i18n_string_translate_langcode($options['langcode'])) {
+  if (i18n_string_translate_langcode($langcode)) {
     // Get textgroup context, preserve placeholder
     list($textgroup, $context) = i18n_string_context($name, '*');
     $translations = i18n_string_textgroup($textgroup)->multiple_translate($context, $strings, $options);
     // Add for l10n client if available, we pass translation object that contains the format
     foreach ($translations as $index => $translation) {
-      i18n_string_l10n_client_add($translation, $options);
-      $strings[$index] = $translation;
+      i18n_string_l10n_client_add($translation, $langcode);
+      $strings[$index] = $translation->format_translation($langcode, $options);
     }
   }
-  // Format and return
-  foreach ($strings as $key => $string) {
-    $strings[$key] = i18n_string_format($string, $options);
+  else {
+    // Format and return
+    foreach ($strings as $key => $string) {
+      $strings[$key] = i18n_string_format($string, $options);
+    }
   }
   return $strings;
 }
@@ -629,7 +648,7 @@ function i18n_string_remove($name, $string = NULL, $options = array()) {
   }
   else {
     list($textgroup, $context) = i18n_string_context($name);
-    return i18n_string_textgroup($textgroup)->remove($context, $string, $options);
+    return i18n_string_textgroup($textgroup)->context_remove($context, $string, $options);
   }
 }
 
@@ -645,13 +664,13 @@ function i18n_string_remove($name, $string = NULL, $options = array()) {
  * @param $context
  *   String object
  */
-function i18n_string_l10n_client_add($string, $options) {
+function i18n_string_l10n_client_add($string, $langcode) {
   // If current language add to l10n client list for later on page translation.
   // If langcode translation was disabled we are not supossed to reach here.
-  if (($string->language == i18n_langcode()) && function_exists('l10_client_add_string_to_page') && i18n_string_translate_access($string)) {
-    $translation = !empty($string->translation) ? $string->translation : TRUE;
+  if (($langcode == i18n_langcode()) && function_exists('l10_client_add_string_to_page') && i18n_string_translate_access($string)) {
+    $translation = $string->get_translation($langcode);
     $source = !empty($string->source) ? $string->source : FALSE;
-    l10_client_add_string_to_page($string->source, $translation, $string->textgroup);
+    l10_client_add_string_to_page($source, $translation ? $translation : FALSE, $string->textgroup, $string->context);
   }
 }
 
@@ -679,6 +698,7 @@ function i18n_string_object_info($type = NULL, $property = NULL) {
     return $list;
   }
 }
+
 /**
  * Translate object properties
  *
@@ -690,16 +710,11 @@ function i18n_string_object_info($type = NULL, $property = NULL) {
  *   Object or array
  */
 function i18n_string_object_translate($type, $object, $options = array()) {
-  // If the object is marked as translation do nothing
-  if (is_object($object) && !empty($object->i18n_string) || is_array($object) && !empty($object['i18n_string'])) {
-    return $object;
-  }
-  $info = i18n_object_info($type);
-  if ($info && !empty($info['string translation'])) {
-    $translate = is_object($object) ? clone $object : (object)$object;
-    $translate->i18n_string = TRUE;
-    $result = i18n_string_textgroup($info['string translation']['textgroup'])->translate_object($type, $translate, $options);
-    return is_array($object) ? (array)$result : $result;
+  $langcode = isset($options['langcode']) ? $options['langcode'] : i18n_langcode();
+  if (i18n_string_translate_langcode($langcode)) {
+    // Object properties will be returned without filtering as in the original one.
+    $options += array('sanitize' => FALSE);
+    return i18n_object($type, $object)->translate($langcode, $options);
   }
   else {
     return $object;
@@ -715,62 +730,56 @@ function i18n_string_object_translate($type, $object, $options = array()) {
  *   Object or array
  */
 function i18n_string_object_remove($type, $object, $options = array()) {
-  $info = i18n_object_info($type);
-  if ($info && !empty($info['string translation'])) {
-    $string_info = $info['string translation'];
-    $object = is_array($object) ? (object)$object : $object;
-    return i18n_string_remove(array($string_info['textgroup'], $string_info['type'], $object->{$info['key']}, '*'), array_keys($string_info['properties']), $options);
-  }
+  return i18n_object($type, $object)->strings_remove($options);
 }
 
 /**
- * Update object properties
+ * Update object properties.
+ * 
+ * @param $type
+ *   Object type
+ * @param $object
+ *   Object or array
  */
-function i18n_string_object_update($type, $object) {
-  $info = i18n_object_info($type);
-  if ($info && !empty($info['string translation'])) {
-    $object = is_array($object) ? (object)$object : $object;
-    return i18n_string_textgroup($info['string translation']['textgroup'])->update_object($type, $object);
-  }
+function i18n_string_object_update($type, $object, $options = array()) {
+  return i18n_object($type, $object)->strings_update($options);
 }
 
 /**
  * Generic translation page for i18n_strings objects.
  */
-function i18n_string_object_translate_page($object_type, $object, $langcode = NULL) {
-  $info = i18n_object_info($object_type);
-  $textgroup = i18n_string_textgroup($info['string translation']['textgroup']);
-
-  // Build the form meta from object type
-  $form_meta = array(
-    '#page_title' => t('Translate @name', array('@name' => $info['title'])),
-    '#edit' => $textgroup->get_edit_path($object_type, $object),
-    '#translate' => $textgroup->get_translate_path($object_type, $object),
-  );
-  $object_key = i18n_object_key($object_type, $object);
-  foreach ($info['string translation']['properties'] as $field => $title) {
-    if ($value = i18n_object_field($object, $field)) {
-      $form_meta['#items'][] = array(
-        '#title' => is_array($title) ? $title['title'] : $title,
-        '#string_key' => array($info['string translation']['textgroup'], $info['string translation']['type'], $object_key, $field),
-        '#default_value' => $value,
-      );
-    }
-  }
-
-  // Set the default item key, assume it's the first.
-  $default_item = reset($form_meta['#items']);
-  $form_meta['#item_title_key'] = $default_item['#string_key'];
-  $form_meta['#item_title_default'] = $default_item['#default_value'];
-
+function i18n_string_object_translate_page($object_type, $object_value, $langcode = NULL) {
   module_load_include('inc', 'i18n_string', 'i18n_string.pages');
-  return i18n_string_translate_page($form_meta, $langcode);
+  return i18n_string_translate_page_object($object_type, $object_value, $langcode);
+}
+
+/**
+ * Preload all strings for this textroup/context.
+ * 
+ * This is a performance optimization to load all needed strings with a single query.
+ * 
+ * Examples of valid string name to search are:
+ *  - 'taxonomy:term:*:title'
+ *    This will find all titles for taxonomy terms
+ *  - array('taxonomy', 'term', array(1,2), '*')
+ *    This will find all properties for taxonomy terms 1 and 2
+ * 
+ * @param $name
+ *   Specially crafted string name, it may take '*' and array parameters for each element.
+ * @param $langcode
+ *   Language code to search translations. Defaults to current language.
+ *   
+ * @return array()
+ *   String objects indexed by context.
+ */
+function i18n_string_translation_search($name, $langcode = NULL) {
+  $langcode = isset($langcode) ? $langcode : i18n_langcode();
+  list ($textgroup, $context) = i18n_string_context($name);
+  return i18n_string_textgroup($textgroup)->multiple_translation_search($context, $langcode);
 }
 
 /**
  * Update / create translation for a certain source.
- *
- //* Therefore it tries to update the source string, 
  *
  * @param $name
  *   Array or string concatenated with ':' that contains textgroup and string context
@@ -778,26 +787,57 @@ function i18n_string_object_translate_page($object_type, $object, $langcode = NU
  *   Translation string for this language code
  * @param $langcode
  *   The language code to translate to a language other than what is used to display the page.
+ * @param $source_string
+ *   Optional source string, just in case it needs to be created.
+ *   
+ * @return mixed
+ *   Source string object if update was successful.
+ *   Null if source string not found.
+ *   FALSE if use doesn't have permission to edit this translation.
  */
-function i18n_string_translation_update($name, $translation, $langcode) {
+function i18n_string_translation_update($name, $translation, $langcode, $source_string = NULL) {
   if (is_array($translation)) {
     return i18n_string_multiple('translation_update', $name, $translation, $langcode);
   }
-  else {
-    list ($textgroup, $context) = i18n_string_context($name);
-    $langcode_default = language_default('language');
-    // It's the default language so we should update the string source as well.
-    if ($langcode == $langcode_default) {
-      i18n_string_update($name, $translation);
-    }
-    elseif ($source = i18n_string_textgroup($textgroup)->update_translation($context, $langcode, $translation)) {
+  elseif ($source = i18n_string_get_source($name)) {
+    if (i18n_string_translation_validate($source, $translation)) {
+      if ($langcode == language_default('language')) {
+        // It's the default language so we should update the string source as well.
+        i18n_string_update($name, $translation);
+      }
+      else {
+        list ($textgroup, $context) = i18n_string_context($name);
+        i18n_string_textgroup($textgroup)->update_translation($context, $langcode, $translation);
+      }
       return $source;
     }
     else {
-      // We don't have a source string, so we need to create it with this translation. Ugly but...
-      // Both source and translation will be the same string.
-      i18n_string_update($name, $translation);
-      return i18n_string_textgroup($textgroup)->update_translation($context, $langcode, $translation);
+      // We cannot update this string because of its input format.
+      return FALSE;
     }
+  }
+  elseif ($source_string) {
+    // We don't have a source in the database, so we need to create it, but only if we've got the source too.
+    // Note this string won't have any format.
+    i18n_string_update($name, $source_string);
+    return i18n_string_translation_update($name, $translation, $langcode);
+  }
+  else {
+    return NULL;
+  }
+}
+
+/**
+ * Validate translation and check user access to input format
+ */
+function i18n_string_translation_validate($i18nstring, $translation) {
+  if (!empty($i18nstring->format)) {
+    // If we've got a text format, just need to check user access to it.
+    return i18n_string_translate_access($i18nstring);
+  }
+  else {
+    // If not text format use standard locale validation.
+    // Note: looks like locale.inc is included by locale_init() ?!
+    return locale_string_is_safe($translation);
   }
 }

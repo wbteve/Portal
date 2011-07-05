@@ -197,6 +197,8 @@ function i18n_menu() {
     'description' => 'Configure extended options for multilingual content and translations.',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
+  module_load_include('pages.inc', 'i18n');
+  $items += i18n_page_menu_items();
   return $items;
 }
 
@@ -305,6 +307,23 @@ function i18n_context_language() {
 }
 
 /**
+ * Create object wrapper
+ */
+function i18n_object($type, $object) {
+  $i18n_object = &drupal_static(__FUNCTION__);
+  $key = i18n_object_key($type, $object);
+  $key = is_array($key) ? implode(':', $key) : $key;
+  if (!isset($i18n_object[$type][$key])) {
+    $class = i18n_object_info($type, 'class');
+    if (!$class) {
+      $class = module_exists('i18n_string') ? 'i18n_string_object_wrapper' : 'i18n_object_wrapper';
+    }
+    $i18n_object[$type][$key] = new $class($type, $object);
+  }
+  return $i18n_object[$type][$key];
+}
+
+/**
  * Get object language code
  *
  * @param $object
@@ -320,14 +339,14 @@ function i18n_object_langcode($object, $default = FALSE, $field = 'language') {
 /**
  * Get translation information for objects
  */
-function i18n_object_info($type = NULL, $property = NULL) {
+function i18n_object_info($type = NULL, $property = NULL, $default = NULL) {
   $info = &drupal_static(__FUNCTION__);
   if (!$info) {
     $info = module_invoke_all('i18n_object_info');
     drupal_alter('i18n_object_info', $info);
   }
   if ($property) {
-    return isset($info[$type][$property]) ? $info[$type][$property] : NULL;
+    return isset($info[$type][$property]) ? $info[$type][$property] : $default;
   }
   elseif ($type) {
     return isset($info[$type]) ? $info[$type] : array();
@@ -341,7 +360,14 @@ function i18n_object_info($type = NULL, $property = NULL) {
  * Get field value from object/array
  */
 function i18n_object_field($object, $field, $default = NULL) {
-  if (is_object($object)) {
+  if (is_array($field)) {
+    // We can handle a list of fields too. This is useful for multiple keys (like blocks)
+    foreach ($field as $key => $name) {
+      $values[$key] = i18n_object_field($object, $name);
+    }
+    return $values;
+  }
+  elseif (is_object($object)) {
     return isset($object->$field) ? $object->$field : $default;
   }
   elseif (is_array($object)) {
@@ -365,26 +391,10 @@ function i18n_object_key($type, $object, $default = NULL) {
 }
 
 /**
- * Get edit path for object
+ * Menu access callback for mixed translation tab
  */
-function i18n_object_edit_path($type, $object) {
-  if ($path = i18n_object_info($type, 'edit path')) {
-    return strtr($path, i18n_object_placeholders($type, $object));
-  }
-  else {
-    return NULL;
-  }
-}
-
-/**
- * Get menu placehoders for object
- */
-function i18n_object_placeholders($type, $object) {
-  $placeholders = i18n_object_info($type, 'placeholders', array());
-  foreach ($placeholders as $name => $field) {
-    $placeholders[$name] = i18n_object_field($object, $field);
-  }
-  return $placeholders;
+function i18n_object_translate_access($type, $object) {
+  return i18n_object($type, $object)->get_translate_access();
 }
 
 /**

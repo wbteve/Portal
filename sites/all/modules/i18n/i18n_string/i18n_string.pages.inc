@@ -8,6 +8,26 @@
  */
 
 /**
+ * Generate translate page from object
+ */
+function i18n_string_translate_page_object($object_type, $object_value, $langcode = NULL) {
+  $object = i18n_object($object_type, $object_value);
+
+  // Build the form meta from object type
+  $form_meta = array(
+    '#page_title' => t('Translate @name', array('@name' => i18n_object_info($object_type, 'title'))),
+    '#edit' => $object->get_edit_path(),
+    '#translate' => $object->get_translate_path(),
+  );
+  // Get base keys for all these strings. Object key may be multiple like for blocks (module, delta)
+  $form_meta['#items'] = $object->get_strings(array('empty' => TRUE));
+  // Set the default item key, assume it's the first.
+  $form_meta['#item_title'] = reset($form_meta['#items']);
+
+  return i18n_string_translate_page($form_meta, $langcode);  
+}
+
+/**
  * Generic translation interface for i18n_strings objects.
  */
 function i18n_string_translate_page($form_meta, $langcode = NULL) {
@@ -20,8 +40,7 @@ function i18n_string_translate_page($form_meta, $langcode = NULL) {
     return i18n_string_translate_page_overview($form_meta);
   }
   else {
-    $languages = language_list();
-    drupal_set_title(t('Translate to @language', array('@language' => $languages[$langcode]->name)));
+    drupal_set_title(t('Translate to @language', array('@language' => i18n_language_name($langcode))));
     return drupal_get_form('i18n_string_translate_page_form', $form_meta, $langcode);
   }
 }
@@ -40,7 +59,7 @@ function i18n_string_translate_page_overview($form_meta) {
     if ($langcode == $default_language->language) {
       $rows[] = array(
         $language->name . ' ' . t('(source)'),
-        $form_meta['#item_title_default'],
+        $form_meta['#item_title']->get_string(),
         t('original'),
         l(t('edit'), $form_meta['#edit']),
       );
@@ -48,18 +67,16 @@ function i18n_string_translate_page_overview($form_meta) {
     else {
       // Try to figure out if this item has any of its properties translated.
       $translated = FALSE;
-      foreach ($form_meta['#items'] as $item) {
-        $str = i18n_string($item['#string_key'], $item['#default_value'], array('langcode' => $langcode, 'sanitize' => FALSE));
-        if ($str != $item['#default_value']) {
+      foreach ($form_meta['#items'] as $i18nstring) {
+        if ($i18nstring->get_translation($langcode)) {
           $translated = TRUE;
           break;
         }
       }
       // Translate the item that was requested to be displayed as title.
-      $item_title = i18n_string($form_meta['#item_title_key'], $form_meta['#item_title_default'], array('langcode' => $langcode));
       $rows[] = array(
         $language->name,
-        $item_title,
+        $form_meta['#item_title']->format_translation($langcode),
         $translated ? t('translated') : t('not translated'),
         l(t('translate'), $form_meta['#translate'] . '/' . $langcode),
       );
@@ -91,28 +108,20 @@ function i18n_string_translate_page_form($form, &$form_state, $form_meta, $langc
   foreach ($form_meta['#items'] as $item) {
     $disabled = FALSE;
     $description = '';
-    list($textgroup, $context) = i18n_string_context($item['#string_key']);
-    $source = db_select('i18n_string', 'i18ns')
-      ->fields('i18ns')
-      ->condition('textgroup', $textgroup)
-      ->condition('context', implode(':', $context))
-      ->execute()
-      ->fetchObject();
-    if ($source) {
-      if ($source->format) {
-        $format = $formats[$source->format];
-        $disabled = !filter_access($format);
-        if ($disabled) {
-          $description = t('This string uses the %name text format. You are not allowed to translate or edit texts with this format.', array('%name' => $format->name));
-        }
-        else {
-          $description = '<h5>' . t('Text format: @name', array('@name' => $format->name)) . '</h5>' . theme('filter_tips', array('tips' => _filter_tips($source->format, FALSE)));
-        }
+    $source = $item->get_source();
+    if ($source && $source->format) {
+      $format = filter_format_load($source->format);
+      $disabled = !i18n_string_translate_access($source);
+      if ($disabled) {
+        $description = t('This string uses the %name text format. You are not allowed to translate or edit texts with this format.', array('%name' => $format->name));
+      }
+      else {
+        $description = '<h5>' . t('Text format: @name', array('@name' => $format->name)) . '</h5>' . theme('filter_tips', array('tips' => _filter_tips($source->format, FALSE)));
       }
     }
-    $default_value = i18n_string($item['#string_key'], $item['#default_value'], array('langcode' => $langcode, 'sanitize' => FALSE));
-    $form['strings'][implode(':', $item['#string_key'])] = array(
-      '#title' => $item['#title'],
+    $default_value = $item->format_translation($langcode, array('langcode' => $langcode, 'sanitize' => FALSE, 'debug' => FALSE));
+    $form['strings'][$item->get_name()] = array(
+      '#title' => $item->get_title(),
       '#type' => 'textarea',
       '#default_value' => $default_value,
       '#disabled' => $disabled,
@@ -167,5 +176,39 @@ function i18n_string_validate_submission($formkey, $value) {
   if (!locale_string_is_safe($value)) {
     form_set_error($formkey, t('The submitted string contains disallowed HTML: %string', array('%string' => $value)));
     watchdog('locale', 'Attempted submission of a translation string with disallowed HTML: %string', array('%string' => $value), WATCHDOG_WARNING);
+  }
+}
+
+
+/**
+ * Menu callback. Saves a string translation coming as POST data.
+ */
+function i18n_string_l10n_client_save_string() {
+  global $user, $language;
+
+  if (user_access('use on-page translation')) {
+    $textgroup = !empty($_POST['textgroup']) ? $_POST['textgroup'] : 'default';
+    // Default textgroup will be handled by l10n_client module
+    if ($textgroup == 'default') {
+      return l10n_client_save_string();
+    }
+    elseif (isset($_POST['source']) && isset($_POST['target']) && !empty($_POST['context']) && !empty($_POST['form_token']) && drupal_valid_token($_POST['form_token'], 'l10n_client_form')) {
+      $name = $textgroup . ':' . $_POST['context'];
+      $result = i18n_string_translation_update($name, $_POST['target'], $language->language, $_POST['source']);
+      if ($result) {
+        $message = theme('l10n_client_message', array('message' => t('Translation saved locally for user defined string.'), 'level' => WATCHDOG_INFO));
+      }
+      elseif ($result === FALSE) {
+        $message = theme('l10n_client_message', array('message' => t('Not saved due to insufficient permissions.')));     
+      }
+      else {
+        $message = theme('l10n_client_message', array('message' => t('Not saved due to source string missing.')));
+      }
+    }
+    else {
+      $message = theme('l10n_client_message', array('message' => t('Not saved due to missing form values.')));
+    }
+    drupal_json_output($message);
+    exit;
   }
 }

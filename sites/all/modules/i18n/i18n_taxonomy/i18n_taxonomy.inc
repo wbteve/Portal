@@ -3,6 +3,10 @@
  * @file
  * Internationalization (i18n) module - Translation set
  */
+/**
+ * @file
+ * Internationalization (i18n) module - Translation set
+ */
 class i18n_taxonomy_translation_set extends i18n_translation_set {
   /**
    * Load all path translations
@@ -25,37 +29,23 @@ class i18n_taxonomy_translation_set extends i18n_translation_set {
 /**
  * Taxonomy textgroup handler
  */
-class i18n_taxonomy_textgroup extends i18n_string_default {
+class i18n_taxonomy_term extends i18n_string_object_wrapper {
   /**
-   * Get edit path for object
-   *
-   * @param $type
-   * 	 Object type in this text group, like 'vocabulary', 'term', etc..
-   * @param $object
-   *   The Drupal object itself
+   * Translation mode for object
    */
-  public function get_edit_path($type, $object) {
-    switch ($type) {
-      case 'taxonomy_term':
-        return 'taxonomy/term/' . $object->tid . '/edit';
-      case 'taxonomy_vocabulary':
-        return 'admin/structure/taxonomy/' . $object->machine_name . '/edit';
+  public function get_translate_mode() {
+    $mode = i18n_taxonomy_vocabulary_mode($this->object->vid);
+    if ($this->get_langcode()) {
+      return $mode & I18N_MODE_TRANSLATE;
+    }
+    else {
+      return $mode & I18N_MODE_LOCALIZE;
     }
   }
   /**
-   * Get translate path for object
-   *
-   * @param $type
-   * 	 Object type in this text group, like 'vocabulary', 'term', etc..
-   * @param $object
-   *   The Drupal object itself
+   * Access to object translation. This should check object properties and permissions
    */
-  public function get_translate_path($type, $object, $language = NULL) {
-    switch ($type) {
-      case 'taxonomy_term':
-        return 'taxonomy/term/' . $object->tid . '/translate' . ($language ? '/' . $language->language : '');
-      case 'taxonomy_vocabulary':
-        return 'admin/structure/taxonomy/' . $object->machine_name . '/translate' . ($language ? '/' . $language->language : '');
-    }
+  protected function translate_access() {
+    return taxonomy_term_edit_access($this->object) && $this->get_langcode() && user_access('translate interface');
   }
 }
