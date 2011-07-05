@@ -79,7 +79,6 @@
  * @see zen_preprocess_node()
  * @see template_process()
  */
-dsm($content);
 ?>
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
 
