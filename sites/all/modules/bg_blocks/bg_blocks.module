@@ -15,6 +15,13 @@ function bg_blocks_block_info() {
     'visibility' => BLOCK_VISIBILITY_LISTED,
     'pages' => 'node/*',
   );
+  $blocks['profile_menu'] = array(
+    'info' => t('User profile menu'),
+    'status' => TRUE,
+    'region' => 'sidebar_first',
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'user/*',
+  );
 
   return $blocks;
 }
@@ -46,6 +53,10 @@ function bg_blocks_block_view($delta = '') {
       $block['subject'] = '';
       $block['content'] = bg_blocks_seo_content();
       break;
+    case 'profile_menu':
+      $block['subject'] = '';
+      $block['content'] = bg_blocks_profile_menu();
+      break;
   }
   return $block;
 }
@@ -60,5 +71,16 @@ function bg_blocks_seo_content() {
       $output .= $node->field_seo_content[$node->language][0]['safe_value'];
     }
   }
+  return $output;
+}
+
+function bg_blocks_profile_menu() {
+  global $user;
+  $output = '';
+  $list_items = array();
+  $list_items[] = l(t('Edit profile'),'user/'.$user->uid.'/edit');
+  $output .= '<div class="profile-menu">';
+    $output .= theme('item_list', array('items' => $list_items));
+  $output .= '</div>';
   return $output;
 }
