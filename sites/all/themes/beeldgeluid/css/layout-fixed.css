@@ -91,9 +91,9 @@ html, body {
 #content,
 .no-sidebars #content {
   float: left; /* LTR */
-  width: 740px;
+  width: 720px;
   margin-left: 0; /* LTR */
-  margin-right: -740px; /* LTR */ /* Negative value of #content's width + left margin. */
+  margin-right: -720px; /* LTR */ /* Negative value of #content's width + left margin. */
   padding: 0; /* DO NOT CHANGE. Add padding or margin to #content .section. */
   margin-bottom: 5em; 
 }
@@ -111,14 +111,14 @@ html, body {
 }
 
 .sidebar-second #content {
-  width: 500px;
+  width: 480px;
   margin-left: 0; /* LTR */
-  margin-right: -520px; /* LTR */ /* Negative value of #content's width + left margin. */
+  margin-right: -480px; /* LTR */ /* Negative value of #content's width + left margin. */
 }
 
 .two-sidebars #content {
-  width: 460px;
-  margin-left: 220px; /* LTR */ /* The width of .region-sidebar-first */
+  width: 240px;
+  margin-left: 240px; /* LTR */ /* The width of .region-sidebar-first */
   margin-right: -480px; /* LTR */ /* Negative value of #content's width + left margin. */
 }
 

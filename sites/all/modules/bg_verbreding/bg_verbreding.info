@@ -1,0 +1,4 @@
+name = Beeld en Geluid Verbreding
+description = Verbredende items op BenG media items 
+package = "Beeld en Geluid"
+core = 7.x

@@ -80,3 +80,14 @@
   width: 440px !important;
   z-index: 1000;
 }
+
+.node-media .field-name-field-media-file {
+  width: 480px;
+  float: left;
+}
+
+.node-media .group-verbreding {
+  background: url(images/grey-40.png);
+  width: 240px;
+  float: left;
+}

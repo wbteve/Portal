@@ -15,12 +15,11 @@
 .with-wireframes .region-bottom {
   outline: 1px solid #ccc;
 }
-/*
-body.node-type-dossier #main-wrapper {
+
+#main-wrapper {
     background-color: #4A4A4A;
     background-image: url('/sites/all/themes/beeldgeluid/images/bg-grid.gif');
     background-position: center top;
     background-repeat: no-repeat;
     color: #FFFFFF;
 }
-*/

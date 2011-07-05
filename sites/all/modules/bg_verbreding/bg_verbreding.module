@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function bg_verbreding_field_extra_fields() {
+  dsm('go');
+  $extra['node']['media'] = array(
+    /*
+    'form' => array(
+      'choice_wrapper' => array(
+        'label' => t('Poll choices'), 
+        'description' => t('Poll choices'), 
+        'weight' => -4,
+      ), 
+      'settings' => array(
+        'label' => t('Poll settings'), 
+        'description' => t('Poll module settings'), 
+        'weight' => -3,
+      ),
+    ),
+    */ 
+    'display' => array(
+      'bg_fb_like' => array(
+        'label' => t('Facebook Like'), 
+        'description' => t('Like button for Facebook'), 
+        'weight' => 10,
+      ),
+    ),
+  );
+
+  return $extra;
+}
+
+function bg_verbreding_node_view($node, $view_mode, $langcode) {
+  
+  // Isn't there a way to do this without hard-coding language codes?
+  $locale = 'nl_NL'; 
+  switch ($langcode) {
+    case 'en':
+      $locale = 'en_US';
+  }
+  
+  $node->content['bg_fb_like'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div id="fb-root"></div><script src="http://connect.facebook.net/' . $locale . '/all.js#appId=245698228789657&amp;xfbml=1"></script><fb:like href="" send="false" width="220" show_faces="false" colorscheme="dark" font="verdana"></fb:like>',
+  );
+}

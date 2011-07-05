@@ -32,9 +32,75 @@ function nodeblock_type_enabled($type) {
  */
 function nodeblock_type_view_mode($type) {
   $type = field_extract_bundle('node', $type);
-
   return variable_get('nodeblock_view_mode_' . $type, 'full');
 }
+
+/**
+ * Utility function to retrieve default node link setting
+ */
+function nodeblock_type_node_link($type) {
+  $type = field_extract_bundle('node', $type);
+  return variable_get('nodeblock_node_link_' . $type, 0);
+}
+
+/**
+ * Utility function to retrieve default comment link setting
+ */
+function nodeblock_type_comment_link($type) {
+  $type = field_extract_bundle('node', $type);
+  return variable_get('nodeblock_comment_link_' . $type, 0);
+}
+
+/**
+ * Utility function to retrieve variable settings for an individual block
+ */
+function nodeblock_block_variable_get($delta) {
+  $defaults = array(
+      'comment_link' => 'node_block_default', 
+      'node_link' => 'node_block_default', 
+      'view_mode' => 'node_block_default');
+  
+  $settings = variable_get('nodeblock_block_' . $delta, $defaults); 
+  
+  //Below adds backwards compatibility.
+  $settings = array_merge ( $defaults, $settings);
+  $update = FALSE;
+
+  if(isset($settings['teaser'])) {
+    if($settings['teaser'] == 1) {
+      $settings['view_mode'] == 'teaser';    
+    }
+    unset($settings['teaser']);
+    $update = TRUE;
+  }
+  if(isset($settings['links'])) {
+    if($settings['links'] == 1) {
+      $settings['node_link'] = 1;
+      $settings['comment_link'] = 1;
+    }
+    unset($settings['links']);
+    $update = TRUE;
+  }
+  if($update) {
+    variable_set('nodeblock_block_' . $delta, $settings);
+  }
+  return $settings;
+}
+
+
+/**
+ * Utility function to retrieve variable settings for an individual block with default values replaced
+ */
+function nodeblock_block_variable_get_values($delta, $type) {
+  $type = field_extract_bundle('node', $type);
+  $settings = nodeblock_block_variable_get($delta);
+  foreach($settings as $setting => &$value) {  
+    $value = ($value == 'node_block_default' && function_exists('nodeblock_type_'.$setting)) ? call_user_func('nodeblock_type_'.$setting, $type) :  $value;
+  }
+  return $settings;
+}
+
+
 
 /**
  * Implementation of hook_form_alter().
@@ -43,7 +109,12 @@ function nodeblock_form_alter(&$form, &$form_state, $form_id) {
 
   if ($form_id == 'node_type_form') {
     // Get View Mode Options
-    $options = nodeblock_get_view_modes($form['#node_type']);
+    $view_modes = nodeblock_get_view_modes($form['#node_type']);
+    
+    $options = array(
+        '0' => 'Hide',
+        '1' => 'Show',
+    );
     // Add group & form fields to node type form
       $form['nodeblock_settings'] = array(
           '#type' => 'fieldset',
@@ -63,11 +134,25 @@ function nodeblock_form_alter(&$form, &$form_state, $form_id) {
         ),
         'nodeblock_view_mode' => array(
           '#type' => 'select',
-          '#title' => t('Default Node Block View Mode'),
+          '#title' => t('Default View Mode'),
           '#default_value' => nodeblock_type_view_mode($form['#node_type']),
+          '#options' => $view_modes,
+          '#description' => t("Select a default View Mode for Node Blocks of this Content Type. 'Disabled' View Modes will show the default View Mode until enabled on the 'Manage Fields' tab."),
+        ),
+        'nodeblock_node_link' => array(
+          '#type' => 'select',
+          '#title' => t('Default Links Display'),
+          '#default_value' => nodeblock_type_node_link($form['#node_type']),
           '#options' => $options,
-          '#description' => t("Select a default View Mode for Node Blocks for this Content Type. 'Disabled' View Modes will show the default View Mode until enabled on the 'Manage Fields' tab."),
-        )
+          '#description' => t("Select the default Node('Read More') link display for Node Blocks of this Content Type."),
+        ),
+        'nodeblock_comment_link' => array(
+          '#type' => 'select',
+          '#title' => t('Default Comments Display'),
+          '#default_value' => nodeblock_type_comment_link($form['#node_type']),
+          '#options' => $options,
+          '#description' => t("Select the default Comment link display for Node Blocks of this Content Type."),
+        ),
     );
   }
   // node add/edit form
@@ -96,13 +181,15 @@ function nodeblock_form_alter(&$form, &$form_state, $form_id) {
  * hook_node_delete
  */
 function nodeblock_node_delete($node) {
-  if (!nodeblock_type_enabled($node)) {
-    return;
+  if(variable_get('nodeblock_block_' . $node->nid, false)) {
+    variable_del('nodeblock_block_' . $node->nid);
   }
 
   if (isset($node->nodeblock['translation_fallback'])) {
-    $tnid = $node->tnid ? $node->tnid : $node->nid;
-    variable_del('nodeblock_translation_fallback_' . $tnid);
+    $tnid = !empty($node->tnid) ? $node->tnid : $node->nid;
+    if(variable_get('nodeblock_translation_fallback_' . $tnid, false)) {
+      variable_del('nodeblock_translation_fallback_' . $tnid);
+    }  
   }
   _block_rehash();
 }
@@ -117,7 +204,6 @@ function nodeblock_node_update($node) {
  * hook_node_insert
  */
 function nodeblock_node_insert($node) {
-  variable_set('nodeblock_block_' . $node->nid, array('view_mode' => 'node_block_default', 'links' => 1));
   _nodeblock_insert_update($node);
 }
 
@@ -126,13 +212,15 @@ function nodeblock_node_insert($node) {
  */
 function _nodeblock_insert_update($node) {
   if (!nodeblock_type_enabled($node)) {
+    nodeblock_node_delete($node);
     return;
   }
-
   if ($node->status) {
     drupal_set_message(t('The block you just created is now available on the <a href="@url">block configuration page</a>.', array('@url' => url('admin/structure/block'))));
   }
-
+  if(!variable_get('nodeblock_block_' . $node->nid, false)) {
+    variable_set('nodeblock_block_' . $node->nid, array('view_mode' => 'node_block_default', 'node_link' => 'node_block_default'));
+  }
   // set the translation fallback variable if set.
   if (isset($node->nodeblock['translation_fallback'])) {
     $tnid = $node->tnid ? $node->tnid : $node->nid;
@@ -173,7 +261,7 @@ function nodeblock_block_view($delta = '') {
   if (!node_access('view', $node)) {
     return;
   }
-  $nodeblock_display = variable_get('nodeblock_block_' . $delta, array('view_mode' => 'full', 'links' => 1));
+  $settings = nodeblock_block_variable_get_values($delta, $node->type);
   $lang = LANGUAGE_NONE;
   // if the node type is translatable, try to load the node with the appropriate
   // language from the translation set.
@@ -201,26 +289,15 @@ function nodeblock_block_view($delta = '') {
   $node->nodeblock = TRUE;
 
   $block['subject'] = check_plain($node->title);
-
-  if (!empty($nodeblock_display['teaser'])) {
-     $display_type = "teaser";
+  
+  $block['content'] =  node_view($node, $settings['view_mode'], $lang);
+  
+  if(!(bool)$settings['node_link'] && isset($block['content']['links']['node'])) {
+    unset($block['content']['links']['node']);
   }
-  elseif (!empty($nodeblock_display['view_mode'])) {
-    $display_type =  $nodeblock_display['view_mode'];
-  }
-  else {
-    $display_type = "node_block_default";
-  }
-
-  // Get Default view_mode for this Node if needed
-  if ($display_type == "node_block_default") {
-    $type = field_extract_bundle('node', $node->type);
-    $default = nodeblock_type_view_mode($type);
-    $display_type = (!empty($default))? $default : 'full';
-  }
-  $block['content'] =  node_view($node, $display_type, $lang);
-  // Check if links should be displayed for block instance.
-  $block['content']['links']['#access'] = (bool) $nodeblock_display['links'];
+  if(!(bool)$settings['comment_link'] && isset($block['content']['links']['comment'])) {
+    unset($block['content']['links']['comment']);
+  }  
   return $block;
 }
 
@@ -229,24 +306,19 @@ function nodeblock_block_view($delta = '') {
  */
 function nodeblock_block_configure($delta = '') {
 
-  $defaults = variable_get('nodeblock_block_' . $delta, array('links' => 1, 'view_mode' => 'node_block_default'));
+  $defaults = nodeblock_block_variable_get($delta);
+  
   $node = node_load($delta);
   $entity_info = entity_get_info('node');
-  $options = array();
-  $options['node_block_default'] = t('Default');
-  $options += nodeblock_get_view_modes($node->type);
-
-  //Clear out old radio on/off teaser option and update variable with view_mode equivelent
-  if (isset($defaults['teaser'])) {
-    if ($defaults['teaser'] == 1 && isset($options['teaser'])) {
-         $defaults['view_mode'] = 'teaser';
-    } 
-    elseif (empty($defaults['view_mode'])) {
-         $defaults['view_mode'] = 'node_block_default';
-    }
-    variable_set('nodeblock_block_' . $delta, array('view_mode' => $defaults['view_mode'], 'links' => $defaults['links']));
-  }
-
+  $view_modes = array();
+  $view_modes['node_block_default'] = t('Default');
+  $view_modes += nodeblock_get_view_modes($node->type);  
+  $options = array(
+      'node_block_default' => 'Default',
+      '0' => 'Hide',
+      '1' => 'Show',
+  );
+  
    // Add a Node Block Group
   $form['nodeblock'] = array(
     '#type' => 'fieldset',
@@ -259,15 +331,23 @@ function nodeblock_block_configure($delta = '') {
     '#weight' => 0,
     'view_mode' => array(
       '#type' => 'select',
-      '#options' => $options,
+      '#options' => $view_modes,
       '#title' => t('View mode'),
       '#default_value' => $defaults['view_mode'],
       '#group' => 'nodeblock',
     ),
-    'links' => array(
-      '#type' => 'checkbox',
-      '#default_value' => $defaults['links'],
-      '#title' => t('Include node links for "add comment", "read more" etc.'),
+    'node_link' => array(
+      '#type' => 'select',
+      '#options' => $options,
+      '#default_value' => $defaults['node_link'],
+      '#title' => t('Node Link Display'),
+      '#group' => 'nodeblock',
+    ),
+    'comment_link' => array(
+      '#type' => 'select',
+      '#options' => $options,
+      '#default_value' => $defaults['comment_link'],
+      '#title' => t('Node Comments Display'),
       '#group' => 'nodeblock',
     ),
   );
@@ -278,42 +358,8 @@ function nodeblock_block_configure($delta = '') {
  * hook_block_save
  */
 function nodeblock_block_save($delta = '', $edit = array()) {
-  variable_set('nodeblock_block_' . $delta, array('view_mode' => $edit['view_mode'], 'links' => $edit['links']));
+  variable_set('nodeblock_block_' . $delta, array('view_mode' => $edit['view_mode'], 'node_link' => $edit['node_link'], 'comment_link' => $edit['comment_link']));
 }
-
-/**
- * Implementation of hook_link().
- * Drupal 7: No longer used.
- */
-//function nodeblock_link($type, $node = NULL, $teaser = FALSE) {
-//  $links = array();
-//
-//  if ($type == 'node' && nodeblock_type_enabled($node)) {
-//    if (node_access('update', $node)) {
-//      $links['nodeblock_edit'] = array(
-//        'title' => t('Edit'),
-//        'href' => 'node/'. $node->nid .'/edit',
-//        'query' => drupal_get_destination(),
-//      );
-//    }
-//    if (module_exists('translation') && _translation_tab_access($node)) {
-//      $links['nodeblock_translate'] = array(
-//        'title' => t('Translate'),
-//        'href' => 'node/'. $node->nid .'/translate',
-//        'query' => drupal_get_destination(),
-//      );
-//    }
-//    if (user_access('administer blocks')) {
-//      $links['nodeblock_configure'] = array(
-//        'title' => t('Configure'),
-//        'href' => 'admin/structure/block/configure/nodeblock/'. $node->nid,
-//        'query' => drupal_get_destination(),
-//      );
-//    }
-//  }
-//
-//  return $links;
-//}
 
 /**
  * Implementation of hook_preprocess_node().
@@ -333,7 +379,6 @@ function nodeblock_preprocess_node(&$variables) {
  * Checks for all available View Modes, then checks which are available for the given content type.
  */
 function nodeblock_get_view_modes($type) {
-
     $bundle = field_extract_bundle('node', $type);
     $entity_info = entity_get_info('node');
     $view_modes = field_view_mode_settings('node', $bundle);
