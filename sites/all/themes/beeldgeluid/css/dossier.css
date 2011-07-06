@@ -17,6 +17,17 @@
   background: #8B8783;
 }
 
+/* Override some properties that have been set as inline styles. Sorry for the !important. */
+.dossier-element-focus {
+  overflow: visible!important;
+  width: auto!important;
+  z-index: 1000;
+}
+
+.vjs-controls {
+  z-index: 500;
+}
+
 .dossier-element h2,
 .dossier-element h2 a {
   font-family: 'BebasNeue';
@@ -46,9 +57,15 @@
   padding: 0 0 0 15px;
   margin: 0;
 }
+
 .dossier-element-media h2.node-title {
   display: none;
 }
+
+.dossier-element-media .node-media-view-mode-full {
+  width: 720px;
+}
+
 
 /* collapsible content */
 
@@ -81,13 +98,83 @@
   z-index: 1000;
 }
 
+
+body.node-type-media #block-system-main {
+  margin-left: 120px;
+  width: 720px;
+}
+
+.node-media .video-titlebar {
+  width: 460px;
+  height: 40px;
+  overflow: hidden;
+  background: transparent url('../images/blue-60.png');
+  margin-top: -60px;
+  position: relative;
+  top: 320px;
+  z-index: 199;
+  text-align: center;
+  padding: 10px;
+}
+
+.node-media .video-titlebar h3 {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.node-media .video-titlebar p {
+  margin: 0;
+}
+
 .node-media .field-name-field-media-file {
   width: 480px;
   float: left;
 }
 
 .node-media .group-verbreding {
-  background: url(images/grey-40.png);
-  width: 240px;
+  background: #E00034;
+  width: 300px;
   float: left;
+  height: 312px;
+  padding: 4px 0;
+  margin-left: -60px;
+  position: relative;
+  z-index: 200;
+}
+
+.node-media .group-verbreding-closed {
+  background: transparent url('../images/grey-40.png');
+  width: 60px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.node-media .verbreding-item {
+  height: 48px;
+  padding: 0 4px 0 60px;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+
+.node-media .verbreding-item-inner {
+  height: 40px;
+  padding: 5px 10px;
+  background-color: #B3002A;
+}
+
+.node-media .verbreding-item-fb-like {
+  background: url('../images/verbreding-like.png') no-repeat;
+}
+
+.node-media .verbreding-item-share-online {
+  background: url('../images/verbreding-share.png') no-repeat;
+}
+
+.node-media .verbreding-item-embed {
+  background: url('../images/verbreding-embed.png') no-repeat;
+}
+
+.verbreding-item-share-online ul {
+  margin: 0;
 }

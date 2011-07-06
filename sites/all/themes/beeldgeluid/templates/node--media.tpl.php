@@ -79,24 +79,31 @@
  * @see zen_preprocess_node()
  * @see template_process()
  */
+//dsm($content);
+//dsm(get_defined_vars());
 ?>
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
 
-    <?php print render($content['field_media_file']); ?>
+  <div class="video-titlebar">
+  <h3><?php print $title; ?></h3>
+  <p><?php print $titlebar_info; ?></p>
+  </div>
+  <?php print render($content['field_media_file']); ?>
+  <?php print render($content['group_verbreding']); ?>
 
-    <?php print render($content['group_verbreding']); ?>
-  
-    <div class="content"<?php print $content_attributes; ?>>
-      <?php
-        // We hide the comments and links now so that we can render them later.
-        hide($content['comments']);
-        hide($content['links']);
-        print render($content);
-      ?>
-    </div>
-  
-    <?php print render($content['links']); ?>
-  
-    <?php print render($content['comments']); ?>
+
+
+  <div class="content"<?php print $content_attributes; ?>>
+    <?php
+      // We hide the comments and links now so that we can render them later.
+      hide($content['comments']);
+      hide($content['links']);
+      print render($content);
+    ?>
+  </div>
+
+  <?php //print render($content['links']); ?>
+
+  <?php print render($content['comments']); ?>
   
 </div><!-- /.node -->

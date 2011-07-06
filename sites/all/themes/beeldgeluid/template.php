@@ -150,6 +150,16 @@ function beeldgeluid_preprocess_node(&$variables, $hook) {
   }
 }
 
+function beeldgeluid_preprocess_node_media(&$variables) {
+  if (isset($variables['content']['group_info']['field_media_episode'][0]['#markup'])) {
+    $titlebar_info[] = t('Episode') . ' ' . $variables['content']['group_info']['field_media_episode'][0]['#markup'];
+  }
+  if (isset($variables['content']['group_info']['field_media_date'][0]['#markup'])) {
+    $titlebar_info[] = $variables['content']['group_info']['field_media_date'][0]['#markup'];
+  }
+  $variables['titlebar_info'] = implode (' &ndash; ', $titlebar_info);
+}
+
 /**
  * Override or insert variables into the comment templates.
  *

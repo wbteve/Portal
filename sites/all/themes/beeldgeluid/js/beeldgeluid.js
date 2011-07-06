@@ -1,47 +1,70 @@
 (function ($) {
-  $(function() {
-    $('#comments h2.title').each(function() {
-      $(this).addClass('closed');
-      $(this).nextAll('div,form').filter(":first").hide();
-      $(this).click(function() {
-        $(this).toggleClass('closed');
-        $(this).nextAll('div,form').filter(":first").slideToggle('fast');
+
+  Drupal.behaviors.bgCollapseComments = {
+    attach: function (context, settings) {
+      $('#comments h2.title').each(function() {
+        $(this).addClass('closed');
+        $(this).nextAll('div,form').filter(":first").hide();
+        $(this).click(function() {
+          $(this).toggleClass('closed');
+          $(this).nextAll('div,form').filter(":first").slideToggle('fast');
+        });
       });
-    });
-    
-    if ($('.node-type-dossier #collapse-content .field-name-body .field-item').length && $('.node-type-dossier #collapse-content .field-name-body .field-item').html().length != 0) {
-      $('.node-type-dossier #collapse-content .field-name-body').hide();
-      $('.node-type-dossier h1#page-title').addClass('closed').click(function() {
+    }
+  };
+
+  Drupal.behaviors.bgCollapseDossierBody = {
+      attach: function (context, settings) {
+        if ($('.node-type-dossier #collapse-content .field-name-body .field-item').length != 0) {
+          $('.node-type-dossier #collapse-content .field-name-body').hide();
+          $('.node-type-dossier h1#page-title').addClass('closed').click(function() {
+            var $this = $(this);
+            $this.toggleClass('closed').toggleClass('open');
+            $('.node-type-dossier #collapse-content .field-name-body').slideToggle('fast');
+            if ($this.hasClass('closed')) {
+              $('.field-name-field-referenced-content').fadeTo('fast', 1);
+            }
+            else {
+              $('.field-name-field-referenced-content').fadeTo('fast', .3);      
+            }
+          });
+        }
+      }
+    };
+
+  Drupal.behaviors.bgCollapseVerbreding = {
+    attach: function (context, settings) {
+      $('.group-verbreding').addClass('group-verbreding-closed').click(function(event) {
         var $this = $(this);
-        $this.toggleClass('closed').toggleClass('open');
-        $('.node-type-dossier #collapse-content .field-name-body').slideToggle('fast');
-        if ($this.hasClass('closed')) {
-          $('.field-name-field-referenced-content').fadeTo('fast', 1);
+        if ($this.hasClass('group-verbreding-closed')) {
+          $(this).animate({'width': '280px'}).removeClass('group-verbreding-closed');
         }
         else {
-          $('.field-name-field-referenced-content').fadeTo('fast', .3);      
+          $(this).animate({'width': '60px'}).addClass('group-verbreding-closed');
         }
       });
     }
-    
-    /*
-    if($('.node-type-dossier').length != 0) {
-      var totalHeight = 0;
-      var totalWidth = 0;
-      $('.dossier-element').each(function() {
-        totalHeight = $(this).height() + $(this).position().top > totalHeight ? $(this).height() + $(this).position().top : totalHeight;
-        totalWidth = $(this).width() + $(this).position().left > totalWidth ? $(this).width() + $(this).position().left : totalWidth;
-      });
-      var marginLeft = -totalWidth/2;
-      $('.field-name-field-referenced-content').height(totalHeight);
-      $('.field-name-field-referenced-content').width(totalWidth);
-      if($('body').width() < totalWidth) {
-        $('body').width(totalWidth)
-        $(document).scrollLeft((totalWidth-$(window).width())/2);
+  };
 
+  Drupal.behaviors.bgVideojsListner = {
+    attach: function (context, settings) {
+      if ($('.node-media-view-mode-full #media-video').length == 1) {
+        setTimeout(function() {
+          $mediaVideo = $('#media-video');
+          $parentElement = $mediaVideo.parents('.dossier-element');
+          var bgVideoPlayer = $mediaVideo[0].player;
+          bgVideoPlayer.onPlay(function(){
+            $('.video-titlebar').fadeOut('fast');
+            $parentElement.addClass('dossier-element-focus');
+            //$('.dossier-element').not($parentElement).fadeTo('fast', .3);
+          });
+          bgVideoPlayer.onPause(function(){
+            $('.video-titlebar').fadeIn('fast');
+            //$('.dossier-element').not($parentElement).fadeTo('fast', 1);
+          });
+        }, 2000);
       }
-      $('.field-name-field-referenced-content').css('marginLeft', marginLeft);
     }
-    */
-  });
+  };
+
 }(jQuery));
