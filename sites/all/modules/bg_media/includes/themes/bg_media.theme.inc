@@ -138,7 +138,9 @@ function bg_media_preprocess_bg_media_video(&$vars) {
  * Preprocess function for theme('bg_media_audio').
  */
 function bg_media_preprocess_bg_media_audio(&$vars) {
-
+  $wrapper = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
+  $vars['url'] = '/' . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename;
+  $vars['mimetype'] = $vars['file']->filemime;
 }
 
 /**
