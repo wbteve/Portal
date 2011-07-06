@@ -127,13 +127,13 @@ Drupal.FieldGroup.Effects.processDiv = {
           wrapper.animating = true;
           var speed = $wrapper.hasClass('speed-fast') ? 300 : 1000;
           if ($wrapper.hasClass('effect-none') && $wrapper.hasClass('speed-none')) {
-            $('> .field-group-format-wrapper', wrapper).toggle();
+            $('> .field-group-format-wrapper', wrapper).slideToggle();
           }
           else if ($wrapper.hasClass('effect-blind')) {
             $('> .field-group-format-wrapper', wrapper).toggle('blind', {}, speed);
           }
           else {
-            $('> .field-group-format-wrapper', wrapper).toggle(speed);
+            $('> .field-group-format-wrapper', wrapper).slideToggle(speed);
           }
           wrapper.animating = false;
         }

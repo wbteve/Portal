@@ -1,1 +1,3 @@
-MvG: field_group.js was patched for theming purposes. See http://drupal.org/node/1180126. 
+MvG: field_group.js was patched for theming purposes. See http://drupal.org/node/1180126.
+
+MvG: field_group.js now uses slideToggle instead of toggle, see http://drupal.org/node/1210682. 
