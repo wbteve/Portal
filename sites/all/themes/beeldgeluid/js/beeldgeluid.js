@@ -9,7 +9,7 @@
       });
     });
     
-    if ($('.node-type-dossier #collapse-content .field-name-body .field-item').html().length != 0) {
+    if ($('.node-type-dossier #collapse-content .field-name-body .field-item').length && $('.node-type-dossier #collapse-content .field-name-body .field-item').html().length != 0) {
       $('.node-type-dossier #collapse-content .field-name-body').hide();
       $('.node-type-dossier h1#page-title').addClass('closed').click(function() {
         var $this = $(this);
