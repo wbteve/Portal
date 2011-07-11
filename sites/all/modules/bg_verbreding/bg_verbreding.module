@@ -40,6 +40,7 @@ function bg_verbreding_node_view($node, $view_mode, $langcode) {
     switch ($langcode) {
       case 'en':
         $locale = 'en_US';
+        break;
     }
    
     $node->content['bg_fb_like'] = array(
@@ -71,3 +72,38 @@ function bg_verbreding_node_view_alter(&$build) {
     unset($build['links']);
   }
 }
+
+
+function bg_verbreding_embed_view($node) {
+  return node_view($node, 'embed');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function bg_verbreding_menu() {
+  $items = array();
+  
+  $items['node/%node/embed'] = array(
+    'title' => 'Embedded',
+    'page callback' => 'bg_verbreding_embed_view',
+    'page arguments' => array(1),
+    'access callback' => 'node_access',
+    'access arguments' => array('view', 1),
+    'type' => MENU_CALLBACK,
+  );
+  
+  return $items;
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ * Add a view mode for embedded nodes.
+ */
+function bg_verbreding_entity_info_alter(&$entity_info) {
+  $entity_info['node']['view modes']['embed'] = array(
+    'label' => t('Embedded'),
+    'custom settings' => FALSE,
+  );
+}
+
