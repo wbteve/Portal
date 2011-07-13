@@ -94,7 +94,12 @@ function beeldgeluid_preprocess_html(&$variables, $hook) {
 function beeldgeluid_preprocess_page(&$variables, $hook) {
   global $language;
   global $user;
-  
+
+  // Hide admin menu in embed-mode.
+  if (end($variables['theme_hook_suggestions']) == 'page__node__embed') {
+    module_invoke('admin_menu', 'suppress');
+  }
+
   // Hide tabs for normal users
   $show_tabs = false;
   foreach($user->roles as $roleid => $rolename){
@@ -151,6 +156,7 @@ function beeldgeluid_preprocess_node(&$variables, $hook) {
 }
 
 function beeldgeluid_preprocess_node_media(&$variables) {
+  $titlebar_info = array();
   if (isset($variables['content']['group_info']['field_media_episode'][0]['#markup'])) {
     $titlebar_info[] = t('Episode') . ' ' . $variables['content']['group_info']['field_media_episode'][0]['#markup'];
   }

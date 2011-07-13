@@ -43,6 +43,12 @@
           $(this).animate({'width': '60px'}).addClass('group-verbreding-closed');
         }
       });
+      $(".verbreding-item-inner").click(function(event){
+        event.stopPropagation();
+      });
+      $(".verbreding-embed-code").focus(function(event){
+        this.select();
+      });
     }
   };
 

@@ -18,6 +18,9 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+body.page-node-embed {
+  background-color: #4a4a4a;
+}
 
 #page-wrapper {
 }
@@ -491,4 +494,21 @@ ul.links li {
 
 #block-bg-blocks-seo-content p {
   margin: 6px 0 0 0;
+}
+
+#block-system-main #search-form {
+  height: 30px;
+}
+
+#block-system-main #search-form label {
+  display: none;
+}
+
+#block-system-main #search-form #edit-keys {
+  width: 330px;
+  height: 30px;
+  font-size: 16px;
+}
+
+#block-system-main #search-form #edit-submit {
 }

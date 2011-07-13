@@ -175,3 +175,28 @@ function bg_media_form_media_format_form_alter($form, $form_state, $form_id) {
   dsm($form);
   */
 }
+
+/**
+ * Implements hook_menu().
+ */
+function bg_media_menu() {
+  $items = array();
+  
+  $items['node/%node/embed'] = array(
+    'title callback' => 'node_page_title', 
+    'title arguments' => array(1),
+    'page callback' => 'bg_media_view_embed',
+    'page arguments' => array(1),
+    'access callback' => 'node_access',
+    'access arguments' => array('view', 1),
+    'type' => MENU_CALLBACK,
+  );
+  
+  return $items;
+}
+
+function bg_media_view_embed($node) {
+  return node_view($node, 'embed');
+
+}
+

@@ -60,7 +60,7 @@ function bg_verbreding_node_view($node, $view_mode, $langcode) {
     $node->content['bg_embed'] = array(
       '#type' => 'markup',
       '#prefix' => '<div class="verbreding-item-embed verbreding-item"><div class="verbreding-item-inner">',
-      '#markup' => 'Embed',
+      '#markup' => '<label>' . t('<strong>Embed</strong> code') . '</label><textarea readonly="readonly" class="verbreding-embed-code" rows="1" cols="40"><iframe src="http://beeldgeluid.localhost/node/475/embed" height="380" width="480" scrolling="no" frameborder="0"></iframe></textarea>',
       '#suffix' => '</div></div>',
     );
   }
@@ -73,28 +73,6 @@ function bg_verbreding_node_view_alter(&$build) {
   }
 }
 
-
-function bg_verbreding_embed_view($node) {
-  return node_view($node, 'embed');
-}
-
-/**
- * Implements hook_menu().
- */
-function bg_verbreding_menu() {
-  $items = array();
-  
-  $items['node/%node/embed'] = array(
-    'title' => 'Embedded',
-    'page callback' => 'bg_verbreding_embed_view',
-    'page arguments' => array(1),
-    'access callback' => 'node_access',
-    'access arguments' => array('view', 1),
-    'type' => MENU_CALLBACK,
-  );
-  
-  return $items;
-}
 
 /**
  * Implements hook_entity_info_alter().
