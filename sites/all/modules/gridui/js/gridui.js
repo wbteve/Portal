@@ -14,12 +14,13 @@
 
     var _this = this;
     var index = this.elements.push(element);
+    var lang  = Drupal.settings.gridui.lang;
 
     // Add to frame
     var $item = $('<div />')
       .attr("id", "dossiergrid-item-" + index)
       .addClass("dossiergrid-item")
-      .css({"width": element.x_size * this.gridstep.x * this.zoom -2, 
+      .css({"width": element.x_size * this.gridstep.x * this.zoom -2,
             "height": element.y_size * this.gridstep.y * this.zoom -2,
             "border": "1px solid #fff",
             "background-color": element.bgcolor,
@@ -29,7 +30,7 @@
                   "snap": true,
                   "stop": function(event, ui) {
                             // Use the starting position of this grid node to calculate the new position (according to the grid + scale)
-                            var id = "edit-field-referenced-content-nl-" + (index-1);
+                            var id = "edit-field-referenced-content-" + lang + "-" + (index-1);
 
                             var x = ui.position.left,
                                 y = ui.position.top;
@@ -71,6 +72,7 @@
           var id = id.slice(0, 6).join('-');
 
           var index = parseInt(id.split(/-/)[5]);
+          var lang = id.split(/-/)[4];
 
           var element = {x_size: $(".bg_reference_width", $fieldset).val(),
                          y_size: $(".bg_reference_height", $fieldset).val(),
@@ -93,8 +95,8 @@
 
           $container.prepend($title);
 
-          $(".form-item-field-referenced-content-nl-" + index + "-pos-x").hide();
-          $(".form-item-field-referenced-content-nl-" + index + "-pos-y").hide();
+          $(".form-item-field-referenced-content-" + lang + "-" + index + "-pos-x").hide();
+          $(".form-item-field-referenced-content-" + lang + "-" + index + "-pos-y").hide();
 
         }
 

@@ -21,6 +21,14 @@
           ),
           'js' => array(
             drupal_get_path('module', 'gridui') . '/js/gridui.js',
+            array(
+              'data' => array(
+                'gridui' => array(
+                  'lang' => $form['language']['#value'],
+                )
+              ),
+              'type' => 'setting',
+            ),
           ),
         ),
       );
