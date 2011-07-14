@@ -152,6 +152,9 @@ function bg_media_preprocess_bg_media_image(&$vars) {
   if($wrapper instanceof BGMediaStreamWrapper) {
     $vars['image_uri'] = $wrapper->getLocalThumbnailPath();
   }
+  else if($wrapper instanceof DrupalPublicStreamWrapper) {
+    $vars['image_uri'] = $wrapper->getUri();
+  }
 }
 
 /**
