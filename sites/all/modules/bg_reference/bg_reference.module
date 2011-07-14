@@ -50,7 +50,7 @@ function theme_bg_reference($variables) {
       $node = node_load($match['nid']);
       $content = drupal_render(node_view($node, 'dossier'));
       break;
-      
+
     case CONTENT_TYPE_MEDIA:
       $classes[] = 'node-type-media';
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
@@ -67,7 +67,7 @@ function theme_bg_reference($variables) {
             ),
           ));
           $content = drupal_render($node_array['field_media_file']);
-        } 
+        }
         else {
           $content = drupal_render($node_array);
         }
@@ -77,7 +77,7 @@ function theme_bg_reference($variables) {
     case CONTENT_TYPE_SEARCH_RESULT:
       $searchterm = check_plain($element['#data']['content']);
       $search_title = '<h2>' . l(t('Search results for "@searchterm"', array('@searchterm' => $searchterm)), 'zoek/' . $searchterm) . '</h2>';
-      
+
       // Check if Solr server is available, eg. for development environments.
       module_load_install('apachesolr');
       foreach (apachesolr_requirements('runtime') as $requirement) {
@@ -87,7 +87,7 @@ function theme_bg_reference($variables) {
           break 2;
         }
       }
-      
+
       $search = apachesolr_search_run('dossier_search', array('q' => $searchterm));
       $list['items'] = array();
       foreach ($search as $result) {
@@ -259,8 +259,22 @@ function bg_reference_field_widget_info() {
  */
 function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
   $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
-  $type       = isset($items[$delta]['type']) ? $items[$delta]['type'] : CONTENT_TYPE_TEXT;
-  $value      = isset($items[$delta]['content']) ? $items[$delta]['content'] : '';
+
+  // Get type and value from form values
+  if(isset($form_state['values']) && isset($form_state['values']['field_referenced_content'][$langcode][$delta])) {
+    $type   = $form_state['values']['field_referenced_content'][$langcode][$delta]['type'];
+    $value  = $form_state['values']['field_referenced_content'][$langcode][$delta]['content'];
+  }
+  // Get type and value from stored data
+  else if(isset($items[$delta])) {
+    $type   = $items[$delta]['type'];
+    $value  = $items[$delta]['content'];
+  }
+  // Set defaults
+  else {
+    $type   = CONTENT_TYPE_TEXT;
+    $value  = '';
+  }
 
   $ajax_settings = array(
     'event'     => 'change',
@@ -338,7 +352,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
         '#c7c2ba' => '#c7c2ba',
         '#ff5800' => '#ff5800',
         '#92d400' => '#92d400',
-      ), 
+      ),
     ),
   );
 
