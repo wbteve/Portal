@@ -1,26 +1,28 @@
 <?php
 
-  define('GRIDUI_DEBUG', false);
+  define('GRIDUI_DEBUG', FALSE);
 
   function gridui_form_alter(&$form, &$form_state, $form_id) {
 
     if(GRIDUI_DEBUG) dsm('Doing gridui_form_alter');
     if(GRIDUI_DEBUG) dsm($form);
+    if(GRIDUI_DEBUG) dsm($form_id);
 
     if($form_id == "dossier_node_form") {
-      if(GRIDUI_DEBUG) dsm('Injecting JavaScript');
-
-      // Inject static files necessary into page
-      drupal_add_js(drupal_get_path('module', 'gridui') . '/js/gridui.js', array('type' => 'file',
-                                                                                 'scope' => 'footer',
-                                                                                 'weight' => 5));
-      drupal_add_css(drupal_get_path('module', 'gridui') . '/css/gridui.css');
-
       if(GRIDUI_DEBUG) dsm('Adding gridui frame');
+
       // Add a drawing frame to the form
       $form['gridui'] = array(
-        '#markup' => '<div id="gridui-frame"></div><br clear="all">',
-        '#weight' => ((int)$form['field_referenced_content']['#weight'] + .1),
+        '#markup'   => '<div id="gridui-frame"></div><br clear="all">',
+        '#weight'   => ((int)$form['field_referenced_content']['#weight'] + .1),
+        '#attached' => array(
+          'css' => array(
+            drupal_get_path('module', 'gridui') . '/css/gridui.css',
+          ),
+          'js' => array(
+            drupal_get_path('module', 'gridui') . '/js/gridui.js',
+          ),
+        ),
       );
 
       // Set position fields to be hidden
@@ -33,8 +35,6 @@
         }
       }
       */
-      
+
     }
   }
-
-?>
