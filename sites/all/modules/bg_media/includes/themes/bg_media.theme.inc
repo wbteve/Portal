@@ -138,9 +138,58 @@ function bg_media_preprocess_bg_media_video(&$vars) {
  * Preprocess function for theme('bg_media_audio').
  */
 function bg_media_preprocess_bg_media_audio(&$vars) {
-  $wrapper = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
-  $vars['url'] = '/' . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename;
+  $js_path      = base_path() . drupal_get_path('module', 'bg_media') . '/includes/js';
+
+  $icon_path    = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
+  $poster_path  = base_path() . file_icon_path((object)$vars['file'], $icon_path);
+
+  $wrapper      = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
+
+  $vars['url'] = base_path() . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename;
   $vars['mimetype'] = $vars['file']->filemime;
+  $vars['flash_audio'] = '<div id="' . BG_MEDIA_FALLBACK_PLAYER_ID . '"></div>';
+
+  drupal_add_library('bg_media', 'swfobject');
+  drupal_add_js($js_path . '/bg_media.js');
+  drupal_add_js(array(
+    'bgMedia' => array(
+      'playerId'      => BG_MEDIA_FALLBACK_PLAYER_ID,
+      'playerSwf'     => $js_path . '/flowplayer/flowplayer-3.2.7.swf',
+      'playerWidth'   => $vars['width'],
+      'playerHeight'  => $vars['height'],
+      'playerAttr'    => array(
+        'class'         => 'flash-fallback'
+      ),
+    ),
+  ), 'setting');
+
+  $config = drupal_json_encode(
+    array(
+      'playlist'  => array(
+        array(
+          'url'       => $poster_path,
+        ),
+        array(
+          'url'       => $vars['url'],
+          'autoPlay'  => false,
+        )
+      ),
+      'plugins'   => array(
+        'audio'  => array(
+          'url'               => $js_path . '/flowplayer/flowplayer.audio/flowplayer.audio-3.2.2.swf',
+        )
+      )
+    )
+  );
+  $config = str_replace("\"", "'", $config);
+
+  drupal_add_js(array(
+    'bgMedia' => array(
+      'playerFlVars'  => array(
+        'config' => $config
+      ),
+    ),
+  ), 'setting');
 }
 
 /**

@@ -2,7 +2,7 @@
 define('BG_MEDIA_THEME_FUNCTION_PREFIX', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
-define('BG_MEDIA_FALLBACK_PLAYER_ID', 'fallback-video-player');
+define('BG_MEDIA_FALLBACK_PLAYER_ID', 'fallback-player');
 
 /**
  *  Implements hook_theme().
@@ -21,7 +21,7 @@ function bg_media_theme($existing, $type, $theme, $path) {
       'path' => $path . '/includes/themes',
     ),
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_audio' => array(
-      'variables' => array('file' => NULL),
+      'variables' => array('file' => NULL, 'width' => 480, 'height' => 320),
       'template' => 'bg_media.audio',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
