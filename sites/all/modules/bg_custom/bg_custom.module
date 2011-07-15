@@ -5,7 +5,7 @@
  */
 function bg_custom_form_alter(&$form, &$form_state, $form_id) {
   global $language;
-  
+
   // Remove name from comment form
   if ($form_id == 'comment_node_blog_form') {
     unset($form['author']);
@@ -13,4 +13,12 @@ function bg_custom_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+function bg_custom_form_comment_form_alter(&$form, &$form_state, &$form_id) {
+  $form['comment_body']['#after_build'][] = 'bg_custom_customize_comment_form';
+}
 
+function bg_custom_customize_comment_form(&$form) {
+  $form[$form['#language']][0]['format']['#access'] = FALSE;
+  $form[$form['#language']][0]['#format'] = 'plain_text';
+  return $form;
+}
