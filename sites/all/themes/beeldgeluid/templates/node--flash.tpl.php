@@ -105,18 +105,16 @@
       // We hide the comments and links now so that we can render them later.
       hide($content['comments']);
       hide($content['links']);
-      print render($content);
     ?>
     <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-      codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,16,0"
-      width="500" height="500" >
+      codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,16,0" width="<?php echo $node->field_width[$node->language][0]['value']; ?>" height="<?php echo $node->field_height[$node->language][0]['value']; ?>">
         <param name="movie" value="<?php print file_create_url($node->field_flash[$node->language][0]['uri']); ?>">
         <param name="quality" value="high">
         <param name="play" value="true">
         <param name="loop" value="false">
-      <embed src="<?php print file_create_url($node->field_flash[$node->language][0]['uri']); ?>" wmode="transparent" width="500" height="500" 
-        play="true" loop="false" quality="high" pluginspage="http://get.adobe.com/nl/flashplayer/" type="application/x-shockwave-flash"></embed>
-    </object> 
+      <embed src="<?php print file_create_url($node->field_flash[$node->language][0]['uri']); ?>" wmode="transparent" width="<?php echo $node->field_width[$node->language][0]['value']; ?>" height="<?php echo $node->field_height[$node->language][0]['value']; ?>"
+      play="true" loop="false" quality="high" pluginspage="http://get.adobe.com/nl/flashplayer/" type="application/x-shockwave-flash"></embed>
+    </object>
   </div>
 
   <?php print render($content['links']); ?>
