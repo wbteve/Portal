@@ -22,3 +22,17 @@ function bg_custom_customize_comment_form(&$form) {
   $form[$form['#language']][0]['#format'] = 'plain_text';
   return $form;
 }
+
+function bg_custom_block_list_alter(&$blocks) {
+  if(arg(0) == 'node' && is_numeric(arg(1))) {
+    $node = node_load(arg(1));
+
+    if($node && in_array($node->type, array('flash', 'iframe'))) {
+      foreach($blocks as $key => $block) {
+        if(in_array($block->region, array('sidebar_first', 'sidebar_second'))) {
+          unset($blocks[$key]);
+        }
+      }
+    }
+  }
+}
