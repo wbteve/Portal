@@ -1,0 +1,4 @@
+name = Beeld en Geluid Video Sitemap
+description = Provides support for video sitemaps.
+package = "Beeld en Geluid"
+core = 7.x

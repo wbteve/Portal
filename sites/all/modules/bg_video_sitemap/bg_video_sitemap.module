@@ -1,0 +1,58 @@
+<?php
+function bg_video_sitemap_menu() {
+  $items = array();
+  $items['sitemap.video.xml'] = array(
+    'page callback' => 'bg_video_sitemap',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function bg_video_sitemap() {
+  $cid = 'bg_video_sitemap';
+
+  $cache = cache_get($cid);
+  bg_video_get_items();
+
+  if(empty($cache)) {
+    $data = <<<XML
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+
+</urlset>
+XML;
+
+  }
+exit;
+  header("Content-type: text/xml; charset=utf-8");
+  echo $data;
+  exit;
+}
+
+function bg_video_get_items() {
+  $return = array();
+
+  $query = "SELECT N.`nid`, N.`title`, FM.`uri` "
+  				."FROM `node` AS N "
+  				."JOIN `file_usage` FU ON N.`nid` = FU.`id` "
+  				."JOIN `file_managed` FM ON FU.`fid` = FM.`fid` "
+  				."WHERE N.`status` = 1 "
+					."AND N.`type` = 'media' "
+					."AND FU.`type` = 'node' "
+					."AND FM.`type` = 'video' ";
+
+  $result = db_query($query);
+
+  foreach($result as $record) {
+    $wrapper = file_stream_wrapper_get_instance_by_uri($record->uri);
+
+    if($wrapper instanceof BGMediaStreamWrapper && !($wrapper instanceof MediaBVDStreamWrapper)) {
+      $res = array(
+      	'loc'           => url("node/{$record->nid}", array('absolute' => TRUE)),
+        'content_loc'   => $wrapper->getExternalUrl(),
+        'thumbnail_loc' => $wrapper->getLocalThumbnailPath(),
+      );
+      $return[] = $res;
+    }
+  }
+}
