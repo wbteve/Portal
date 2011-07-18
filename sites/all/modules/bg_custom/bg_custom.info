@@ -2,4 +2,4 @@ name = Custom site adjustments
 description = All kinds of form alters etc.
 package = "Beeld en Geluid"
 core = 7.x
-
+dependencies[] = bg_media
