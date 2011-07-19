@@ -455,13 +455,13 @@ function _bg_reference_validate($element, &$form_state) {
         }
 
         // Validate width
-        if (!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && $values['width'] <= 0)) {
-          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][width", t('Width should be a positive integer value larger than zero'));
+        if (!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && ($values['width'] <= 0 || $values['width'] > 4))) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][width", t('Width should be a value between 1 and 4'));
         }
 
         // Validate height
-        if (!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && $values['height'] <= 0)) {
-          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a positive integer value larger than zero'));
+        if (!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && ($values['height'] <= 0 || $values['height'] > 4))) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a value between 1 and 4'));
         }
 
       }
