@@ -36,17 +36,19 @@ function bg_custom_node_load($nodes, $types) {
         $file     = file_load($node->field_media_file[$node->language][0]['fid']);
         $wrapper  = file_stream_wrapper_get_instance_by_uri($file->uri);
 
-        if($wrapper instanceof BGMediaStreamWrapper) {
+        if($wrapper instanceof BGMediaStreamWrapper || $wrapper instanceof MediaYouTubeStreamWrapper) {
           $uri = $wrapper->getLocalThumbnailPath();
         }
         else if($wrapper instanceof DrupalPublicStreamWrapper) {
           $uri = $file->uri;
         }
 
-        $node->dummy_field_og_image = array(
-          'uri'	      => $uri,
-        	'filemime'	=> 'image',
-        );
+        if(isset($uri)) {
+          $node->dummy_field_og_image = array(
+            'uri'	      => $uri,
+          	'filemime'	=> 'image',
+          );
+        }
       }
     }
   }
