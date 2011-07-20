@@ -2,6 +2,7 @@
 define('BG_MEDIA_THEME_FUNCTION_PREFIX', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
+define('BG_MEDIA_DISPLAY_TYPE_LENGTH', 'bg_media_length');
 define('BG_MEDIA_FALLBACK_PLAYER_ID', 'fallback-player');
 
 /**
@@ -107,6 +108,11 @@ function bg_media_field_formatter_info() {
       'field types' => array('file', 'media'),
       'description' => t('Display a Beeld en Geluid media thumbnail.'),
     ),
+    BG_MEDIA_DISPLAY_TYPE_LENGTH => array(
+      'label'       => t('Beeld en Geluid: Media length'),
+      'field types' => array('number_integer'),
+      'description' => t('Display length as H:M:S.'),
+    ),
   );
 }
 
@@ -147,6 +153,12 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
             '#style_name' => $display['settings']['style_name'],
           );
         }
+      }
+      break;
+
+    case BG_MEDIA_DISPLAY_TYPE_LENGTH:
+      foreach($items as $delta => $item) {
+        $element[$delta] = array('#markup' => bg_media_duration($item['value']));
       }
       break;
   }
@@ -199,5 +211,26 @@ function bg_media_menu() {
 function bg_media_view_embed($node) {
   return node_view($node, 'embed');
 
+}
+
+function bg_media_duration($seconds_count) {
+  $delimiter  = ':';
+  $seconds = $seconds_count % 60;
+  $minutes = floor($seconds_count/60);
+  $hours   = floor($seconds_count/3600);
+
+  $seconds = str_pad($seconds, 2, "0", STR_PAD_LEFT);
+  $minutes = str_pad($minutes, 2, "0", STR_PAD_LEFT).$delimiter;
+
+  if($hours > 0)
+  {
+  	$hours = str_pad($hours, 2, "0", STR_PAD_LEFT).$delimiter;
+  }
+  else
+  {
+  	$hours = '';
+  }
+
+  return "$hours$minutes$seconds";
 }
 
