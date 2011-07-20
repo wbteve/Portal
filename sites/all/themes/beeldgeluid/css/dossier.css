@@ -1,7 +1,7 @@
 /*
  * Dossier styling
  */
- 
+
 .node-type-dossier #main {
   padding-bottom: 40px;
 }
@@ -115,7 +115,7 @@
   background: transparent url('../images/blue-60.png');
   margin-top: -60px;
   position: relative;
-  top: 320px;
+  top: 60px;
   z-index: 199;
   text-align: center;
   padding: 10px;
