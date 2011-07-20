@@ -118,9 +118,8 @@ input.form-checkbox, input.form-radio {
  * Search (search-block-form.tpl.php)
  */
 #header #block-search-form /* Wrapper for the search form */ {
-  position: absolute;
-  right: 0;
-  top: 18px;
+  margin: 10px 0 0 0; /* 10px top margin assumes that it is placed below a 20px heigh navigation block */
+  float: right;
 }
 
 #header #block-search-form #edit-submit {
