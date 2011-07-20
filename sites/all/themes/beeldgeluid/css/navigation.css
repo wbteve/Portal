@@ -57,8 +57,8 @@ li a.active {
  * these limitations, see http://drupal.org/project/menu_block
  */
 #header .block-nice-menus {
-  margin: 0;
-  float: left;
+  margin: 20px 0 -64px; /* bottom margin = negative value of height + top margin */
+  height: 44px;
 }
 
 #header .block-nice-menus .content ul {
@@ -99,7 +99,7 @@ li a.active {
 /* dropdown */
 #header .block-nice-menus .content ul ul {
   background: url('../images/dropdown.png') no-repeat 0 0 #FFF;
-  top: 56px;
+  top: 48px;
   width: 179px;
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
@@ -150,9 +150,10 @@ li a.active {
 
 #header #block-menu-block-3,
 #header #block-menu-block-4 {
-  float: right;
-  margin: 0;
-  line-height: 10px;
+  margin: 4px 0 0 0;
+  line-height: 14px;
+  height: 16px;
+  width: 720px;
 }
 
 #header #block-menu-block-3 .content ul,
@@ -161,6 +162,7 @@ li a.active {
   padding: 0;
   list-style: none;
   list-style-image: none;
+  text-align: right;
 }
 
 #header #block-menu-block-3 .content ul li,
