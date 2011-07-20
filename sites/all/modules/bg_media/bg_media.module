@@ -150,7 +150,7 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
           $element[] = array(
             '#theme' => 'image_style',
             '#path' => $wrapper->getLocalThumbnailPath(),
-            '#style_name' => $display['settings']['style_name'],
+            '#style_name' => isset($display['settings']['style_name']) ? $display['settings']['style_name'] : 'thumbnail',
           );
         }
       }
