@@ -157,21 +157,26 @@ li a.active {
 }
 #page #header .block-nice-menus ul ul ul{
   left: 179px;
-  top: 0;
+  top: -10px;
   background: #FFF;
   padding: 0 5px;
 }
 
 #page #header .block-nice-menus ul ul ul li.first{
   margin-top: 0px;
+  padding-top: 10px;  
 }
 
 #page #header .block-nice-menus ul ul ul li{
   margin-left: -13px;
   margin-bottom: 0px;
-  padding-bottom: 10px;
   background-color: #FFF;
 }
+
+#page #header .block-nice-menus ul ul ul li.last{
+  padding-bottom: 10px;  
+}
+
 
 
 #header #block-menu-block-3,
