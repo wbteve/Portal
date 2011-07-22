@@ -1,14 +1,14 @@
-#header #block-nice-menus-1 .content ul ul li.first {
+#page #header #block-nice-menus-1 .content ul ul li.first {
   margin-top: 20px;
   padding-top: 5px;
 }
 
-#header #block-nice-menus-1 .content ul ul {
+#page #header #block-nice-menus-1 .content ul ul {
   width: 189px;
  background: url('../images/dropdownIE.png') no-repeat center 0 transparent;
 }
 
-#header #block-nice-menus-1 .content ul ul li {
+#page #header #block-nice-menus-1 .content ul ul li {
  padding: 0;
  margin: 0;
  display: block;
@@ -16,11 +16,17 @@
  background: transparent url('../images/bg_subnav.png') left bottom no-repeat;
 }
 
-#header #block-nice-menus-1 .content ul ul li.last {
+#page #header #block-nice-menus-1 .content ul ul li.last {
   background-image: url('../images/bg_subnav_bot.png');
   margin-bottom: 0;
   padding-bottom: 17px;
 }
-#header #block-nice-menus-1 .content ul ul li a {
+#page #header #block-nice-menus-1 .content ul ul li a {
   padding: 0 15px;
 }
+
+#page #header #block-nice-menus-1 .content ul ul ul{
+  width: 189px;
+  background: none;
+}
+

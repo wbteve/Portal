@@ -130,6 +130,10 @@ li a.active {
   color: #4A4A4A;
 }
 
+#header .block-nice-menus .content ul ul li a:hover {
+  
+}
+
 /* Aligning the drop down menu for each parent item until there's a script to calculate the center */
 
 #header .block-nice-menus .menu-680 ul {
@@ -147,6 +151,28 @@ li a.active {
 #header .block-nice-menus .menu-420 ul {
   left: -34px;
 }
+
+#page #header .block-nice-menus ul ul li.menuparent{
+  background: url("../images/arrow_right.png") no-repeat scroll 95% center #FFF;
+}
+#page #header .block-nice-menus ul ul ul{
+  left: 179px;
+  top: 0;
+  background: none;
+  padding: 0 5px;
+}
+
+#page #header .block-nice-menus ul ul ul li.first{
+  margin-top: 0px;
+}
+
+#page #header .block-nice-menus ul ul ul li{
+  margin-left: -13px;
+  margin-bottom: 0px;
+  padding-bottom: 10px;
+  background-color: #FFF;
+}
+
 
 #header #block-menu-block-3,
 #header #block-menu-block-4 {
