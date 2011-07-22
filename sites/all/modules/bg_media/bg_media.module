@@ -3,7 +3,7 @@ define('BG_MEDIA_THEME_FUNCTION_PREFIX', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
 define('BG_MEDIA_DISPLAY_TYPE_LENGTH', 'bg_media_length');
-define('BG_MEDIA_FLASH_PLAYER_ID', 'fallback-player');
+define('BG_MEDIA_FLASH_PLAYER_ID', 'flash-media-player');
 
 /**
  *  Implements hook_theme().
