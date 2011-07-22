@@ -19,44 +19,25 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     $vars['video'] = theme('media_youtube_video', array('uri' => $vars['file']->uri, 'width' => $vars['width'], 'height' => $vars['height']));
   }
   if($wrapper instanceof MediaBVDStreamWrapper) {
-    drupal_add_library('bg_media', 'swfobject');
-    drupal_add_js($js_path . '/bg_media.js');
-
-    $config = drupal_json_encode(
-      array(
-        'playlist'  => array(
-          array(
-            'url'     => file_create_url($wrapper->getLocalThumbnailPath()),
-          ),
-          array(
-            'url'       => $wrapper->getExternalPath(),
-            'provider'  => 'rtmp',
-            'autoPlay'  => false,
-          )
+    $vars['video'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '" class="flowplayer"></div>';
+    flowplayer_add('#' . BG_MEDIA_FLASH_PLAYER_ID, array(
+      'playlist'  => array(
+        array(
+          'url'     => file_create_url($wrapper->getLocalThumbnailPath()),
         ),
-        'plugins'   => array(
-          'rtmp'  => array(
-            'url'               => $js_path . '/flowplayer/flowplayer.rtmp/flowplayer.rtmp-3.2.3.swf',
-            'netConnectionUrl'  => $wrapper->getBaseUrl(),
-          )
-        )
-      )
-    );
-    $config = str_replace("\"", "'", $config);
-
-    drupal_add_js(array(
-      'bgMedia' => array(
-        'playerId'      => BG_MEDIA_FALLBACK_PLAYER_ID,
-        'playerSwf'     => $js_path . '/flowplayer/flowplayer-3.2.7.swf',
-        'playerWidth'   => $vars['width'],
-        'playerHeight'  => $vars['height'],
-        'playerFlVars'  => array(
-          'config' => $config
+        array(
+          'url'       => $wrapper->getExternalPath(),
+          'provider'  => 'rtmp',
+          'autoPlay'  => false,
         ),
       ),
-    ), 'setting');
-
-    $vars['video'] = '<div id="' . BG_MEDIA_FALLBACK_PLAYER_ID . '"></div>';
+      'plugins'   => array(
+        'rtmp'  => array(
+          'url'               => 'flowplayer.rtmp.swf',
+          'netConnectionUrl'  => $wrapper->getBaseUrl(),
+        )
+      ),
+    ));
   }
   else if($wrapper instanceof BGMediaStreamWrapper) {
     $fallback_video_url = null;
@@ -67,7 +48,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     drupal_add_js($js_path . '/bg_media.js');
     drupal_add_js(array(
       'bgMedia' => array(
-        'playerId'      => BG_MEDIA_FALLBACK_PLAYER_ID,
+        'playerId'      => BG_MEDIA_FLASH_PLAYER_ID,
         'playerSwf'     => $js_path . '/flowplayer/flowplayer-3.2.7.swf',
         'playerWidth'   => $vars['width'],
         'playerHeight'  => $vars['height'],
@@ -101,7 +82,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
       $video_candidate['video_url']   = file_create_url($video_candidate['uri']);
       $video_candidate['video_type']  = $codecs[$video_candidate['filemime']];
 
-      $vars['flash_video'] = '<div id="' . BG_MEDIA_FALLBACK_PLAYER_ID . '"></div>';
+      $vars['flash_video'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '"></div>';
 
       // Set fallback video
       if($video_candidate['filemime'] == 'video/mp4' && empty($fallback_video_url)) {
@@ -145,7 +126,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     drupal_add_js($js_path . '/bg_media.js');
     drupal_add_js(array(
       'bgMedia' => array(
-        'playerId'      => BG_MEDIA_FALLBACK_PLAYER_ID,
+        'playerId'      => BG_MEDIA_FLASH_PLAYER_ID,
         'playerSwf'     => $js_path . '/flowplayer/flowplayer-3.2.7.swf',
         'playerWidth'   => $vars['width'],
         'playerHeight'  => $vars['height'],
@@ -177,7 +158,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     $video_candidate['video_url']   = file_create_url($video_candidate['uri']);
     $video_candidate['video_type']  = $codecs[$video_candidate['filemime']];
 
-    $vars['flash_video'] = '<div id="' . BG_MEDIA_FALLBACK_PLAYER_ID . '"></div>';
+    $vars['flash_video'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '"></div>';
 
     // Set fallback video
     if($video_candidate['filemime'] == 'video/mp4' && empty($fallback_video_url)) {
@@ -224,13 +205,13 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
 
   $vars['url'] = base_path() . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename;
   $vars['mimetype'] = $vars['file']->filemime;
-  $vars['flash_audio'] = '<div id="' . BG_MEDIA_FALLBACK_PLAYER_ID . '"></div>';
+  $vars['flash_audio'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '"></div>';
 
   drupal_add_library('bg_media', 'swfobject');
   drupal_add_js($js_path . '/bg_media.js');
   drupal_add_js(array(
     'bgMedia' => array(
-      'playerId'      => BG_MEDIA_FALLBACK_PLAYER_ID,
+      'playerId'      => BG_MEDIA_FLASH_PLAYER_ID,
       'playerSwf'     => $js_path . '/flowplayer/flowplayer-3.2.7.swf',
       'playerWidth'   => $vars['width'],
       'playerHeight'  => $vars['height'],

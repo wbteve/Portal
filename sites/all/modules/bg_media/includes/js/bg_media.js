@@ -17,3 +17,15 @@
       );
   });
 })(jQuery);
+
+function startMedia() {
+
+}
+
+function stopMedia() {
+
+}
+
+function pauseMedia() {
+  stopMedia();
+}
