@@ -65,7 +65,16 @@ function theme_bg_reference($variables) {
       $classes[] = 'node-type-media';
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
       if (is_numeric($match['nid'])) {
+
+        $classes[] = 'node-id-' . $match['nid'];
         $node = node_load($match['nid']);
+
+        // XXX: Only send part of the node object, only the relevant bits to JS
+        drupal_add_js(array(
+                        'bg_reference' => array(
+                                            'media' => array('node-id-' . $node->nid => array('nid' => $node->id
+                                                                                                                )))), 'setting');
+
         $node_array = node_view($node, 'full');
         if ($element['#data']['width'] < 4 || $element['#data']['height'] < 4) {
           // Replace media player with smaller media thumbnail.
@@ -79,6 +88,7 @@ function theme_bg_reference($variables) {
           $content = drupal_render($node_array['field_media_file']);
         }
         else {
+          // Store main media player
           $content = drupal_render($node_array);
         }
       }
