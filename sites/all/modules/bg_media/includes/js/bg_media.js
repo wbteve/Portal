@@ -1,31 +1,17 @@
 (function($) {
-  $(document).ready(function(){
-    swfobject.embedSWF(Drupal.settings.bgMedia.playerSwf,
-        Drupal.settings.bgMedia.playerId,
-        Drupal.settings.bgMedia.playerWidth,
-        Drupal.settings.bgMedia.playerHeight,
-        "9.0.0",
-        null,
-        Drupal.settings.bgMedia.playerFlVars,
-        Drupal.settings.bgMedia.playerParams,
-        Drupal.settings.bgMedia.playerAttr,
-        function(e) {
-          if(typeof(VideoJS) != 'undefined') {
-            VideoJS.setup();
-          }
-        }
-      );
-  });
+  Drupal.BGMediaPlayerLoadHandler = function() {
+    if(typeof(VideoJS) == 'function') {
+      var player = VideoJS.setup();
+      $('#media-video').bind('play', function(){Drupal.BGMediaPlayerPlayHandler();});
+      $('#media-video').bind('pause', function(){Drupal.BGMediaPlayerStopHandler();});
+    }
+  }
+
+  Drupal.BGMediaPlayerPlayHandler = function() {
+    $('.video-titlebar, .group_verbreding').fadeOut('fast');
+  }
+
+  Drupal.BGMediaPlayerStopHandler = function() {
+    $('.video-titlebar, .group_verbreding').fadeIn('fast');
+  }
 })(jQuery);
-
-function startMedia() {
-
-}
-
-function stopMedia() {
-
-}
-
-function pauseMedia() {
-  stopMedia();
-}
