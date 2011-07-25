@@ -52,25 +52,27 @@
     }
   };
 
-  Drupal.behaviors.bgVideojsListner = {
+  Drupal.behaviors.searchLabel = {
     attach: function (context, settings) {
-      if ($('.node-media-view-mode-full #media-video').length == 1) {
-        setTimeout(function() {
-          $mediaVideo = $('#media-video');
-          $parentElement = $mediaVideo.parents('.dossier-element');
-          var bgVideoPlayer = $mediaVideo[0].player;
-          bgVideoPlayer.onPlay(function(){
-            $('.video-titlebar').fadeOut('fast');
-            $parentElement.addClass('dossier-element-focus');
-            //$('.dossier-element').not($parentElement).fadeTo('fast', .3);
-          });
-          bgVideoPlayer.onPause(function(){
-            $('.video-titlebar').fadeIn('fast');
-            //$('.dossier-element').not($parentElement).fadeTo('fast', 1);
-          });
-        }, 2000);
-      }
+      // some variables.
+      var $searchInput = $('#edit-search-block-form--2');
+      var searchString = Drupal.t('search');
+
+      // Event listeners.
+      $searchInput.focus(function() {
+        if ($searchInput.val() == searchString) {
+          $searchInput.val('');
+        }
+      }).blur(function() {
+        if ($searchInput.val() == '') {
+          $searchInput.val(searchString);
+        }
+      });
+      
+      // Trigger blur event on page load.
+      $searchInput.blur();
+      
     }
   };
-
+  
 }(jQuery));
