@@ -25,7 +25,7 @@
               $('.field-name-field-referenced-content').fadeTo('fast', 1);
             }
             else {
-              $('.field-name-field-referenced-content').fadeTo('fast', .3);      
+              $('.field-name-field-referenced-content').fadeTo('fast', .3);
             }
           });
         }
