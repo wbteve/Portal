@@ -1,0 +1,22 @@
+### Eclipse Workspace Patch 1.0
+#P beeldgeluid
+Index: sites/all/libraries/video-js/video.js
+===================================================================
+--- sites/all/libraries/video-js/video.js	(revision 18654)
++++ sites/all/libraries/video-js/video.js	(working copy)
+@@ -191,7 +191,7 @@
+   getFlashElement: function(){
+     var children = this.video.children;
+     for (var i=0,j=children.length; i<j; i++) {
+-      if (children[i].className == "vjs-flash-fallback") {
++      if (children[i].className.indexOf("vjs-flash-fallback") >= 0) {
+         return children[i];
+       }
+     }
+@@ -1755,4 +1755,4 @@
+ window.VideoJS = window._V_ = VideoJS;
+ 
+ // End self-executing function
+-})(window);
+\ No newline at end of file
++})(window);

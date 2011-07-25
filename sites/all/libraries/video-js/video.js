@@ -191,7 +191,7 @@ VideoJS.player.extend({
   getFlashElement: function(){
     var children = this.video.children;
     for (var i=0,j=children.length; i<j; i++) {
-      if (children[i].className == "vjs-flash-fallback") {
+      if (children[i].className.indexOf("vjs-flash-fallback") >= 0) {
         return children[i];
       }
     }
