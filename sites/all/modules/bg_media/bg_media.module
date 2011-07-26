@@ -153,6 +153,15 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
             '#style_name' => isset($display['settings']['style_name']) ? $display['settings']['style_name'] : 'thumbnail',
           );
         }
+        else if($wrapper instanceof DrupalLocalStreamWrapper) {
+          $icon_path    = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
+          $poster_path  = file_icon_path((object)$item['file'], $icon_path);
+          $element[] = array(
+            '#theme' => 'image',
+            '#path' => file_create_url($poster_path),
+            //'#style_name' => isset($display['settings']['style_name']) ? $display['settings']['style_name'] : 'thumbnail',
+          );
+        }
       }
       break;
 

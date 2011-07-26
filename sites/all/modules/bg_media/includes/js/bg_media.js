@@ -19,12 +19,15 @@
     attach: function (context, settings) {
       $('.dossier-element-media a.use-ajax:not(.main-media-player)').each(function(){
         linkInfo = $(this).attr('rel').split('|');
+
         // Set new href
         $(this).attr('href', 'ajax/switch-media/'
             + Drupal.settings.bg_reference.dossierNid + '/'
             + Drupal.settings.bg_reference.mainMediaNid + '/'
             + linkInfo[0] + '/'
-            + linkInfo[1]);
+            + linkInfo[1])
+          .unbind('click')
+          .removeClass('ajax-processed');
       });
     }
   }
