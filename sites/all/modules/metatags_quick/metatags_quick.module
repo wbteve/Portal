@@ -376,7 +376,7 @@ function _metatags_quick_add_head($item = FALSE) {
     include_once $module_path . '/known_tags.inc';
     $known_tags = _metatags_quick_known_fields();
     // Add a <link> tag to the html head. 
-    if ($known_tags[$item['name']]['type'] == 'head_link') {
+    if (isset($known_tags[$item['name']]) && $known_tags[$item['name']]['type'] == 'head_link') {
       $attributes = array(
         'rel' => $item['name'],
         'href' => url($item['content']),
