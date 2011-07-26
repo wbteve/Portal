@@ -3,9 +3,9 @@ description = Defines a meta tag field type.
 core = 7.x
 package = Fields
 
-; Information added by drupal.org packaging script on 2011-06-15
-version = "7.x-1.9"
+; Information added by drupal.org packaging script on 2011-07-14
+version = "7.x-2.0-beta1"
 core = "7.x"
 project = "metatags_quick"
-datestamp = "1308117419"
+datestamp = "1310674319"
 
