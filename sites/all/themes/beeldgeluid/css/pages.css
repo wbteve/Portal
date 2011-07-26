@@ -511,3 +511,68 @@ ul.links li {
 
 #block-system-main #search-form #edit-submit {
 }
+
+/* Agenda */
+.view-agenda .views-field-title a {
+  color: #4A4A4A;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.view-agenda .views-field-title a:hover {
+  text-decoration: underline;
+}
+
+.view-agenda .views-row {
+  margin-bottom: 1em;
+}
+
+.view-agenda .views-field-field-event-date,
+.view-agenda .views-field-field-event-date .date-display-single {
+  font-size: 10px;
+  color: #A5A5A5;
+}
+
+.view-agenda .views-field-field-event-date {
+  margin-top: -13px;
+}
+
+/* SEARCH */
+.search-result h3 a {
+  color: #FFF;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.search-result h3 a:hover {
+  text-decoration: underline;
+}
+
+.search-result .search-snippet-info {
+  padding: 0;
+}
+
+.search-result  .search-snippet {
+  margin-bottom: 0;
+}
+
+.block-facetapi a {
+  color: #FFF;
+  text-decoration: none;
+}
+
+.block-facetapi a:hover {
+  text-decoration: underline;
+}
+
+
+.block-facetapi ul, .block-facetapi li.leaf {
+  margin:0;
+  padding: 0;
+  list-style: none;
+  list-style-image: none;
+}
+
+.block-facetapi .block-title {
+  margin-bottom: 13px;
+}
