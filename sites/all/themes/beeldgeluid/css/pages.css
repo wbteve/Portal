@@ -543,6 +543,12 @@ ul.links li {
   margin-top: -13px;
 }
 
+.view-agenda h3 .date-display-single {
+  font-size: 25px;
+  font-family: 'BebasNeue';
+  text-transform: uppercase;
+}
+
 /* SEARCH */
 .search-result h3 a {
   color: #FFF;
