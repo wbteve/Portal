@@ -370,14 +370,40 @@ function _metatags_quick_add_head($item = FALSE) {
     $content = trim(strip_tags($content));
     $item['content'] = $content;
     $meta_data[] = $item;
-    $element = array(
-      '#tag' => 'meta',
-      '#attributes' => array(
-        'name' => $item['name'],
-        'content' => $item['content'],
-      ),
-    );
-    drupal_add_html_head($element, 'metatags_quick_' . $item['name']);
+    
+    // Certain meta elements are added as <link> tag, not as <meta> tag. 
+    $module_path = drupal_get_path('module', 'metatags_quick');
+    include_once $module_path . '/known_tags.inc';
+    $known_tags = _metatags_quick_known_fields();
+    // Add a <link> tag to the html head. 
+    if ($known_tags[$item['name']]['type'] == 'head_link') {
+      $attributes = array(
+        'rel' => $item['name'],
+        'href' => url($item['content']),
+      );
+      // Unset an existing html head link with the same rel attribute, assuming that
+      // the array key has been built by drupal_add_html_head_link().
+      $head_elements = &drupal_static('drupal_add_html_head');
+      foreach ($head_elements as $key => $head_element) {
+        // If an existing key starts with 'drupal_add_html_head_link:[name]', unset it.
+        if (strpos($key, 'drupal_add_html_head_link:' . $item['name']) === 0) {
+          unset($head_elements[$key]);
+        }
+      }
+      drupal_add_html_head_link($attributes, TRUE);
+    }
+    // Add a <meta> tag to the html head.
+    else {
+      $element = array(
+        '#tag' => 'meta',
+        '#attributes' => array(
+          'name' => $item['name'],
+          'content' => $item['content'],
+        ),
+      );
+      drupal_add_html_head($element, 'metatags_quick_' . $item['name']);
+    }
+    $head_elements = &drupal_static('drupal_add_html_head');
     
   }
   $added_meta[$item['name']] = TRUE;
