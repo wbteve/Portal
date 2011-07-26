@@ -67,3 +67,11 @@ function bg_custom_block_list_alter(&$blocks) {
     }
   }
 }
+
+/*
+ * Implements hook_menu_alter().
+ */
+function bg_custom_menu_alter(&$items) {
+  // Disable the default front page.
+  unset($items['node']);
+}
