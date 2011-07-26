@@ -207,3 +207,7 @@
   margin: 0;
   float: left;
 }
+
+.ui-effects-transfer {
+  border: 2px solid #E00034;
+}

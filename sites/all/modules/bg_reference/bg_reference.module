@@ -34,6 +34,7 @@ function bg_reference_menu() {
 function bg_reference_node_view($node, $view_mode, $langcode) {
   if($node->type == CONTENT_TYPE_DOSSIER) {
     drupal_add_js(array('bg_reference' => array('dossierNid' => $node->nid)), 'setting');
+    drupal_add_library('system', 'effects.transfer');
   }
 }
 

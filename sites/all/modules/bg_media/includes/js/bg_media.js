@@ -26,13 +26,35 @@
             + Drupal.settings.bg_reference.mainMediaNid + '/'
             + linkInfo[0] + '/'
             + linkInfo[1])
+          // Unbind existing handlers
           .unbind('click')
+          // Force rebinding of AJAX handlers
           .removeClass('ajax-processed');
+      });
+
+      $('.main-media-player').bind('mouseover', function(){
+        $(this).addClass('dossier-element-focus');
+      });
+
+      $('.main-media-player').bind('mouseout', function(){
+        // Collapse all expanded UI components
+        var verbreding = $('.group-verbreding');
+        if(!verbreding.hasClass('group-verbreding-closed')) {
+          verbreding.trigger('click');
+        }
+
+        $(this).removeClass('dossier-element-focus');
       });
     }
   }
 
   $.fn.bgDossierMediaChange = function(newThumb) {
+    // Build field groups
+    Drupal.FieldGroup.Effects.processDiv.execute($('.main-media-player'));
 
+    // Display transition effect
+    $(newThumb).effect('transfer', {to: $('.main-media-player')}, 1000);
+    // Parse FBML
+    FB.XFBML.parse();
   }
 })(jQuery);

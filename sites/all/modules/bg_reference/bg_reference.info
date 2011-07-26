@@ -3,3 +3,4 @@ description = Provides support for all kinds of referenced content. Primarily in
 package = "Beeld en Geluid"
 core = 7.x
 files[] = bg_reference_field.module
+dependencies[] = bg_media
