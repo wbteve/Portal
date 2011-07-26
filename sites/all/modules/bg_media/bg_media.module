@@ -146,7 +146,7 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
       foreach($items as $item) {
         $uri = isset($item['file']) ? $item['file']->uri : $item['uri'];
         $wrapper = file_stream_wrapper_get_instance_by_uri($uri);
-        if ($wrapper instanceof BGMediaStreamWrapper) {
+        if ($wrapper instanceof BGMediaStreamWrapper || $wrapper instanceof MediaYouTubeStreamWrapper) {
           $element[] = array(
             '#theme' => 'image_style',
             '#path' => $wrapper->getLocalThumbnailPath(),
