@@ -4,6 +4,7 @@ define('CONTENT_TYPE_TEXT', 'text');
 define('CONTENT_TYPE_SEARCH_RESULT', 'search_result');
 define('CONTENT_TYPE_BANNER', 'banner');
 define('CONTENT_TYPE_EVENT', 'agenda');
+define('CONTENT_TYPE_DOSSIER', 'dossier');
 
 define('UNIT_SIZE_WIDTH', 120);
 define('UNIT_SIZE_HEIGHT', 80);
@@ -21,8 +22,19 @@ function bg_reference_menu() {
     'access callback' => TRUE,
     'type'            => MENU_CALLBACK,
   );
+  $items['ajax/switch-media/%node/%node/%node'] = array(
+    'page callback' => 'bg_reference_ajax_switch_main_media',
+    'page arguments' => array(2, 3, 4),
+    'access callback' => TRUE,
+  );
 
   return $items;
+}
+
+function bg_reference_node_view($node, $view_mode, $langcode) {
+  if($node->type == CONTENT_TYPE_DOSSIER) {
+    drupal_add_js(array('bg_reference' => array('dossierNid' => $node->nid)), 'setting');
+  }
 }
 
 function bg_reference_theme() {
@@ -34,7 +46,12 @@ function bg_reference_theme() {
 }
 
 function theme_bg_reference($variables) {
+  static $main_player_rendered;
   extract($variables);
+
+  if(is_null($main_player_rendered)) {
+    $main_player_rendered = FALSE;
+  }
 
   $classes = array(
     'dossier-element',
@@ -44,7 +61,7 @@ function theme_bg_reference($variables) {
   );
 
   switch($element['#data']['type']) {
-    
+
     case CONTENT_TYPE_BANNER:
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
       $node = node_load($match['nid']);
@@ -64,32 +81,31 @@ function theme_bg_reference($variables) {
     case CONTENT_TYPE_MEDIA:
       $classes[] = 'node-type-media';
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
-      if (is_numeric($match['nid'])) {
 
+      if (is_numeric($match['nid'])) {
         $classes[] = 'node-id-' . $match['nid'];
         $node = node_load($match['nid']);
 
-        // XXX: Only send part of the node object, only the relevant bits to JS
-        drupal_add_js(array(
-                        'bg_reference' => array(
-                                            'media' => array('node-id-' . $node->nid => array('nid' => $node->id
-                                                                                                                )))), 'setting');
-
         $node_array = node_view($node, 'full');
-        if ($element['#data']['width'] < 4 || $element['#data']['height'] < 4) {
-          // Replace media player with smaller media thumbnail.
+
+        // Render main media player
+        if ($element['#data']['width'] == 4 && $element['#data']['height'] == 4 && !$main_player_rendered) {
+          $content = drupal_render($node_array);
+          $classes[] = 'main-media-player';
+          drupal_add_js(array('bg_reference' => array('mainMediaNid' => $node->nid)), 'setting');
+          $main_player_rendered = TRUE;
+        }
+        // Render media thumbnail
+        else {
           $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
             'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
             'label' => 'hidden',
             'settings' => array(
-              'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+           	  'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
             ),
           ));
-          $content = drupal_render($node_array['field_media_file']);
-        }
-        else {
-          // Store main media player
-          $content = drupal_render($node_array);
+
+          $content = bg_reference_ajax_text_button(drupal_render($node_array['field_media_file']), "node/{$node->nid}", t('View @title', array('@title' => $node->title)), $node->nid);
         }
       }
       break;
@@ -488,6 +504,11 @@ function _bg_reference_is_int($value) {
   return ((string) $value) === ((string)(int) $value);
 }
 
+function bg_reference_ajax_text_button($text, $dest, $alt, $rel = '', $class = '', $type = 'use-ajax') {
+  drupal_add_js('misc/ajax.js');
+  return l($text, $dest, array('html' => TRUE, 'attributes' => array('class' => array($type, $class), 'title' => $alt, 'rel' => $rel)));
+}
+
 /**************************************************************************
  * AJAX callbacks
  **************************************************************************/
@@ -530,4 +551,22 @@ function _bg_reference_autocomplete($bundle, $string = '') {
   }
 
   drupal_json_output($matches);
+}
+
+function bg_reference_ajax_switch_main_media($dossier_nid, $old_main_media_nid, $new_main_media_nid) {
+  /*$new_main_player = theme('bg_reference', array(
+    'element' => array(
+      '#data' => array(
+        'type'   => CONTENT_TYPE_MEDIA,
+        'width'  => 4,
+        'height' => 4,
+        'content' => "[nid:{$node->nid}]"
+      )
+    )
+  ));
+
+  $commands = array();
+  $commands[] = ajax_command_replace('.main-media-player', $new_main_player);
+  print ajax_render($commands);*/
+  exit;
 }
