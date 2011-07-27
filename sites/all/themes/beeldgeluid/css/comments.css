@@ -100,3 +100,9 @@ h3.comment-title /* Comment title */ {
   font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;
   font-weight: bold;
 }
+
+.comment-list   {
+  position: relative;
+  float:left;
+  width: 480px;
+  }

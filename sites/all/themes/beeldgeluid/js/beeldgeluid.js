@@ -50,10 +50,10 @@
   function bgCollapseComments() {
     $('#comments h2.title').each(function() {
       $(this).addClass('closed');
-      $(this).nextAll('div,form').filter(":first").hide();
+      $(this).nextAll('.comment-list, form').filter(':first').hide();
       $(this).click(function() {
         $(this).toggleClass('closed');
-        $(this).nextAll('div,form').filter(":first").slideToggle('fast');
+        $(this).nextAll('.comment-list, form').filter(':first').slideToggle('fast');
       });
     });
   }
