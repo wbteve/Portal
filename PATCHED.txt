@@ -1,0 +1,2 @@
+Drupal core (user.module) was patched around line 1845.
+See http://drupal.org/node/1197622#comment-4660822.
