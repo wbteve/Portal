@@ -31,10 +31,10 @@ function bg_media_preprocess_bg_media_video(&$vars) {
           'url'       => $wrapper->getExternalPath(),
           'provider'  => 'rtmp',
           'autoPlay'  => false,
-          'onStart'	  => 'function(){Drupal.BGMediaPlayerPlayHandler();}',
-          'onResume'  => 'function(){Drupal.BGMediaPlayerPlayHandler();}',
-          'onStop'	  => 'function(){Drupal.BGMediaPlayerStopHandler();}',
-          'onPause'   => 'function(){Drupal.BGMediaPlayerStopHandler();}',
+          'onStart'	  => 'Drupal.BGMediaPlayerPlayHandler',
+          'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
+          'onStop'	  => 'Drupal.BGMediaPlayerStopHandler',
+          'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
         ),
       ),
       'plugins'   => array(
@@ -68,13 +68,13 @@ function bg_media_preprocess_bg_media_video(&$vars) {
         array(
           'url'       => $fallback_video_url,
           'autoPlay'  => false,
-          'onStart'	  => 'function(){Drupal.BGMediaPlayerPlayHandler();}',
-          'onResume'  => 'function(){Drupal.BGMediaPlayerPlayHandler();}',
-          'onStop'	  => 'function(){Drupal.BGMediaPlayerStopHandler();}',
-          'onPause'   => 'function(){Drupal.BGMediaPlayerStopHandler();}',
+          'onStart'	  => 'Drupal.BGMediaPlayerPlayHandler',
+          'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
+          'onStop'	  => 'Drupal.BGMediaPlayerStopHandler',
+          'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
         ),
       ),
-      'onBeforeLoad'  => 'function(){Drupal.BGMediaPlayerLoadHandler();}'
+      'onBeforeLoad'  => 'Drupal.BGMediaPlayerLoadHandler',
     ));
   }
   else if($wrapper instanceof DrupalPublicStreamWrapper) {
@@ -101,13 +101,13 @@ function bg_media_preprocess_bg_media_video(&$vars) {
         array(
           'url'       => $fallback_video_url,
           'autoPlay'  => false,
-          'onStart'	  => 'function(){Drupal.BGMediaPlayerPlayHandler();}',
-          'onResume'  => 'function(){Drupal.BGMediaPlayerPlayHandler();}',
-          'onStop'	  => 'function(){Drupal.BGMediaPlayerStopHandler();}',
-          'onPause'   => 'function(){Drupal.BGMediaPlayerStopHandler();}',
+          'onStart'	  => 'Drupal.BGMediaPlayerPlayHandler',
+          'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
+          'onStop'	  => 'Drupal.BGMediaPlayerStopHandler',
+          'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
         ),
       ),
-      'onBeforeLoad'  => 'function(){Drupal.BGMediaPlayerLoadHandler();}'
+      'onBeforeLoad'  => 'Drupal.BGMediaPlayerLoadHandler',
     ));
   }
 }
@@ -136,10 +136,10 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
       array(
         'url'       => $vars['url'],
         'autoPlay'  => false,
-        'onStart'	=> 'function(){Drupal.BGMediaPlayerPlayHandler();}',
-        'onResume'  => 'function(){Drupal.BGMediaPlayerPlayHandler();}',
-        'onStop'	=> 'function(){Drupal.BGMediaPlayerStopHandler();}',
-        'onPause'   => 'function(){Drupal.BGMediaPlayerStopHandler();}',
+        'onStart'	=> 'Drupal.BGMediaPlayerPlayHandler',
+        'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
+        'onStop'	=> 'Drupal.BGMediaPlayerStopHandler',
+        'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
       ),
     ),
     'plugins'   => array(
