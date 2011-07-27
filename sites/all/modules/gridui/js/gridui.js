@@ -5,9 +5,6 @@
     this.gridstep = {'x': Drupal.settings.bg_reference.unitSizeWidth,
                      'y': Drupal.settings.bg_reference.unitSizeHeight};
     this.zoom = zoom;
-
-    // Set some properties on the element
-    this.$frame.css({position: "relative"});
   }
 
   DossierGrid.prototype.add_media = function(element) {
@@ -23,8 +20,7 @@
       .css({"width": element.x_size * this.gridstep.x * this.zoom -2,
             "height": element.y_size * this.gridstep.y * this.zoom -2,
             "border": "1px solid #fff",
-            "background-color": element.bgcolor,
-            "position": "absolute"})
+            "background-color": element.bgcolor})
       .draggable({"containment": "parent",
                   "grid": [this.gridstep.x * this.zoom, this.gridstep.y * this.zoom],
                   "snap": true,
@@ -45,7 +41,8 @@
 
                           }})
       .css({"top": element.y_pos * this.gridstep.y * this.zoom,
-            "left": element.x_pos * this.gridstep.x * this.zoom})
+            "left": element.x_pos * this.gridstep.x * this.zoom,
+            "position": "absolute"})
       .html(element.html);
 
     $("#dossiergrid-item-" + index).remove();
