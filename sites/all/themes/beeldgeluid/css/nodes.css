@@ -67,3 +67,13 @@ h2.node-title /* Node title */ {
 
 .node ul.links /* Node links. See also the ul.links declaration in the pages.css. */ {
 }
+
+.main-media-player-type-image .field-item {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.main-media-player-type-image .field-item img {
+  display: block;
+  margin: auto;
+}

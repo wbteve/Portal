@@ -94,6 +94,7 @@ function theme_bg_reference($variables) {
         if ($element['#data']['width'] == 4 && $element['#data']['height'] == 4 && !$main_player_rendered) {
           $content = drupal_render($node_array);
           $classes[] = 'main-media-player';
+          $classes[] = 'main-media-player-type-' . $node->field_media_file[$node->language][0]['file']->type;
           drupal_add_js(array('bg_reference' => array('mainMediaNid' => $node->nid)), 'setting');
           $main_player_rendered = TRUE;
         }
