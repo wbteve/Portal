@@ -106,3 +106,13 @@ h2.block-title /* Block title */ {
 
 #block-user-online /* "Who's online" block for a list of the online users */ {
 }
+
+#block-views-my-reactions-block ul {
+  list-style: none;
+  padding: 0;
+}
+
+#block-views-my-reactions-block li {
+  list-style: none;
+  margin-bottom: 1em;
+}
