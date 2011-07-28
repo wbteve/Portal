@@ -21,7 +21,7 @@
         linkInfo = $(this).attr('rel').split('|');
 
         // Set new href
-        $(this).attr('href', 'ajax/switch-media/'
+        $(this).attr('href', '/ajax/switch-media/'
             + Drupal.settings.bg_reference.dossierNid + '/'
             + Drupal.settings.bg_reference.mainMediaNid + '/'
             + linkInfo[0] + '/'
