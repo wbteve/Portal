@@ -4,6 +4,14 @@ define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
 define('BG_MEDIA_DISPLAY_TYPE_LENGTH', 'bg_media_length');
 define('BG_MEDIA_FLASH_PLAYER_ID', 'flash-media-player');
+define('BG_MEDIA_PLAYER_WIDTH', 480);
+define('BG_MEDIA_PLAYER_HEIGHT', 320);
+
+function bg_media_node_view($node, $view_mode, $langcode) {
+  if($node->type == CONTENT_TYPE_DOSSIER) {
+    drupal_add_js(drupal_get_path('module', 'bg_media') . '/includes/js/bg_media.js');
+  }
+}
 
 /**
  *  Implements hook_theme().
@@ -11,7 +19,7 @@ define('BG_MEDIA_FLASH_PLAYER_ID', 'flash-media-player');
 function bg_media_theme($existing, $type, $theme, $path) {
   return array(
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_video' => array(
-      'variables' => array('file' => NULL, 'width' => 480, 'height' => 320),
+      'variables' => array('file' => NULL, 'width' => BG_MEDIA_PLAYER_WIDTH, 'height' => BG_MEDIA_PLAYER_HEIGHT),
       'template' => 'bg_media.video',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
@@ -22,7 +30,7 @@ function bg_media_theme($existing, $type, $theme, $path) {
       'path' => $path . '/includes/themes',
     ),
     BG_MEDIA_THEME_FUNCTION_PREFIX . '_audio' => array(
-      'variables' => array('file' => NULL, 'width' => 480, 'height' => 320),
+      'variables' => array('file' => NULL, 'width' => BG_MEDIA_PLAYER_WIDTH, 'height' => BG_MEDIA_PLAYER_HEIGHT),
       'template' => 'bg_media.audio',
       'file' => 'bg_media.theme.inc',
       'path' => $path . '/includes/themes',
@@ -135,8 +143,8 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
           $element[] = array(
             '#theme' => $theme_function,
             '#file' => $item['file'],
-            '#width' => 480,
-            '#height' => 320,
+            '#width' => BG_MEDIA_PLAYER_WIDTH,
+            '#height' => BG_MEDIA_PLAYER_HEIGHT,
           );
         }
       }

@@ -10,3 +10,4 @@ files[] = includes/classes/MediaInternetBVDHandler.inc
 files[] = includes/classes/MediaInternetOIHandler.inc
 dependencies[] = media
 dependencies[] = file_entity
+dependencies[] = bg_reference
