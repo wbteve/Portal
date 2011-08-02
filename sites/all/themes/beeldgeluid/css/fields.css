@@ -76,3 +76,9 @@
 
 .field-name-field-FIELDNAME /* Underscores in field name are replaced with dashes. */ {
 }
+
+.field-name-field-tags .field-item {
+  float: left;
+  padding-right: 6px;
+}
+

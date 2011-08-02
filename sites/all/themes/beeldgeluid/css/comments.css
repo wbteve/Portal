@@ -9,7 +9,7 @@
 }
 
 #comments h2.title /* Heading for the list of comments */ {
-  text-align: center;
+  text-align: left;
   margin: 0 0 1em 0;
 }
 

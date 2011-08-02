@@ -210,8 +210,9 @@ h1.node-title,
 h1.node-title {
   font-size: 36px;
   line-height: 30px;
-  height: 30px;
+  /*height: 30px;
   overflow: hidden;
+  */
   margin: 0;
 }
 
