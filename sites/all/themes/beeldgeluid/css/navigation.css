@@ -301,7 +301,8 @@ li a.active {
 
 #block-bg-footermenu-footer-menu .footer-column {
   float: left;
-  width: 240px;
+  width: 185px;
+  margin-bottom: 1em;
 }
 
 #block-bg-footermenu-footer-menu .footer-column h2{
