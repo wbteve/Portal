@@ -7,18 +7,18 @@ function bg_verbreding_field_extra_fields() {
   $extra['node']['media'] = array(
     'display' => array(
       'bg_fb_like' => array(
-        'label' => t('Facebook Like'), 
-        'description' => t('Like button for Facebook'), 
+        'label' => t('Facebook Like'),
+        'description' => t('Like button for Facebook'),
         'weight' => 10,
       ),
       'bg_share_online' => array(
-        'label' => t('Share online'), 
-        'description' => t('Share with online services'), 
+        'label' => t('Share online'),
+        'description' => t('Share with online services'),
         'weight' => 11,
       ),
       'bg_embed' => array(
-        'label' => t('Embed'), 
-        'description' => t('Embed'), 
+        'label' => t('Embed'),
+        'description' => t('Embed'),
         'weight' => 12,
       ),
     ),
@@ -34,33 +34,33 @@ function bg_verbreding_node_view($node, $view_mode, $langcode) {
 
   if ($node->type == 'media') {
     $href = entity_uri('node', $node);
-    
+
     // Isn't there a way to do this without hard-coding language codes?
-    $locale = 'nl_NL'; 
+    $locale = 'nl_NL';
     switch ($langcode) {
       case 'en':
         $locale = 'en_US';
         break;
     }
-   
+
     $node->content['bg_fb_like'] = array(
       '#type' => 'markup',
       '#prefix' => '<div class="verbreding-item-fb-like verbreding-item"><div class="verbreding-item-inner">',
       '#markup' => '<fb:like href="' . $href . '" layout="button_count" send="false" width="220" show_faces="false" colorscheme="dark" font="verdana"></fb:like>',
       '#suffix' => '</div></div>',
     );
-  
+
     $node->content['bg_share_online'] = array(
       '#type' => 'markup',
       '#prefix' => '<div class="verbreding-item-share-online verbreding-item"><div class="verbreding-item-inner">' . t('<strong>Share</strong> this clip'),
       '#markup' => '',
       '#suffix' => '</div></div>',
     );
-      
+
     $node->content['bg_embed'] = array(
       '#type' => 'markup',
       '#prefix' => '<div class="verbreding-item-embed verbreding-item"><div class="verbreding-item-inner">',
-      '#markup' => '<label>' . t('<strong>Embed</strong> code') . '</label><textarea readonly="readonly" class="verbreding-embed-code" rows="1" cols="40"><iframe src="http://beeldgeluid.localhost/node/475/embed" height="380" width="480" scrolling="no" frameborder="0"></iframe></textarea>',
+      '#markup' => '<label>' . t('Kopiëer de embed code') . '</label><textarea readonly="readonly" row="1" col="1000" class="verbreding-embed-code"><iframe src="http://beeldgeluid.localhost/node/475/embed" height="380" width="480" scrolling="no" frameborder="0"></iframe></textarea>',
       '#suffix' => '</div></div>',
     );
   }
