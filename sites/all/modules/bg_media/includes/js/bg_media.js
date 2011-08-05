@@ -37,12 +37,6 @@
       });
 
       $('.main-media-player').bind('mouseout', function(){
-        // Collapse all expanded UI components
-        var verbreding = $('.group-verbreding');
-        if(!verbreding.hasClass('group-verbreding-closed')) {
-          verbreding.trigger('click');
-        }
-
         $(this).removeClass('dossier-element-focus');
       });
     }

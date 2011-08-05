@@ -75,13 +75,43 @@
     }
   }
 
+  var bgVerbredingMouseLeave = function(event) {
+      $(this)
+      .animate(
+        {'width': '60px'},
+        200,
+        function() {
+          $(this).addClass('group-verbreding-closed');
+          $(this).unbind('mouseleave', bgVerbredingMouseLeave);
+        }
+      );
+  }
+
   function bgToggleVerbreding(event) {
     var $this = $(this);
     if ($this.hasClass('group-verbreding-closed')) {
-      $(this).animate({'width': '280px'}).removeClass('group-verbreding-closed');
+      $(this)
+      .width(60) // width isn't set on initial page load
+      .removeClass('group-verbreding-closed') // set the background color
+      .animate(
+        {'width': '280px'},
+        200,
+        function() {
+          $(this).bind('mouseleave', bgVerbredingMouseLeave);
+        }
+      );
     }
     else {
-      $(this).animate({'width': '60px'}).addClass('group-verbreding-closed');
+      // Called manually instead of bgVerbredingMouseLeave
+      $(this)
+      .animate(
+        {'width': '60px'},
+        200,
+        function() {
+          $(this).addClass('group-verbreding-closed');
+          $(this).unbind('mouseleave', bgVerbredingMouseLeave);
+        }
+      );
     }
   }
 }(jQuery));
