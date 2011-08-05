@@ -68,7 +68,7 @@ function bg_blog_nav_block_save($delta = '', $edit = array()) {
  */
 function bg_blog_nav_block_view($delta = '') {
   $blocks = bg_blog_nav_get_navblocks();
-  
+
   $block['subject'] = t('Navigation for !name', array('!name' => $blocks[$delta]['title']));
   $block['content'] = bg_blog_nav_navigation_content($delta);
   return $block;
@@ -87,21 +87,26 @@ function bg_blog_nav_navigation_content($delta) {
     'items' => array(),
     'attributes' => array('class' => 'menu'),
   );
-  
+
   $list['items'][] = l('- ' . t('all') . ' -', $path.'/'.arg(1));
-  
+
   // Get blog termname
   if(arg(0) == 'node'){
     $node = node_load(arg(1));
     $year = date('Y',$node->created);
     $month = date('n',$node->created);
     $termname = taxonomy_term_load($node->field_blog[$node->language][0]['tid'])->name;
-  }else{
+    $termpath = str_replace(' ', '-', $termname);
+  }
+  else {
     $year = arg(2);
     $month = arg(3);
-    $termname = arg(1);
+    $termpath = arg(1);
+    $termname = str_replace('-', ' ', arg(1));
   }
-  
+
+ //drupal_set_message($termname);
+
   /*
   SB: Tagging filters
   $result = db_query("SELECT DISTINCT taxonomy_term_data.name AS taxonomy_term_data_name, taxonomy_term_data.vid AS taxonomy_term_data_vid, taxonomy_term_data.tid AS tid, taxonomy_vocabulary.machine_name AS taxonomy_vocabulary_machine_name
@@ -114,7 +119,7 @@ function bg_blog_nav_navigation_content($delta) {
     $list['items'][] .= l($record->taxonomy_term_data_name, $type .'/'. $record->taxonomy_term_data_name);
   }
   */
-  
+
   switch (variable_get("${delta}_granularity", 'month')) {
     case 'month':
       /* SB: No all blogs of all terms page
@@ -131,12 +136,12 @@ function bg_blog_nav_navigation_content($delta) {
         WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname AND taxonomy_term_data.vid = :vid
         ORDER BY created_year DESC, created_month DESC", array(':type' => $type,':termname' => strtolower($termname),':vid' => variable_get("${delta}_vid", '')));
       foreach ($result as $record) {
-        $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termname.'/'. $record->created_year);
+         $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termpath.'/'. $record->created_year);
         if($year == $record->created_year) $list['items'][$record->created_year]['class'][] = 'active';
         if(!isset($list['items'][$record->created_year]['children'])) $list['items'][$record->created_year]['children'] = array();
         // Add children
         $listitem = array();
-        $listitem['data'] = l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $path .'/'.$termname.'/'. $record->created_year .'/'. $record->created_month);
+        $listitem['data'] = l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $path .'/'.$termpath.'/'. $record->created_year .'/'. $record->created_month);
         if($month == $record->created_month) $listitem['class'][] = 'active';
         $list['items'][$record->created_year]['children'][] = $listitem;
       }
@@ -154,7 +159,7 @@ function bg_blog_nav_navigation_content($delta) {
         WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname AND taxonomy_term_data.vid = :vid
         ORDER BY created_year DESC", array(':type' => $type,':termname' => strtolower($termname),':vid' => variable_get("${delta}_vid", '')));
       foreach ($result as $record) {
-        $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termname.'/'. $record->created_year);
+        $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termpath.'/'. $record->created_year);
         if($year == $record->created_year) $list['items'][$record->created_year]['class'][] = 'active';
       }
       break;
