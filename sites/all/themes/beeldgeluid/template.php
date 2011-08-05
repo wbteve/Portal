@@ -86,7 +86,6 @@ function beeldgeluid_preprocess_html(&$variables, $hook) {
       $variables['seo_code_body'] = $node->field_seo_code_body[$node->language][0]['value'];
     }
   }
-
 }
 
 /**
@@ -101,6 +100,10 @@ function beeldgeluid_preprocess_html(&$variables, $hook) {
 function beeldgeluid_preprocess_page(&$variables, $hook) {
   global $language;
   global $user;
+
+  if (isset($variables['node']) && $variables['node']->type == 'dossier') {
+    $variables['theme_hook_suggestions'][] = 'page__node__dossier';
+  }
 
   // Hide admin menu in embed-mode.
   if (end($variables['theme_hook_suggestions']) == 'page__node__embed') {
