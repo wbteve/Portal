@@ -49,8 +49,6 @@
 
   function bgCollapseComments() {
     $('#comments h2.title').each(function() {
-      $(this).addClass('closed');
-      $(this).nextAll('.comment-list, form').filter(':first').hide();
       $(this).click(function() {
         $(this).toggleClass('closed');
         $(this).nextAll('.comment-list, form').filter(':first').slideToggle('fast');
