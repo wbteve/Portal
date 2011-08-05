@@ -101,10 +101,6 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   global $language;
   global $user;
 
-  if (isset($variables['node']) && $variables['node']->type == 'dossier') {
-    $variables['theme_hook_suggestions'][] = 'page__node__dossier';
-  }
-
   // Hide admin menu in embed-mode.
   if (end($variables['theme_hook_suggestions']) == 'page__node__embed') {
     module_invoke('admin_menu', 'suppress');

@@ -45,8 +45,8 @@ function bg_custom_node_load($nodes, $types) {
 
         if(isset($uri)) {
           $node->dummy_field_og_image = array(
-            'uri'	      => $uri,
-          	'filemime'	=> 'image',
+            'uri'       => $uri,
+            'filemime'  => 'image',
           );
         }
       }
@@ -58,7 +58,7 @@ function bg_custom_block_list_alter(&$blocks) {
   if(arg(0) == 'node' && is_numeric(arg(1))) {
     $node = node_load(arg(1));
 
-    if($node && in_array($node->type, array('flash', 'iframe'))) {
+    if($node && in_array($node->type, array('flash', 'iframe', 'dossier'))) {
       foreach($blocks as $key => $block) {
         if(in_array($block->region, array('sidebar_first', 'sidebar_second'))) {
           unset($blocks[$key]);
