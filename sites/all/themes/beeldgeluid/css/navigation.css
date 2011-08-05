@@ -97,6 +97,9 @@ li a.active {
 }
 
 /* dropdown */
+#header {
+  z-index: 1001;
+}
 #header .block-nice-menus .content ul ul {
   background: url('../images/dropdown.png') no-repeat 0 0 #FFF;
   top: 48px;
@@ -131,7 +134,7 @@ li a.active {
 }
 
 #header .block-nice-menus .content ul ul li a:hover {
-  
+
 }
 
 /* Aligning the drop down menu for each parent item until there's a script to calculate the center */
@@ -164,7 +167,7 @@ li a.active {
 
 #page #header .block-nice-menus ul ul ul li.first{
   margin-top: 0px;
-  padding-top: 10px;  
+  padding-top: 10px;
 }
 
 #page #header .block-nice-menus ul ul ul li{
@@ -174,7 +177,7 @@ li a.active {
 }
 
 #page #header .block-nice-menus ul ul ul li.last{
-  padding-bottom: 10px;  
+  padding-bottom: 10px;
 }
 
 
