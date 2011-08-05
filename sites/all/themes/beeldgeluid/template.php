@@ -68,7 +68,14 @@
  *   The name of the template being rendered ("html" in this case.)
  */
 function beeldgeluid_preprocess_html(&$variables, $hook) {
-  
+  if (arg(0) == 'node' && arg(2)) {
+    foreach ($variables['classes_array'] as $key => $class) {
+      if (strpos($class, 'node-type-') === 0) {
+        $variables['classes_array'][$key] = $class . '-' . check_plain(arg(2));
+      }
+    }
+  }
+
   $variables['seo_code_head'] = '';
   $variables['seo_code_body'] = '';
   if ($node = menu_get_object()) {
@@ -109,7 +116,7 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
     }
   }
   if(!$show_tabs) unset($variables['tabs']);
-  
+
   $variables['page_title_tag'] = 'h1';
   // Code that should only run when a node is being displayed.
   if (isset($variables['node'])) {
@@ -117,7 +124,7 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
     if (isset($variables['node']->field_seo_h1[$variables['node']->language])) {
       $variables['page_title_tag'] = 'h2';
     };
-    
+
     // $variables['theme_hook_suggestions'][] = 'page__'. $variables['node']->type;
     if (isset($variables['node']->type) && $variables['node']->type == 'blog') {
       $variables['page_title_tag'] = 'h2';
@@ -130,9 +137,9 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
         $variables['title'] = '';
         $variables['$head_title_array'][0] = '';
       }
-    }    
+    }
   }
-  
+
 }
 
 /**
@@ -146,7 +153,7 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
 function beeldgeluid_preprocess_node(&$variables, $hook) {
   $variables['classes_array'][] = 'view-mode-' . $variables['view_mode'];
   $variables['classes_array'][] = 'node-' . $variables['type'] . '-view-mode-' . $variables['view_mode'];
-  
+
   // Optionally, run node-type-specific preprocess functions, like
   // beeldgeluid_preprocess_node_page() or beeldgeluid_preprocess_node_story().
   $function = __FUNCTION__ . '_' . $variables['node']->type;
@@ -196,7 +203,7 @@ function beeldgeluid_preprocess_block(&$variables, $hook) {
 
 /**
  * Theme the way an 'all day' label will look.
- * In this theme, we return an empty string to disable the '(all day)' suffix. 
+ * In this theme, we return an empty string to disable the '(all day)' suffix.
  */
 function beeldgeluid_date_all_day_label() {
   return '';
@@ -225,6 +232,6 @@ function beeldgeluid_image_style($variables) {
       $variables['height'] = $height;
     }
   }
-  
+
   return theme('image', $variables);
 }
