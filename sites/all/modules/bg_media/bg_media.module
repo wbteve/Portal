@@ -152,7 +152,8 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
 
     case BG_MEDIA_DISPLAY_TYPE_THUMBNAIL:
       foreach($items as $item) {
-        $uri = isset($item['file']) ? $item['file']->uri : $item['uri'];
+        $uri   = isset($item['file']) ? $item['file']->uri : $item['uri'];
+        $type  = isset($item['file']) ? $item['file']->type : $item['type'];
         $wrapper = file_stream_wrapper_get_instance_by_uri($uri);
         if ($wrapper instanceof BGMediaStreamWrapper || $wrapper instanceof MediaYouTubeStreamWrapper) {
           $element[] = array(
@@ -163,10 +164,10 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
         }
         else if($wrapper instanceof DrupalLocalStreamWrapper) {
           // Display thumbnail for std Drupal image media
-          if($item['file']->type == 'image') {
+          if($type == 'image') {
             $element[] = array(
               '#theme'       => 'image_style',
-              '#path'        => $item['file']->uri,
+              '#path'        => $uri,
               '#style_name'  => isset($display['settings']['style_name']) ? $display['settings']['style_name'] : 'thumbnail',
             );
           }
