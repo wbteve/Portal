@@ -143,6 +143,9 @@ function theme_bg_reference($variables) {
       break;
 
     case CONTENT_TYPE_TEXT:
+      if(in_array($element['#data']['color_back'], array('#ffffff', '#fce300'))) {
+        $classes[] = 'dossier-element-black';
+      }
       $content = '<div class="dossier-element-text-inner">' . $element['#data']['content'] . '</div>';
       break;
   }
@@ -393,6 +396,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
       '#attributes'    => array('class' => array('bg_reference_color_back')),
       '#default_value' => isset($items[$delta]['color_back']) ? $items[$delta]['color_back'] : '#8b8784',
       '#options'       => array(
+        '#ffffff' => '#ffffff',
         '#8b8784' => '#8b8784',
         '#e00034' => '#e00034',
         '#009fda' => '#009fda',

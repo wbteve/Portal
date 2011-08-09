@@ -47,6 +47,13 @@
   color: #fff;
 }
 
+.dossier-element-black p,
+.dossier-element-black a,
+.dossier-element-black span.date-display-single {
+  color: #000;
+}
+
+
 .node-agenda-view-mode-dossier,
 .dossier-element-text-inner,
 .dossier-element-search_result-inner {

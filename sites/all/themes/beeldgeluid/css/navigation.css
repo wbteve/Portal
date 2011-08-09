@@ -98,7 +98,7 @@ li a.active {
 
 /* dropdown */
 #header {
-  z-index: 1001;
+  z-index: 955;
 }
 #header .block-nice-menus .content ul ul {
   background: url('../images/dropdown.png') no-repeat 0 0 #FFF;
