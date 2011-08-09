@@ -2,12 +2,20 @@
 body.page-search #content {
   margin-right: -720px;
   width: 720px;
+  clear: both;
+}
+
+body.page-search #page-title {
+  float: left;
+  width: 565px;
+  text-align: left;
 }
 
 .search-results {
   margin: 0;
   padding: 0;
   list-style-type: none;
+  overflow: hidden;
 }
 
 .search-result {
@@ -47,4 +55,17 @@ body.page-search #content {
 .search-result-grid-1_5x1_5 .info-box {
   width: 180px;
   height: 120px;
+}
+
+#search-info {
+  float: left;
+  width: 155px
+}
+
+#search-info p {
+  margin: 0;
+}
+
+#search-info p.search-info-top {
+  font-size: 1.3em;
 }

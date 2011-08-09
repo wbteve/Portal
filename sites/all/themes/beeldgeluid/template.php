@@ -138,6 +138,15 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
       }
     }
   }
+
+  // If page is search results
+  if(arg(0) == 'search') {
+    $adapter = facetapi_adapter_load('apachesolr@solr');
+    drupal_set_title($adapter->getSearchKeys());
+
+    $variables['search_info'] = '<p class="search-info-top">' . t('Search results for') . '</p>' .
+      '<p class="search-info-bottom">' . t('@result_count results', array('@result_count' => $adapter->getResultCount()));
+  }
 }
 
 function beeldgeluid_page_alter(&$page) {
