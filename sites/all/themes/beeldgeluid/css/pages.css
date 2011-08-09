@@ -309,6 +309,10 @@ ul.links li {
   color: #4A4A4A;
 }
 
+.page-search .item-list .pager li a:hover {
+  color: #FFFFFF;
+}
+
 .feed-icon /* The link to the RSS or Atom feed for the current list of content */ {
 }
 
