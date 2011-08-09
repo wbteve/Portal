@@ -138,7 +138,12 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
       }
     }
   }
+}
 
+function beeldgeluid_page_alter(&$page) {
+  if (!empty($page['content']['system_main']['search_form'])) {
+    unset($page['content']['system_main']['search_form']);
+  }
 }
 
 /**
