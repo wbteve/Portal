@@ -146,7 +146,8 @@ function theme_bg_reference($variables) {
       if(in_array($element['#data']['color_back'], array('#ffffff', '#fce300'))) {
         $classes[] = 'dossier-element-black';
       }
-      $content = '<div class="dossier-element-text-inner">' . $element['#data']['content'] . '</div>';
+
+      $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], 'dossier_text') . '</div>';
       break;
   }
 
