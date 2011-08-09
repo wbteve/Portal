@@ -205,6 +205,92 @@ function beeldgeluid_preprocess_block(&$variables, $hook) {
 }
 
 /**
+ * Override or insert variables into the search result templates.
+ *
+ * @param $variables
+ *   An array of variables to pass to the theme template.
+ * @param $hook
+ *   The name of the template being rendered ("search_results" in this case.)
+ */
+function beeldgeluid_preprocess_search_results(&$variables, $hook) {
+  //dsm($variables);
+}
+
+/**
+ * Override or insert variables into the search result templates.
+ *
+ * @param $variables
+ *   An array of variables to pass to the theme template.
+ */
+function beeldgeluid_preprocess_search_result(&$variables) {
+  $id = isset($_GET['page']) ? $_GET['page'] * 18 + $variables['id'] : $variables['id'];
+  $style = _beeldgeluid_get_style($id);
+  $variables['classes_array'][] = 'search-result-' . $style;
+  $variables['classes_array'][] = 'search-result-' . $id;
+
+  if($style != 'grid-3x3') {
+    unset($variables['snippet']);
+  }
+
+  if($variables['result']['entity_type'] == 'node') {
+    // Load node
+    $node = array_shift(entity_load('node', array($variables['result']['node']->entity_id)));
+
+    switch($node->type) {
+      // Entity types which have no image data attached
+      case 'agenda':
+      case 'article':
+      case 'flash':
+      case 'iframe':
+      case 'news':
+      case 'webform':
+        break;
+
+      case 'blog':
+        break;
+
+      case 'dossier':
+        break;
+
+      case 'media':
+        $file = file_load($node->field_media_file[$node->language][0]['fid']);
+        $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
+
+        if($wrapper instanceof BGMediaStreamWrapper) {
+          $image_uri = $wrapper->getLocalThumbnailPath();
+        }
+        else if($wrapper instanceof DrupalPublicStreamWrapper && $file->type == 'image') {
+          $image_uri = $wrapper->getUri();
+        }
+
+        if(isset($image_uri)) {
+          $variables['image'] = array(
+            '#theme'       => 'image_style',
+            '#style_name'  => $style,
+            '#path'        => $image_uri,
+          );
+        }
+        break;
+    }
+  }
+}
+
+function _beeldgeluid_get_style($id) {
+  // Large
+  if($id <= 4) {
+    return 'grid-3x3';
+  }
+  // Medium
+  else if($id <= 10) {
+    return 'grid-2x2';
+  }
+  // Small
+  else {
+    return 'grid-1_5x1_5';
+  }
+}
+
+/**
  * Theme the way an 'all day' label will look.
  * In this theme, we return an empty string to disable the '(all day)' suffix.
  */

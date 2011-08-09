@@ -1,0 +1,50 @@
+@CHARSET "UTF-8";
+body.page-search #content {
+  margin-right: -720px;
+  width: 720px;
+}
+
+.search-results {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.search-result {
+  float: left;
+  overflow: hidden;
+}
+
+.search-result img {
+  position: absolute;
+  z-index: 50;
+}
+
+.search-result .info-box {
+  position: absolute;
+  overflow: hidden;
+  z-index: 51;
+  background: url("../images/blue-60.png") repeat scroll 0 0 transparent;
+}
+
+.search-result .info-box .info {
+  margin: 10px;
+}
+
+.search-result-grid-3x3,
+.search-result-grid-3x3 .info-box {
+  width: 360px;
+  height: 240px;
+}
+
+.search-result-grid-2x2,
+.search-result-grid-2x2 .info-box {
+  width: 240px;
+  height: 160px;
+}
+
+.search-result-grid-1_5x1_5,
+.search-result-grid-1_5x1_5 .info-box {
+  width: 180px;
+  height: 120px;
+}

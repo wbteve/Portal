@@ -86,7 +86,7 @@
 
   <div class="video-titlebar">
   <h3><?php print $title; ?></h3>
-  <p><?php print $titlebar_info; ?></p>
+  <p><?php //print $titlebar_info; ?></p>
   </div>
   <?php print render($content['field_media_file']); ?>
   <?php print render($content['group_verbreding']); ?>
@@ -105,5 +105,5 @@
   <?php //print render($content['links']); ?>
 
   <?php print render($content['comments']); ?>
-  
+
 </div><!-- /.node -->

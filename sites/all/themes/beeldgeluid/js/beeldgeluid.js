@@ -1,5 +1,30 @@
 (function ($) {
 
+  Drupal.behaviors.bgSearchResults = {
+    attach: function (context, settings) {
+      $('.search-result').css({'cursor': 'pointer'});
+
+      $('.search-result').click(function(){
+        window.location = $('a:first', $(this)).attr('href');
+      });
+
+      $('.search-result:has(img)').each(function(){
+        (function (context) {
+          // Initially hide information
+          $('.info-box', context).hide();
+          // Show information on mouseover
+          context.bind('mouseover', function(){
+            $('.info-box', context).show();
+          });
+          // Hide information on mouseout
+          context.bind('mouseout', function(){
+            $('.info-box', context).hide();
+          });
+        })($(this));
+      });
+    }
+  };
+
   Drupal.behaviors.bgCollapseComments = {
     attach: function (context, settings) {
       bgCollapseComments();
