@@ -11,6 +11,10 @@ function bg_custom_form_alter(&$form, &$form_state, $form_id) {
     unset($form['author']);
     unset($form['comment_body'][$form['language']['#value']][0]['value']['#title']);
   }
+  else if($form_id == 'search_block_form') {
+    $adapter = facetapi_adapter_load('apachesolr@solr');
+    $form['search_block_form']['#default_value'] = $adapter->getSearchKeys();
+  }
 }
 
 function bg_custom_form_comment_form_alter(&$form, &$form_state, &$form_id) {
