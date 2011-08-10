@@ -216,7 +216,6 @@ function bg_media_entity_info_alter(&$entity_info) {
     'label' => t('Grid 3x3'),
     'custom settings' => TRUE,
   );
-  dsm($entity_info);
 }
 
 
