@@ -1,48 +1,65 @@
 <?php
+define('GRIDUI_DEBUG', FALSE);
 
-  define('GRIDUI_DEBUG', FALSE);
+function gridui_form_alter(&$form, &$form_state, $form_id) {
+  if(GRIDUI_DEBUG) dsm('Doing gridui_form_alter');
+  if(GRIDUI_DEBUG) dsm($form);
+  if(GRIDUI_DEBUG) dsm($form_id);
 
-  function gridui_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == "dossier_node_form") {
+    // Add quick actions bar.
+    $form['quick_actions'] = array(
+      '#type' => 'container',
+      '#weight' => 1,
+      'quick_submit' => array(
+        '#weight' => 1,
+        '#type' => 'submit',
+        '#value' => t('Save & Edit'),
+        '#submit' => array('gridui_quick_submit'),
+      ),
+    );
 
-    if(GRIDUI_DEBUG) dsm('Doing gridui_form_alter');
-    if(GRIDUI_DEBUG) dsm($form);
-    if(GRIDUI_DEBUG) dsm($form_id);
+ //   print_r($form);
 
-    if($form_id == "dossier_node_form") {
-      if(GRIDUI_DEBUG) dsm('Adding gridui frame');
+    if(GRIDUI_DEBUG) dsm('Adding gridui frame');
 
-      // Add a drawing frame to the form
-      $form['gridui'] = array(
-        '#markup'   => '<div id="gridui-frame"></div><br clear="all">',
-        '#weight'   => ((int)$form['field_referenced_content']['#weight'] + .1),
-        '#attached' => array(
-          'css' => array(
-            drupal_get_path('module', 'gridui') . '/css/gridui.css',
-          ),
-          'js' => array(
-            drupal_get_path('module', 'gridui') . '/js/gridui.js',
-            array(
-              'data' => array(
-                'gridui' => array(
-                  'lang' => $form['language']['#value'],
-                )
-              ),
-              'type' => 'setting',
+    // Add a drawing frame to the form
+    $form['gridui'] = array(
+      '#markup'   => '<div id="gridui-frame"></div><br clear="all">',
+      '#weight'   => ((int)$form['field_referenced_content']['#weight'] + .1),
+      '#attached' => array(
+        'css' => array(
+          drupal_get_path('module', 'gridui') . '/css/gridui.css',
+        ),
+        'js' => array(
+          drupal_get_path('module', 'gridui') . '/js/gridui.js',
+          array(
+            'data' => array(
+              'gridui' => array(
+                'lang' => $form['language']['#value'],
+              )
             ),
+            'type' => 'setting',
           ),
         ),
-      );
+      ),
+    );
 
-      // Set position fields to be hidden
-      /*
-      foreach($form["field_referenced_content"]["nl"] as $key => $value) {
-        if(is_numeric($key)) {
-          if(GRIDUI_DEBUG) dsm("Hiding positions of {$key}");
-          $form["field_referenced_content"]["nl"][$key]["pos_x"]["#type"] = "hidden";
-          $form["field_referenced_content"]["nl"][$key]["pos_y"]["#type"] = "hidden";
-        }
+    // Set position fields to be hidden
+    /*
+    foreach($form["field_referenced_content"]["nl"] as $key => $value) {
+      if(is_numeric($key)) {
+        if(GRIDUI_DEBUG) dsm("Hiding positions of {$key}");
+        $form["field_referenced_content"]["nl"][$key]["pos_x"]["#type"] = "hidden";
+        $form["field_referenced_content"]["nl"][$key]["pos_y"]["#type"] = "hidden";
       }
-      */
-
     }
+    */
+
   }
+}
+
+function gridui_quick_submit($form, &$form_state) {
+  $_GET['destination'] = $_GET['q'];
+  node_form_submit($form, $form_state);
+}
