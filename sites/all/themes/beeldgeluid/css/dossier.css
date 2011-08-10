@@ -51,8 +51,10 @@
   color: #fff;
 }
 
+.dossier-element-black h2,
 .dossier-element-black p,
 .dossier-element-black a,
+.dossier-element-black span,
 .dossier-element-black span.date-display-single {
   color: #000;
 }
