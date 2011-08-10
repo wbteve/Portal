@@ -204,6 +204,19 @@ function bg_media_entity_info_alter(&$entity_info) {
     'label' => t('Medium'),
     'custom settings' => TRUE,
   );
+  $entity_info['file']['view modes']['media_grid_1x1'] = array(
+    'label' => t('Grid 1x1'),
+    'custom settings' => TRUE,
+  );
+  $entity_info['file']['view modes']['media_grid_2x2'] = array(
+    'label' => t('Grid 2x2'),
+    'custom settings' => TRUE,
+  );
+  $entity_info['file']['view modes']['media_grid_3x3'] = array(
+    'label' => t('Grid 3x3'),
+    'custom settings' => TRUE,
+  );
+  dsm($entity_info);
 }
 
 
