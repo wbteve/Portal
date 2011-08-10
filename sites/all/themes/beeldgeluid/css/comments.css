@@ -13,6 +13,12 @@
   margin: 0 0 1em 0;
 }
 
+.node-type-blog #comments {
+  background-color: #ffffff;
+  border: 1px solid #eaeaea;
+  padding: 5px;
+}
+
 #comments h2.comment-form /* Heading for the comment form */ {
 }
 
@@ -96,9 +102,8 @@ h3.comment-title /* Comment title */ {
 }
 
 #comment-form .form-item label {
-  font-size: 14px;
+  font-size: 12px;
   font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;
-  font-weight: bold;
 }
 
 .comment-list   {

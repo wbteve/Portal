@@ -180,6 +180,10 @@ function beeldgeluid_preprocess_node(&$variables, $hook) {
   if ($variables['display_submitted'] == TRUE && $variables['node']->type == 'blog') {
     $variables['submitted'] = t('Submitted by !username on !datetime', array('!username' => $variables['name'], '!datetime' => format_date($variables['node']->created, 'short')));
   }
+
+  if ($variables['node']->type == 'blog' && $variables['view_mode'] == 'full' && isset($variables['content']['links']['comment'])) {
+    unset($variables['content']['links']['comment']);
+  }
 }
 
 function beeldgeluid_preprocess_node_media(&$variables) {
