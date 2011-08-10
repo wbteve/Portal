@@ -71,6 +71,27 @@
   margin: 0;
 }
 
+.dossier-element-media .ajax-progress {
+  position: absolute;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent url('../images/blue-60.png');
+}
+
+.dossier-element-media .ajax-progress .throbber {
+  background: transparent url('../images/ajax-loader.gif');
+  width: 32px;
+  height: 32px;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  margin-left: -16px;
+  margin-top: -16px;
+}
+
 .dossier-element-media h2.node-title {
   display: none;
 }
