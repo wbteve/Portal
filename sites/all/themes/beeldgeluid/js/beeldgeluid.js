@@ -106,6 +106,7 @@
         function() {
           $(this).addClass('group-verbreding-closed');
           $(this).unbind('mouseleave', bgVerbredingMouseLeave);
+          $('#block-system-main .dossier-element .node-media-view-mode-full').width(480);
         }
       );
   }
@@ -113,6 +114,7 @@
   function bgToggleVerbreding(event) {
     var $this = $(this);
     if ($this.hasClass('group-verbreding-closed')) {
+      $('#block-system-main .dossier-element .node-media-view-mode-full').width(720);
       $(this)
       .width(60) // width isn't set on initial page load
       .removeClass('group-verbreding-closed') // set the background color

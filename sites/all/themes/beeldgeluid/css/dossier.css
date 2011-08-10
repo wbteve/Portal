@@ -97,7 +97,7 @@
 }
 
 .dossier-element-media .node-media-view-mode-full {
-  width: 720px;
+  width: 480px;
 }
 
 
@@ -139,7 +139,7 @@
 
 #block-system-main .dossier-element .node-media-view-mode-full {
   margin-left: 0;
-  width: 720px;
+  width: 480px;
 }
 
 .node-media .video-titlebar {
