@@ -8,11 +8,11 @@
   }
 
   Drupal.BGMediaPlayerPlayHandler = function() {
-    $('.video-titlebar, .group_verbreding').fadeOut('fast');
+    // RVW: Removed $('.video-titlebar, .group_verbreding').fadeOut('fast');
   }
 
   Drupal.BGMediaPlayerStopHandler = function() {
-    $('.video-titlebar, .group_verbreding').fadeIn('fast');
+    // RVW: Removed $('.video-titlebar, .group_verbreding').fadeIn('fast');
   }
 
   Drupal.behaviors.bgDossierMediaBehavior = {

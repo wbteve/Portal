@@ -133,6 +133,7 @@
 }
 
 #block-system-main .node-media-view-mode-full {
+  position: relative;
   margin-left: 120px;
   width: 720px;
 }
@@ -144,12 +145,10 @@
 
 .node-media .video-titlebar {
   width: 460px;
-  height: 40px;
+  height: 20px;
   overflow: hidden;
   background: transparent url('../images/blue-60.png');
-  margin-top: -60px;
   position: relative;
-  top: 60px;
   z-index: 199;
   text-align: center;
   padding: 10px;
@@ -174,12 +173,12 @@
 .node-media .group-verbreding {
   background: #E00034;
   width: 300px;
-  float: left;
   height: 312px;
   padding: 4px 0;
-  margin-left: -60px;
-  position: relative;
+  position: absolute;
   z-index: 200;
+  top: 0;
+  left: 420px;
 }
 
 .node-media .group-verbreding-closed {
@@ -191,8 +190,8 @@
 
 #flash-media-player,
 .field-type-media .field-item {
-  width: 480px;
-  height: 320px;
+  width: 420px;
+  height: 280px;
 }
 
 .node-media .verbreding-item {
