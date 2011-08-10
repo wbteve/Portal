@@ -114,6 +114,9 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
       break;
     }
   }
+  if ($user->uid == 1) {
+    $show_tabs = TRUE;
+  }
   if(!$show_tabs) unset($variables['tabs']);
 
   $variables['page_title_tag'] = 'h1';
