@@ -51,7 +51,7 @@
 }
 
 #edit-quick-actions {
-  float: right;
-  margin-right: 40px;
+  position: relative;
+  left: 1035px;
 }
 
