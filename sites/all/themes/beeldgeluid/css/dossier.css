@@ -19,9 +19,16 @@
 
 /* Override some properties that have been set as inline styles. Sorry for the !important. */
 .dossier-element-focus {
-  overflow: visible!important;
   width: auto!important;
   z-index: 1000;
+}
+
+.dossier-element .content {
+  display: none;
+}
+
+.dossier-element-focus .content {
+  display: block;
 }
 
 .vjs-controls {

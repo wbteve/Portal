@@ -163,7 +163,7 @@ function theme_bg_reference($variables) {
   $width           = $element['#data']['width'] * UNIT_SIZE_WIDTH;
   $height          = $element['#data']['height'] * UNIT_SIZE_HEIGHT;
   $background_color = $element['#data']['type'] == CONTENT_TYPE_MEDIA ? 'transparent' : $element['#data']['color_back'];
-  $style           = "position: absolute; overflow: hidden; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px; background-color: {$background_color};";
+  $style           = "position: absolute; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px; background-color: {$background_color};";
 
   $row++;
 
