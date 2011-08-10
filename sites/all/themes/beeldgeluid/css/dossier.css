@@ -41,6 +41,10 @@
   margin: 0 0 10px 0;
 }
 
+.dossier-element-media .dossier-element-text-inner {
+  padding: 0;
+}
+
 .dossier-element p,
 .dossier-element a,
 .dossier-element span.date-display-single {

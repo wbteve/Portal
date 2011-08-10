@@ -143,8 +143,14 @@ function theme_bg_reference($variables) {
       break;
 
     case CONTENT_TYPE_TEXT:
+      // Add class when color is white or yellow so text turns black for contrast
       if(in_array($element['#data']['color_back'], array('#ffffff', '#fce300'))) {
         $classes[] = 'dossier-element-black';
+      }
+
+      // If element contains media
+      if(strpos($element['#data']['content'], '[[{"type":"media"') !== FALSE) {
+        $classes[] = 'dossier-element-media';
       }
 
       $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], 'dossier_text') . '</div>';
