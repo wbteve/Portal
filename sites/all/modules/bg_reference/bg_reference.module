@@ -104,7 +104,7 @@ function theme_bg_reference($variables) {
             'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
             'label' => 'hidden',
             'settings' => array(
-           	  'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+              'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
             ),
           ));
 
@@ -286,13 +286,33 @@ function bg_reference_field_formatter_view($object_type, $object, $field, $insta
   $element = array();
 
   if($display['type'] == 'bg_reference_default') {
+    // We want to center the dossier.
+    $x_low = 12;
+    $x_high = 1;
     foreach ($items as $delta => $item) {
+      if ($item['pos_x'] < $x_low) {
+        $x_low = $item['pos_x'];
+      }
+      if ($item['pos_x'] > $x_high) {
+        $x_high = $item['pos_x'];
+      }
+    }
+
+    foreach ($items as $delta => $item) {
+      if ($x_low > 0) {
+        $item['pos_x'] = $item['pos_x'] - $x_low;
+      }
+
       $element[$delta] = array(
         '#theme'  => 'bg_reference',
         '#data'   => $item
       );
     }
   }
+
+  $width = ($x_high-$x_low+1) * UNIT_SIZE_WIDTH;
+  $element['#type'] = 'container';
+  $element['#attributes'] = array('style' => 'width: ' . $width . 'px; margin: 0 auto;');
 
   return $element;
 }

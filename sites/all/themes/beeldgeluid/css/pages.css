@@ -595,3 +595,28 @@ ul.links li {
 .block-facetapi .block-title {
   margin-bottom: 13px;
 }
+
+/**
+ * Theming of dossiers
+ */
+.node-type-dossier #main {
+  width: inherit;
+  margin: 0;
+}
+.node-type-dossier #main-info {
+  width: 720px;
+  margin: 0 auto;
+}
+.node-type-dossier  #content {
+  float: none;
+  margin: 0 auto;
+  width: inherit;
+}
+.node-type-dossier .field-name-field-referenced-content {
+  position: relative;
+  height: 560px;
+}
+.node-type-dossier .tabs {
+  width: 720px;
+  margin: 0 auto;
+}

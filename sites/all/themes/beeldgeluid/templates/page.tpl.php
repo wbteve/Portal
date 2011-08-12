@@ -115,19 +115,21 @@
   </div></div><!-- /.section, /#header -->
 
   <div id="main-wrapper"><div id="main" class="clearfix<?php if ($main_menu || $page['navigation']) { print ' with-navigation'; } ?>">
-    <div class="breadcrumb-wrapper">
-      <?php print $breadcrumb; ?>
+    <div id="main-info">
+      <div class="breadcrumb-wrapper">
+        <?php print $breadcrumb; ?>
+      </div>
+      <?php if (isset($search_info)) : ?>
+      <div id="search-info">
+        <?php print $search_info; ?>
+      </div>
+      <?php endif; ?>
+      <?php print render($title_prefix); ?>
+      <?php if ($title): ?>
+        <<?php print $page_title_tag; ?> class="title" id="page-title"><?php print $title; ?></<?php print $page_title_tag; ?>>
+      <?php endif; ?>
+      <?php print render($title_suffix); ?>
     </div>
-    <?php if (isset($search_info)) : ?>
-    <div id="search-info">
-      <?php print $search_info; ?>
-    </div>
-    <?php endif; ?>
-    <?php print render($title_prefix); ?>
-    <?php if ($title): ?>
-      <<?php print $page_title_tag; ?> class="title" id="page-title"><?php print $title; ?></<?php print $page_title_tag; ?>>
-    <?php endif; ?>
-    <?php print render($title_suffix); ?>
     <div id="content" class="column"><div class="section">
       <?php print render($page['highlighted']); ?>
 
