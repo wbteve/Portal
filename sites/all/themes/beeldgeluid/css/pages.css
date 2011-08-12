@@ -610,7 +610,7 @@ ul.links li {
 .node-type-dossier  #content {
   float: none;
   margin: 0 auto;
-  width: inherit;
+  width: 100%;
 }
 .node-type-dossier .field-name-field-referenced-content {
   position: relative;
