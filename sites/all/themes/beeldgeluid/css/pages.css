@@ -96,21 +96,13 @@ div#site-name /* The name of the website */ {
  * Main (container for everything else)
  */
 #main-wrapper {
-  background-color: #f8f6f5;
+  background-color: #4A4A4A;
   color: #fff;
 }
 
 a.use-ajax {
   text-decoration: none;
   font-weight: bold;
-}
-
-body.front #main-wrapper ,
-body.page-search #main-wrapper,
-body.node-type-media #main-wrapper,
-body.node-type-dossier #main-wrapper {
-  background-color: #4A4A4A;
-  color: #fff;
 }
 
 body#tinymce {
@@ -129,9 +121,13 @@ body#tinymce {
 #content .section {
 }
 
-.region-highlighted {
+.sidebar-first #content,
+.node-type-page #content,
+.page-views #content {
+  padding: 10px;
+  background-color: #f8f6f5;
+  color: #000000;
 }
-
 .region-content-top /* Wrapper for any blocks placed in the "content top" region */ {
 }
 
