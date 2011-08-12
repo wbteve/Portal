@@ -97,8 +97,13 @@ div#site-name /* The name of the website */ {
  */
 #main-wrapper {
   background-color: #f8f6f5;
+  color: #fff;
 }
 
+a.use-ajax {
+  text-decoration: none;
+  font-weight: bold;
+}
 
 body.front #main-wrapper ,
 body.page-search #main-wrapper,

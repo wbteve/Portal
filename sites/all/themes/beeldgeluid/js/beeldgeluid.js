@@ -49,6 +49,26 @@
     }
   };
 
+  Drupal.behaviors.bgImgHover = {
+    attach: function (context, settings) {
+      $('.dossier-element .use-ajax').each(function() {
+        $(this).hover(
+          function() {
+            // MouseIn
+            $('.hover', this).remove();
+            $('img', this).css('position', 'absolute');
+            $(this).append(
+              '<span class="hover" style="overflow: hidden; position: absolute; padding: 5px 10px; background-color: #000000; opacity: 0.9; margin: auto 0; display: block; width: ' + ($('img', this).width()-20) + 'px; height: ' + ($('img', this).height()-10) + 'px"><span>' + $(this).attr('title') + '</span></span>'
+            );
+          },
+          function() {
+            $('.hover', this).remove();
+          }
+        );
+      });
+    }
+  };
+
   Drupal.behaviors.searchLabel = {
     attach: function (context, settings) {
       // some variables.
