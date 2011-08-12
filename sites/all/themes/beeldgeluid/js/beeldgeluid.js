@@ -70,6 +70,12 @@
 
   Drupal.behaviors.bgImgHover = {
     attach: function (context, settings) {
+      $('.dossier-element-1x1 .dossier-element-text-inner, .dossier-element-agenda-1x1 .node-agenda-view-mode-dossier').each(function() {
+        $(this).hover(
+          function() { $(this).addClass('dossier-text-hover'); },
+          function() { $(this).removeClass('dossier-text-hover'); }
+        );
+      });
       $('.dossier-element .use-ajax').each(function() {
         $(this).hover(
           function() {
@@ -77,7 +83,7 @@
             $('.hover', this).remove();
             $('img', this).css('position', 'absolute');
             $(this).append(
-              '<span class="hover" style="overflow: hidden; position: absolute; padding: 5px 10px; background-color: #000000; opacity: 0.9; margin: auto 0; display: block; width: ' + ($('img', this).width()-20) + 'px; height: ' + ($('img', this).height()-10) + 'px"><span>' + $(this).attr('title') + '</span></span>'
+              '<span class="hover" style="overflow: hidden; position: absolute; padding: 5px 10px; background-color: #000000; opacity: 0.8; margin: auto 0; display: block; width: ' + ($('img', this).width()-20) + 'px; height: ' + ($('img', this).height()-10) + 'px"><span>' + $(this).attr('title') + '</span></span>'
             );
           },
           function() {
