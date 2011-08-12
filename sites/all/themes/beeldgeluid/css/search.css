@@ -35,24 +35,24 @@ body.page-search #page-title {
   background: url("../images/blue-60.png") repeat scroll 0 0 transparent;
 }
 
-.search-result .info-box .info {
+.page-search-site .search-result .info-box .info {
   margin: 10px;
 }
 
-.search-result-grid-3x3,
-.search-result-grid-3x3 .info-box {
+.page-search-site .search-result-grid-3x3,
+.page-search-site .search-result-grid-3x3 .info-box {
   width: 360px;
   height: 240px;
 }
 
-.search-result-grid-2x2,
-.search-result-grid-2x2 .info-box {
+.page-search-site .search-result-grid-2x2,
+.page-search-site .search-result-grid-2x2 .info-box {
   width: 240px;
   height: 160px;
 }
 
-.search-result-grid-1_5x1_5,
-.search-result-grid-1_5x1_5 .info-box {
+.page-search-site .search-result-grid-1_5x1_5,
+.page-search-site .search-result-grid-1_5x1_5 .info-box {
   width: 180px;
   height: 120px;
 }
@@ -68,4 +68,26 @@ body.page-search #page-title {
 
 #search-info p.search-info-top {
   font-size: 1.3em;
+}
+
+
+.page-search-list-site .search-result {
+  float: none;
+  overflow: visible;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.page-search-list-site .search-result .info-box {
+  position: static;
+  overflow: visible;
+  background: none;
+}
+.page-search-list-site #content {
+  padding: 10px;
+  background-color: #f8f6f5;
+  color: #000000;
+}
+.page-search-list-site #content a {
+  color: #000000;
 }
