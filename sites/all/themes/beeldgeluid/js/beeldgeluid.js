@@ -49,6 +49,25 @@
     }
   };
 
+  function resizeDossier(dossier) {
+      var main_info_pos = $('#main-info').offset();
+      var calc = main_info_pos.left - (Drupal.settings.bg_reference.unitSizeWidth*2);
+      dossier.css('left', calc);
+      dossier.css('position', 'absolute');
+  }
+
+  Drupal.behaviors.bgDossierPosition = {
+    attach: function (context, settings) {
+      var dossier = $('#dossier-container');
+      if (dossier.length > 0) {
+        resizeDossier(dossier);
+        $(window).resize(function() {
+          resizeDossier(dossier);
+        });
+      }
+    }
+  };
+
   Drupal.behaviors.bgImgHover = {
     attach: function (context, settings) {
       $('.dossier-element .use-ajax').each(function() {

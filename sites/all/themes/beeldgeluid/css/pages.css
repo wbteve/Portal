@@ -608,13 +608,14 @@ ul.links li {
   margin: 0 auto;
 }
 .node-type-dossier  #content {
+  height: 640px;
   float: none;
   margin: 0 auto;
   width: 100%;
 }
 .node-type-dossier .field-name-field-referenced-content {
   position: relative;
-  height: 560px;
+  height: 640px;
 }
 .node-type-dossier .tabs {
   width: 720px;

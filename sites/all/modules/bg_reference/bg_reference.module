@@ -287,22 +287,15 @@ function bg_reference_field_formatter_view($object_type, $object, $field, $insta
 
   if($display['type'] == 'bg_reference_default') {
     // We want to center the dossier.
-    $x_low = 12;
     $x_high = 1;
     foreach ($items as $delta => $item) {
-      if ($item['pos_x'] < $x_low) {
-        $x_low = $item['pos_x'];
-      }
-      if ($item['pos_x'] > $x_high) {
-        $x_high = $item['pos_x'];
+      $item_x_high = $item['pos_x']+$item['width']-1;
+      if ($item_x_high > $x_high) {
+        $x_high = $item_x_high;
       }
     }
 
     foreach ($items as $delta => $item) {
-      if ($x_low > 0) {
-        $item['pos_x'] = $item['pos_x'] - $x_low;
-      }
-
       $element[$delta] = array(
         '#theme'  => 'bg_reference',
         '#data'   => $item
@@ -310,9 +303,10 @@ function bg_reference_field_formatter_view($object_type, $object, $field, $insta
     }
   }
 
-  $width = ($x_high-$x_low+1) * UNIT_SIZE_WIDTH;
+  $width = ($x_high) * UNIT_SIZE_WIDTH;
   $element['#type'] = 'container';
-  $element['#attributes'] = array('style' => 'width: ' . $width . 'px; margin: 0 auto;');
+  // Set styling for non-js browsers.
+  $element['#attributes'] = array('id' => 'dossier-container', 'style' => 'width: ' . $width . 'px; margin: 0 auto');
 
   return $element;
 }
