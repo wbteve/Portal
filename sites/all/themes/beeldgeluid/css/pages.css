@@ -600,7 +600,7 @@ ul.links li {
  * Theming of dossiers
  */
 .node-type-dossier #main {
-  width: inherit;
+  width: 100%;
   margin: 0;
 }
 .node-type-dossier #main-info {
