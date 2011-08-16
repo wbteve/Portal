@@ -143,7 +143,7 @@
         <ul class="action-links"><?php print render($action_links); ?></ul>
       <?php endif; ?>
       <?php print render($page['content']); ?>
-      <?php // RVW: Removed feed icons. print $feed_icons; ?>
+      <?php print $feed_icons; ?>
     </div></div><!-- /.section, /#content -->
 
     <?php if ($page['navigation'] || $main_menu): ?>
