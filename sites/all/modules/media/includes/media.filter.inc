@@ -148,7 +148,7 @@ function media_token_to_markup($match, $wysiwyg = FALSE) {
     if (!is_string($tag)) {
       throw new Exception('Unable to find matching tag');
     }
-    
+
     $tag_info = drupal_json_decode($tag);
 
     if (!isset($tag_info['fid'])) {
@@ -216,7 +216,7 @@ function media_pre_render_text_format($element) {
   if (!isset($element['format'])) {
     return $element;
   }
-  
+
   $field = &$element['value'];
   $settings = array(
     'field' => $field['#id'],
@@ -388,6 +388,17 @@ function media_get_file_without_label($file, $view_mode, $settings = array()) {
   // element attributes.
   if (!isset($element['#attributes']) && isset($settings['attributes'])) {
     $element['#attributes'] = $settings['attributes'];
+
+    // While this function may be called for any file type, images are a common
+    // use-case. theme_image() and theme_image_style() require the 'alt'
+    // attribute to be passed separately from the 'attributes' array (see
+    // http://drupal.org/node/999338). Until that's fixed, implement this
+    // special-case logic. Image formatters using other theme functions are
+    // responsible for their own 'alt' attribute handling. See
+    // theme_media_formatter_large_icon() for an example.
+    if (isset($settings['attributes']['alt']) && !array_key_exists('#alt', $element) && isset($element['#theme']) && in_array($element['#theme'], array('image', 'image_style'))) {
+      $element['#alt'] = $settings['attributes']['alt'];
+    }
   }
 
   return $element;

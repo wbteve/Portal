@@ -1,0 +1,57 @@
+### Eclipse Workspace Patch 1.0
+#P beeldgeluid
+Index: sites/all/modules/media/includes/media.filter.inc
+===================================================================
+--- sites/all/modules/media/includes/media.filter.inc	(revision 18985)
++++ sites/all/modules/media/includes/media.filter.inc	(working copy)
+@@ -148,7 +148,7 @@
+     if (!is_string($tag)) {
+       throw new Exception('Unable to find matching tag');
+     }
+-    
++
+     $tag_info = drupal_json_decode($tag);
+ 
+     if (!isset($tag_info['fid'])) {
+@@ -216,7 +216,7 @@
+   if (!isset($element['format'])) {
+     return $element;
+   }
+-  
++
+   $field = &$element['value'];
+   $settings = array(
+     'field' => $field['#id'],
+@@ -388,6 +388,17 @@
+   // element attributes.
+   if (!isset($element['#attributes']) && isset($settings['attributes'])) {
+     $element['#attributes'] = $settings['attributes'];
++
++    // While this function may be called for any file type, images are a common
++    // use-case. theme_image() and theme_image_style() require the 'alt'
++    // attribute to be passed separately from the 'attributes' array (see
++    // http://drupal.org/node/999338). Until that's fixed, implement this
++    // special-case logic. Image formatters using other theme functions are
++    // responsible for their own 'alt' attribute handling. See
++    // theme_media_formatter_large_icon() for an example.
++    if (isset($settings['attributes']['alt']) && !array_key_exists('#alt', $element) && isset($element['#theme']) && in_array($element['#theme'], array('image', 'image_style'))) {
++      $element['#alt'] = $settings['attributes']['alt'];
++    }
+   }
+ 
+   return $element;
+Index: sites/all/modules/media/includes/media.theme.inc
+===================================================================
+--- sites/all/modules/media/includes/media.theme.inc	(revision 18985)
++++ sites/all/modules/media/includes/media.theme.inc	(working copy)
+@@ -321,5 +321,10 @@
+   $icon_dir = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
+   $icon = file_icon_path((object)$file, $icon_dir);
+   $variables['path'] = $icon;
++  // theme_image() requires the 'alt' attribute passed as its own variable.
++  // @see http://drupal.org/node/999338
++  if (!isset($variables['alt']) && isset($variables['attributes']['alt'])) {
++    $variables['alt'] = $variables['attributes']['alt'];
++  }
+   return theme('image', $variables);
+ }
