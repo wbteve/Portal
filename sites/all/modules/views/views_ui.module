@@ -80,7 +80,7 @@ function views_ui_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -10,
-    'theme callback' => 'views_ajax_theme_callback',
+    'theme callback' => 'ajax_base_page_theme',
   ) + $base;
   $items['admin/structure/views/view/%views_ui_cache/edit/%/ajax'] = array(
     'page callback' => 'views_ui_ajax_get_form',
@@ -149,16 +149,6 @@ function views_ui_menu() {
 }
 
 /**
- * Implements hook_help().
- */
-function views_ui_help($path, $arg = '') {
-  switch ($path) {
-
-  }
- // return '<pre>'.print_r(views_ui_get_wizards(),1);
-}
-
-/**
  * Implements hook_theme().
  */
 function views_ui_theme() {
@@ -188,9 +178,6 @@ function views_ui_theme() {
     'views_ui_rearrange_filter_form' => array(
       'render element' => 'form',
       'file' => 'includes/admin.inc',
-    ),
-    'views_ui_item_delete_form' => array(
-      'render element' => 'form',
     ),
     'views_ui_expose_filter_form' => array(
       'render element' => 'form',
