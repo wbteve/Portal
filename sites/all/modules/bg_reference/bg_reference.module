@@ -108,6 +108,8 @@ function theme_bg_reference($variables) {
             ),
           ));
 
+          $classes[] = 'media-type-' . $node->field_media_file[$node->language][0]['file']->type;
+
           $row = isset($element['#data']['delta']) ? $element['#data']['delta'] : $row;
           $link = bg_reference_ajax_text_button('', "node/{$node->nid}", t('View @title', array('@title' => $node->title)), "{$node->nid}|{$row}");
           $link_close_length = strlen('</a>');
