@@ -59,6 +59,29 @@
  */
 
 
+function beeldgeluid_breadcrumb($variables) {
+  $breadcrumb = $variables['breadcrumb'];
+
+  if (!empty($breadcrumb)) {
+    // Override first crumb if it is a link
+    if(strpos($breadcrumb[0], '<a ') !== FALSE) {
+      $breadcrumb[0] = l(t('Home'), '', array('attributes' => array('class' => array('first'))));
+    }
+
+    $last_element_key = count($breadcrumb) -1;
+    if($last_element_key > 0) {
+      $breadcrumb[$last_element_key] = '<span class="last">' . $breadcrumb[$last_element_key] . '</span>';
+    }
+
+    // Provide a navigational heading to give context for breadcrumb links to
+    // screen-reader users. Make the heading invisible with .element-invisible.
+    $output = '<h2 class="element-invisible">' . t('You are here') . '</h2>';
+
+    $output .= '<div class="breadcrumb">' . implode('/', $breadcrumb) . '</div>';
+    return $output;
+  }
+}
+
 /**
  * Override or insert variables into the html templates.
  *
@@ -107,17 +130,17 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   }
 
   // Hide tabs for normal users
-  $show_tabs = false;
+  $show_tabs = FALSE;
   foreach($user->roles as $roleid => $rolename){
-    if($roleid != 2){
-      $show_tabs = true;
+    if($roleid != 2 && arg(0) != 'search'){
+      $show_tabs = TRUE;
       break;
     }
   }
+
   if ($user->uid == 1) {
     $show_tabs = TRUE;
   }
-  if(!$show_tabs) unset($variables['tabs']);
 
   $variables['page_title_tag'] = 'h1';
   // Code that should only run when a node is being displayed.
@@ -144,12 +167,36 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
 
   // If page is search results
   if(arg(0) == 'search') {
+    $display_type = arg(1) == 'list' ? arg(1) : 'block';
+
+    // Do not show tabs
+    $show_tabs = FALSE;
+
     $adapter = facetapi_adapter_load('apachesolr@solr');
     drupal_set_title($adapter->getSearchKeys());
 
     $variables['search_info'] = '<p class="search-info-top">' . t('Search results for') . '</p>' .
       '<p class="search-info-bottom">' . t('@result_count results', array('@result_count' => $adapter->getResultCount()));
+
+    $variables['search_display_switch'] = array(
+      '#markup' => l(t('Block view'), 'search/site/' . $adapter->getSearchKeys(), array(
+          'query' => $adapter->getParams(),
+          'attributes' => array(
+          	'class' => array('search-display-switch-btn', 'search-display-switch-btn-block', ($display_type == 'list' ? '' : 'search-display-switch-btn-block-active')),
+            'title' => t('Block view'),
+          )
+        )) .
+        l(t('List view'), 'search/list/site/' . $adapter->getSearchKeys(), array(
+          'query' => $adapter->getParams(),
+          'attributes' => array(
+          	'class' => array('search-display-switch-btn', 'search-display-switch-btn-list', ($display_type == 'list' ? 'search-display-switch-btn-list-active' : '')),
+            'title' => t('List view'),
+          )
+        ))
+    );
   }
+
+  if(!$show_tabs) unset($variables['tabs']);
 }
 
 function beeldgeluid_page_alter(&$page) {
@@ -244,12 +291,13 @@ function beeldgeluid_preprocess_search_results(&$variables, $hook) {
  *   An array of variables to pass to the theme template.
  */
 function beeldgeluid_preprocess_search_result(&$variables) {
+  $display_type = arg(1) == 'list' ? arg(1) : 'block';
   $id = isset($_GET['page']) ? $_GET['page'] * 18 + $variables['id'] : $variables['id'];
-  $style = _beeldgeluid_get_style($id);
+  $style = _beeldgeluid_get_style($id, $display_type);
   $variables['classes_array'][] = 'search-result-' . $style;
   $variables['classes_array'][] = 'search-result-' . $id;
 
-  if($style != 'grid-3x3') {
+  if($display_type != 'list' && $style != 'grid-3x3') {
     unset($variables['snippet']);
   }
 
@@ -296,13 +344,13 @@ function beeldgeluid_preprocess_search_result(&$variables) {
   }
 }
 
-function _beeldgeluid_get_style($id) {
+function _beeldgeluid_get_style($id, $display_type) {
   // Large
-  if($id <= 4) {
+  if($display_type != 'list'  && $id <= 4) {
     return 'grid-3x3';
   }
   // Medium
-  else if($id <= 10) {
+  else if($display_type != 'list' && $id <= 10) {
     return 'grid-2x2';
   }
   // Small

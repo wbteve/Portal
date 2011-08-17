@@ -130,6 +130,13 @@
       <?php endif; ?>
       <?php print render($title_suffix); ?>
     </div>
+
+    <?php if(isset($search_display_switch)) : ?>
+    <div id="search-display-switch">
+      <?php print render($search_display_switch); ?>
+    </div>
+    <?php endif; ?>
+
     <div id="content" class="column"><div class="section">
       <?php print render($page['highlighted']); ?>
 

@@ -10,6 +10,28 @@
   background: #8B8783;
 }
 
+.dossier-element span.hover {
+  overflow: hidden;
+  position: absolute;
+  margin: auto 0;
+  background: url("../images/blue-60.png") repeat scroll 0 0 transparent;
+}
+
+.dossier-element span.hover span {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.media-type-video span.hover span {
+  background: url("../images/icon-video.png") no-repeat scroll center center transparent;
+}
+
+.media-type-audio span.hover span {
+  background: url("../images/icon-audio.png") no-repeat scroll center center transparent;
+}
+
 /* Override some properties that have been set as inline styles. Sorry for the !important. */
 .dossier-element-focus {
   width: auto!important;
@@ -29,12 +51,17 @@
 }
 
 .dossier-element h2,
+.dossier-element h2.node-title {
+  margin: 0 0 0.5em;
+  letter-spacing: 1px;
+  font-size: 1.55em;
+}
+
+.dossier-element h2,
 .dossier-element h2 a {
   font-family: 'BebasNeue';
   text-transform: uppercase;
   color: #fff;
-  font-size: 20px;
-  margin: 0 0 10px 0;
 }
 
 .dossier-element-text p {
@@ -148,11 +175,11 @@
   z-index: 199;
   text-align: center;
   padding: 10px;
+  clear: both;
 }
 
 .node-media .video-titlebar h3 {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 2em;
   margin: 0;
   color: #fff;
 }

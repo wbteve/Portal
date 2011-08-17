@@ -70,12 +70,18 @@ body.page-search #page-title {
   font-size: 1.3em;
 }
 
-
 .page-search-list-site .search-result {
-  float: none;
   overflow: visible;
+  width: 100%;
   margin-bottom: 20px;
+  padding-bottom: 20px;
   border-bottom: 1px solid #eaeaea;
+}
+
+.page-search-list-site .search-result img {
+  position: static;
+  float: left;
+  margin-right: 10px;
 }
 
 .page-search-list-site .search-result .info-box {
@@ -84,10 +90,51 @@ body.page-search #page-title {
   background: none;
 }
 .page-search-list-site #content {
-  padding: 10px;
   background-color: #f8f6f5;
   color: #000000;
+}
+.page-search-list-site #content div.section {
+  margin: 10px;
 }
 .page-search-list-site #content a {
   color: #000000;
 }
+
+/******************************** SEARCH DISPLAY SWITCH ********************************/
+#search-display-switch {
+  float:right;
+  margin-bottom: 10px;
+}
+
+#search-display-switch a.search-display-switch-btn {
+  display: block;
+  float: left;
+  background: url('../images/btn_search_display_switch.png') no-repeat 0 0;
+  width: 20px;
+  height: 18px;
+  text-indent: -9999px;
+}
+
+#search-display-switch a.search-display-switch-btn-block:hover,
+#search-display-switch a.search-display-switch-btn-block-active {
+  background-position: 0 -18px;
+}
+
+#search-display-switch a.search-display-switch-btn-block-active {
+  margin-right: -1px;
+}
+
+#search-display-switch a.search-display-switch-btn-list {
+  background-position: -20px 0px;
+}
+
+#search-display-switch a.search-display-switch-btn-list:hover,
+#search-display-switch a.search-display-switch-btn-list-active {
+  background-position: -20px -18px;
+}
+
+#search-display-switch a.search-display-switch-btn-list-active {
+  margin-left: -1px;
+}
+
+/**************************** END SEARCH DISPLAY SWITCH ********************************/

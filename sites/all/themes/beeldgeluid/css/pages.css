@@ -100,6 +100,10 @@ div#site-name /* The name of the website */ {
   color: #fff;
 }
 
+#main-info {
+  overflow: hidden;
+}
+
 a.use-ajax {
   text-decoration: none;
   font-weight: bold;
@@ -142,20 +146,20 @@ body#tinymce {
   margin: 0 0 10px 0;
 }
 
-.breadcrumb a {
+.breadcrumb a,
+.breadcrumb span {
   text-decoration: none;
   color: #a4a4a4;
   padding: 0 5px;
 }
 
-.breadcrumb a:hover,
-.breadcrumb a:active {
-  color: #4a4a4a;
+.breadcrumb a.first {
+  padding-left: 0;
 }
 
 /* Dark BG pages */
-.section-search .breadcrumb a:hover,
-.section-search .breadcrumb a:active {
+.breadcrumb a:hover,
+.breadcrumb a:active {
   color: #FFF;
 }
 
@@ -400,12 +404,16 @@ ul.links li {
   text-align: center;
 }
 
-.node-type-media .field-group-format .field-group-format-toggler a {
+.node-type-media .field-group-format .field-group-format-toggler a,
+.node-type-media #comments h2.title {
+  font-family: Verdana,Tahoma,"DejaVu Sans",sans-serif;
   color: #fff;
   text-decoration: none;
   font-weight: bold;
   font-size: 14px;
   display: block;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .node-type-media .field-group-format.collapsed .field-group-format-toggler,
@@ -559,7 +567,6 @@ ul.links li {
 /* SEARCH */
 .search-result h3 a {
   color: #FFF;
-  font-weight: bold;
   text-decoration: none;
 }
 

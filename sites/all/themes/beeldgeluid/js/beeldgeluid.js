@@ -8,7 +8,7 @@
         window.location = $('a:first', $(this)).attr('href');
       });
 
-      $('.search-result:has(img)').each(function(){
+      $('.page-search-site .search-result:has(img)').each(function(){
         (function (context) {
           // Initially hide information
           $('.info-box', context).hide();
@@ -83,7 +83,7 @@
             $('.hover', this).remove();
             $('img', this).css('position', 'absolute');
             $(this).append(
-              '<span class="hover" style="overflow: hidden; position: absolute; padding: 5px 10px; background-color: #000000; opacity: 0.8; margin: auto 0; display: block; width: ' + ($('img', this).width()-20) + 'px; height: ' + ($('img', this).height()-10) + 'px"><span>' + $(this).attr('title') + '</span></span>'
+              '<span class="hover" style="width: ' + ($('img', this).width()) + 'px; height: ' + ($('img', this).height()) + 'px"><span></span></span>'
             );
           },
           function() {
