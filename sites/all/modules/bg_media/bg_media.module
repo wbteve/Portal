@@ -175,10 +175,13 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
           else {
             $icon_path    = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
             $poster_path  = file_icon_path((object)$item['file'], $icon_path);
+
+            $new_path = 'public://' . pathinfo($poster_path, PATHINFO_BASENAME);
+
             $element[] = array(
-              '#theme' => 'image',
-              '#path' => file_create_url($poster_path),
-              //'#style_name' => isset($display['settings']['style_name']) ? $display['settings']['style_name'] : 'thumbnail',
+              '#theme' => 'image_style',
+              '#path' => $new_path,
+              '#style_name' => isset($display['settings']['style_name']) ? $display['settings']['style_name'] : 'thumbnail',
             );
           }
         }
