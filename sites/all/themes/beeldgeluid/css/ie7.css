@@ -36,3 +36,8 @@ tr.odd th,
 tr.odd td {
   border-bottom: 1px solid #ccc; /* IE doesn't display borders on table rows */
 }
+
+/* Zoekresultaten -> Om het filter tussen blokken of lijstweergave te 'clearen' clear both werkt helaas niet onder ie7 */
+body.page-search #content {
+  margin-top: 15px;
+}
