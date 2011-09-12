@@ -128,9 +128,14 @@ body#tinymce {
 .sidebar-first #content,
 .node-type-page #content,
 .page-views #content {
-  padding: 10px;
+  /*padding: 10px;*/
   background-color: #f8f6f5;
   color: #000000;
+}
+.sidebar-first #content .section,
+.node-type-page #content .section,
+.page-views #content .section {
+  padding: 10px;
 }
 .region-content-top /* Wrapper for any blocks placed in the "content top" region */ {
 }
