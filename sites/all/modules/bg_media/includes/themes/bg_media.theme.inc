@@ -13,7 +13,7 @@
  */
 function bg_media_preprocess_bg_media_video(&$vars) {
   $wrapper = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
-  $js_path = base_path() . drupal_get_path('module', 'bg_media') . '/includes/js';
+  $js_path = drupal_get_path('module', 'bg_media') . '/includes/js';
   drupal_add_js($js_path . '/bg_media.js');
 
   if($wrapper instanceof MediaYouTubeStreamWrapper) {
@@ -116,7 +116,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
  * Preprocess function for theme('bg_media_audio').
  */
 function bg_media_preprocess_bg_media_audio(&$vars) {
-  $js_path      = base_path() . drupal_get_path('module', 'bg_media') . '/includes/js';
+  $js_path      = drupal_get_path('module', 'bg_media') . '/includes/js';
   drupal_add_js($js_path . '/bg_media.js');
 
   $icon_path    = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
