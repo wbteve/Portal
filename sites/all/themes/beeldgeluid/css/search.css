@@ -5,6 +5,19 @@ body.page-search #content {
   margin-right: -720px;
   width: 480px;
 }
+body.page-search.two-sidebars #content {
+ /* width: 720px;*/
+  clear: both;
+  margin-right: -720px;
+  width: 480px;
+}
+
+body.page-search.sidebar-second #content {
+  clear: both;
+  margin-right: -720px;
+  width: 720px;
+}
+
 
 body.page-search #page-title {
   float: left;
@@ -46,16 +59,33 @@ body.page-search #page-title {
   height: 240px;
 }
 
+.page-search-site.sidebar-second .search-result-grid-3x3,
+.page-search-site.sidebar-second  .search-result-grid-3x3 .info-box {
+  width: 360px;
+  height: 240px;
+}
+
 .page-search-site .search-result-grid-2x2,
 .page-search-site .search-result-grid-2x2 .info-box {
   width: 160px;
-  height: 10px;
+  height: 160px;
+}
+
+.page-search-site.sidebar-second .search-result-grid-2x2,
+.page-search-site.sidebar-second .search-result-grid-2x2 .info-box {
+  width: 240px;
+  height: 160px;
 }
 
 .page-search-site .search-result-grid-1_5x1_5,
 .page-search-site .search-result-grid-1_5x1_5 .info-box {
   width: 120px;
-  height: 140px;
+  height: 160px;
+}
+.page-search-site.sidebar-second  .search-result-grid-1_5x1_5,
+.page-search-site.sidebar-second .search-result-grid-1_5x1_5 .info-box {
+  width: 180px;
+  height: 120px;
 }
 
 #search-info {
