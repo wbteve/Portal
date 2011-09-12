@@ -157,8 +157,12 @@
 
 #block-system-main .node-media-view-mode-full {
   position: relative;
-  /*margin-left: 120px;*/
+  margin-left: 120px;
   width: 720px;
+}
+
+.sidebar-first #block-system-main .node-media-view-mode-full {
+  margin-left: 0px;
 }
 
 #block-system-main .dossier-element .node-media-view-mode-full {
