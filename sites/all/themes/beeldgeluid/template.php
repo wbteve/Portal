@@ -421,7 +421,7 @@ function beeldgeluid_flowplayer($variables) {
     'top' => 20,
     'right' => 20
   );
-
+  dsm($config);
   // Prepare the attributes, passing in the flowplayer class.
   if (isset($attributes['class'])) {
     $attributes['class'] .= ' flowplayer';
