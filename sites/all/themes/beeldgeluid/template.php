@@ -393,3 +393,46 @@ function beeldgeluid_image_style($variables) {
 
   return theme('image', $variables);
 }
+
+/**
+ * Creates the markup and adds the JavaScript to display a media file in
+ *
+ * @param $config
+ *   (optional) Can either be a string representing the media to load, or
+ *   an array of arguments containing the options provided on this page:
+ *     http://flowplayer.org/documentation/configuration.html
+ * @param $id
+ *   (optional) The ID of the DIV element to use.
+ * @param $attributes
+ *   (optional) Any additional attributes to associate with the DIV.
+ */
+function beeldgeluid_flowplayer($variables) {
+  $config = $variables['config'];
+  $id = $variables['id'];
+  $attributes = $variables['attributes'];
+  // Prepare the ID.
+  $id = drupal_clean_css_identifier($id);
+  
+  // Add custom logo
+  $config['logo'] = array(
+    'url' => 'branding.png',
+    'fullscreenOnly' => false,
+    'displayTime' => 0,
+    'top' => 20,
+    'right' => 20
+  );
+
+  // Prepare the attributes, passing in the flowplayer class.
+  if (isset($attributes['class'])) {
+    $attributes['class'] .= ' flowplayer';
+  } else {
+    $attributes['class'] = 'flowplayer';
+  }
+  $attributes = drupal_attributes($attributes);
+
+  // Add the JavaScript to handle the element.
+  flowplayer_add('#' . $id, $config);
+
+  // Return the markup.
+  return "<div id='$id' $attributes></div>";
+}
