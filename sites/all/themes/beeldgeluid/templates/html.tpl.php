@@ -78,7 +78,7 @@
   <div id="fb-root"></div>
   <script>
     window.fbAsyncInit = function() {
-      FB.init({appId: '213992525311995', status: true, cookie: true,
+      FB.init({appId: '<?php echo variable_get('serviceconnect_facebook_application_id', ''); ?>', status: true, cookie: true,
                xfbml: true});
     };
     (function() {
