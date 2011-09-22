@@ -492,6 +492,11 @@ ul.links li {
 .region-footer {
 }
 
+.region-footer .footer-column h2 {
+  letter-spacing: 0;
+  text-transform: none
+}
+
 /*
  * Page bottom
  */
