@@ -106,21 +106,21 @@ html, body {
 }
 
 .sidebar-first #content {
-  width: 480px;
+  width: 500px;
   margin-left: 240px; /* LTR */ /* The width of .region-sidebar-first. */
-  margin-right: -720px; /* LTR */ /* Negative value of #content's width + left margin. */
+  margin-right: -740px; /* LTR */ /* Negative value of #content's width + left margin. */
 }
 
 .sidebar-second #content {
-  width: 480px;
+  width: 500px;
   margin-left: 0; /* LTR */
-  margin-right: -480px; /* LTR */ /* Negative value of #content's width + left margin. */
+  margin-right: -500px; /* LTR */ /* Negative value of #content's width + left margin. */
 }
 
 .two-sidebars #content {
-  width: 240px;
+  width: 260px;
   margin-left: 240px; /* LTR */ /* The width of .region-sidebar-first */
-  margin-right: -480px; /* LTR */ /* Negative value of #content's width + left margin. */
+  margin-right: -500px; /* LTR */ /* Negative value of #content's width + left margin. */
 }
 
 #content .section {
