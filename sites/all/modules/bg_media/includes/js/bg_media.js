@@ -39,6 +39,9 @@
       $('.main-media-player').bind('mouseout', function(){
         $(this).removeClass('dossier-element-focus');
       });
+
+      // Force reattachment of AJAX behavior
+      Drupal.behaviors.AJAX.attach(context, settings);
     }
   }
 
