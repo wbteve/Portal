@@ -63,7 +63,7 @@ function bg_verbreding_node_view($node, $view_mode, $langcode) {
     $node->content['bg_embed'] = array(
       '#type' => 'markup',
       '#prefix' => '<div class="verbreding-item-embed verbreding-item"><div class="verbreding-item-inner">',
-      '#markup' => '<label>' . t('Kopiëer de embed code') . '</label><textarea readonly="readonly" row="1" col="1000" class="verbreding-embed-code">' .
+      '#markup' => '<label>' . l(t('Kopiëer de embed code'), '', array('attributes' => array('class' => 'embed-copy'))) . '</label><textarea readonly="readonly" row="1" col="1000" class="verbreding-embed-code">' .
           '<div style="width:480px"><strong style="display:block;margin:12px 0 4px">' . $embed_title . '</strong>' .
           '<iframe src="' . $embed_url . '" height="380" width="480" marginwidth="0" marginheight="0" scrolling="no" frameborder="0"></iframe>' .
           '<div style="padding:5px 0 12px">' . t('View more !media at !beeldengeluid', array(
