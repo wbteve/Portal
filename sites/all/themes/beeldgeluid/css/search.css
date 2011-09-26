@@ -109,13 +109,16 @@ body.page-search #page-title {
 .page-search-list-site #content a {
 }
 
-.page-search-list-site .search-result h3 {
+.search-result h3,
+.section-search .sidebar-second h2 {
   font-family: Verdana;
   text-transform: none;
   letter-spacing: 0;
-  font-size: 13px;
   font-weight: bold;
-  
+}
+
+.page-search-list-site .search-result h3 {
+  font-size: 13px;
 }
 
 /******************************** SEARCH DISPLAY SWITCH ********************************/
