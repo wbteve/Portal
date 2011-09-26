@@ -1,0 +1,15 @@
+### Eclipse Workspace Patch 1.0
+#P beeldgeluid
+Index: sites/all/modules/flowplayer/flowplayer.js
+===================================================================
+--- sites/all/modules/flowplayer/flowplayer.js	(revision 19475)
++++ sites/all/modules/flowplayer/flowplayer.js	(working copy)
+@@ -124,7 +124,7 @@
+         }
+ 
+         // Create the flowplayer element on the non-processed elements.
+-        $(selector + ':not(.flowplayer-processed)').addClass('flowplayer-processed').flowplayer(settings.basePath + settings.flowplayerSwf, config);
++        $(selector + ':not(.flowplayer-processed)').addClass('flowplayer-processed').flowplayer({src: settings.basePath + settings.flowplayerSwf, wmode: 'transparent'}, config);
+       });
+     }
+   };

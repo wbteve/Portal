@@ -124,7 +124,7 @@
         }
 
         // Create the flowplayer element on the non-processed elements.
-        $(selector + ':not(.flowplayer-processed)').addClass('flowplayer-processed').flowplayer(settings.basePath + settings.flowplayerSwf, config);
+        $(selector + ':not(.flowplayer-processed)').addClass('flowplayer-processed').flowplayer({src: settings.basePath + settings.flowplayerSwf, wmode: 'transparent'}, config);
       });
     }
   };
