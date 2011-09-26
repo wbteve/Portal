@@ -109,6 +109,10 @@ body.page-search #page-title {
 .page-search-list-site #content a {
 }
 
+.search-result h3 {
+  line-height: 23px;
+}
+
 .search-result h3,
 .section-search .sidebar-second h2 {
   font-family: Verdana;
@@ -119,6 +123,7 @@ body.page-search #page-title {
 
 .page-search-list-site .search-result h3 {
   font-size: 13px;
+  line-height: 1em;
 }
 
 /******************************** SEARCH DISPLAY SWITCH ********************************/
