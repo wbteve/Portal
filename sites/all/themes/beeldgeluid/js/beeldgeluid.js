@@ -39,12 +39,19 @@
 
   Drupal.behaviors.bgCollapseVerbreding = {
     attach: function (context, settings) {
-      $('.group-verbreding').addClass('group-verbreding-closed').click(bgToggleVerbreding);
-      $(".verbreding-item-inner").click(function(event){
+      $('.group-verbreding', context).addClass('group-verbreding-closed').click(bgToggleVerbreding);
+
+      $(".verbreding-item-inner", context).click(function(event){
         event.stopPropagation();
       });
-      $(".verbreding-embed-code").focus(function(event){
+
+      $(".verbreding-embed-code", context).focus(function(event){
         this.select();
+      });
+
+      $('.embed-copy', context).click(function(event){
+        event.preventDefault();
+        $('.verbreding-embed-code').select();
       });
     }
   };
