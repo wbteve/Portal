@@ -53,20 +53,20 @@ body.page-search #page-title {
   margin: 10px;
 }
 
-.page-search-site.sidebar-second .search-result-grid-3x3,
-.page-search-site.sidebar-second  .search-result-grid-3x3 .info-box {
+.page-search-site .search-result-grid-3x3,
+.page-search-site .search-result-grid-3x3 .info-box {
   width: 360px;
   height: 240px;
 }
 
-.page-search-site.sidebar-second .search-result-grid-2x2,
-.page-search-site.sidebar-second .search-result-grid-2x2 .info-box {
+.page-search-site .search-result-grid-2x2,
+.page-search-site .search-result-grid-2x2 .info-box {
   width: 240px;
   height: 160px;
 }
 
-.page-search-site.sidebar-second  .search-result-grid-1_5x1_5,
-.page-search-site.sidebar-second .search-result-grid-1_5x1_5 .info-box {
+.page-search-site .search-result-grid-1_5x1_5,
+.page-search-site .search-result-grid-1_5x1_5 .info-box {
   width: 180px;
   height: 120px;
 }
