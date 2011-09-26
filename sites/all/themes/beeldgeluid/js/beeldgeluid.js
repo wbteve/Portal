@@ -8,7 +8,7 @@
         window.location = $('a:first', $(this)).attr('href');
       });
 
-      $('.page-search-site .search-result:has(img)').each(function(){
+      $('.page-search-site .search-result:has(img), .section-tags .search-result:has(img)').each(function(){
         (function (context) {
           // Initially hide information
           $('.info-box', context).hide();
