@@ -104,6 +104,7 @@ div#site-name /* The name of the website */ {
 .node-type-news #main-wrapper,
 .node-type-webform #main-wrapper {
   background-color: #F8F6F5;
+  color: #000000;  
 }
 
 .node-type-article #main-wrapper a,
