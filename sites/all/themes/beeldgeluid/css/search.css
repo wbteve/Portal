@@ -88,8 +88,6 @@ body.page-search #page-title {
   overflow: visible;
   width: 100%;
   margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eaeaea;
 }
 
 .page-search-list-site .search-result img {
@@ -109,6 +107,14 @@ body.page-search #page-title {
   margin: 10px;
 }
 .page-search-list-site #content a {
+}
+
+.page-search-list-site .search-result h3 {
+  font-family: Verdana;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  
 }
 
 /******************************** SEARCH DISPLAY SWITCH ********************************/
