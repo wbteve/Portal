@@ -53,22 +53,10 @@ body.page-search #page-title {
   margin: 10px;
 }
 
-.page-search-site .search-result-grid-3x3,
-.page-search-site .search-result-grid-3x3 .info-box {
-  width: 240px;
-  height: 240px;
-}
-
 .page-search-site.sidebar-second .search-result-grid-3x3,
 .page-search-site.sidebar-second  .search-result-grid-3x3 .info-box {
   width: 360px;
   height: 240px;
-}
-
-.page-search-site .search-result-grid-2x2,
-.page-search-site .search-result-grid-2x2 .info-box {
-  width: 160px;
-  height: 160px;
 }
 
 .page-search-site.sidebar-second .search-result-grid-2x2,
@@ -77,11 +65,6 @@ body.page-search #page-title {
   height: 160px;
 }
 
-.page-search-site .search-result-grid-1_5x1_5,
-.page-search-site .search-result-grid-1_5x1_5 .info-box {
-  width: 120px;
-  height: 160px;
-}
 .page-search-site.sidebar-second  .search-result-grid-1_5x1_5,
 .page-search-site.sidebar-second .search-result-grid-1_5x1_5 .info-box {
   width: 180px;
@@ -121,14 +104,11 @@ body.page-search #page-title {
   background: none;
 }
 .page-search-list-site #content {
-  background-color: #f8f6f5;
-  color: #000000;
-}
+  }
 .page-search-list-site #content div.section {
   margin: 10px;
 }
 .page-search-list-site #content a {
-  color: #000000;
 }
 
 /******************************** SEARCH DISPLAY SWITCH ********************************/
