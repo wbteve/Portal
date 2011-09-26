@@ -24,6 +24,10 @@
   height: 100%;
 }
 
+.media-type-image span.hover span {
+  background: url("../images/icon-image.png") no-repeat scroll center center transparent;
+}
+
 .media-type-video span.hover span {
   background: url("../images/icon-video.png") no-repeat scroll center center transparent;
 }
