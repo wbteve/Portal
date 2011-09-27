@@ -12,13 +12,12 @@ class MediaInternetOIHandler extends MediaInternetBaseHandler {
   public function __construct($embedCode) {
     parent::__construct($embedCode);
 
-    $url = parse_url($embedCode);
-    if(is_array($url)) {
-      $type = $url['path'];
-      $this->uri = str_replace($type, '', $this->embedCode);
+    $path = parse_url($embedCode, PHP_URL_PATH);
+    if(!is_null($path)) {
+      $this->uri = str_replace($path, '', $this->embedCode);
 
       // Set (MIME) type
-      switch($type) {
+      switch($path) {
         case '/Moving Image':
           $this->mime_type = 'video/openbeelden';
           $this->type = 'video';
