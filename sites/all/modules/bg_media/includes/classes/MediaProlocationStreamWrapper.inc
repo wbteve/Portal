@@ -8,7 +8,7 @@
  *  Create an instance like this:
  *  $bvd = new ResourceOpenImagesStreamWrapper('barendenvandorp://identifier');
  */
-class MediaBVDStreamWrapper extends BGMediaStreamWrapper {
+class MediaProlocationStreamWrapper extends BGMediaStreamWrapper {
   protected $base_url = 'rtmpe://stream10.bevd.prolocation.net/simplevideostreaming/';
   protected $image_base_url = 'http://www.barendenvandorp.nl/sites/default/files/stills/';
 
