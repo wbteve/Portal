@@ -81,6 +81,7 @@ function bg_media_media_internet_providers() {
     ),
     'MediaInternetProlocationHandler' => array(
       'title' => 'Prolocation',
+      'hidden' => TRUE,
     ),
   );
 }
