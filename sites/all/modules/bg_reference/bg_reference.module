@@ -62,22 +62,25 @@ function theme_bg_reference($variables) {
     'dossier-element-' . $element['#data']['type'] . '-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
   );
 
+  $content = '';
   switch($element['#data']['type']) {
 
     case CONTENT_TYPE_BANNER:
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
-      $node = node_load($match['nid']);
-      $node_array = node_view($node, 'dossier');
-      if (isset($node_array['field_banner'][0])) {
-        $node_array['field_banner'][0]['#image_style'] = 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'];
+      if (isset($match['nid']) && $node = node_load($match['nid'])) {
+        $node_array = node_view($node, 'dossier');
+        if (isset($node_array['field_banner'][0])) {
+          $node_array['field_banner'][0]['#image_style'] = 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'];
+        }
+        $content = drupal_render($node_array);
       }
-      $content = drupal_render($node_array);
       break;
 
     case CONTENT_TYPE_EVENT:
       preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
-      $node = node_load($match['nid']);
-      $content = drupal_render(node_view($node, 'dossier'));
+      if (isset($match['nid']) && $node = node_load($match['nid'])) {
+        $content = drupal_render(node_view($node, 'dossier'));
+      }
       break;
 
     case CONTENT_TYPE_MEDIA:
@@ -86,38 +89,39 @@ function theme_bg_reference($variables) {
 
       if (is_numeric($match['nid'])) {
         $classes[] = 'node-id-' . $match['nid'];
-        $node = node_load($match['nid']);
-
-        $node_array = node_view($node, 'full');
-
-        // Render main media player
-        if ($element['#data']['width'] == 4 && $element['#data']['height'] == 4 && !$main_player_rendered) {
-          $content = drupal_render($node_array);
-          $classes[] = 'main-media-player';
-          $classes[] = 'main-media-player-type-' . $node->field_media_file[$node->language][0]['file']->type;
-          drupal_add_js(array('bg_reference' => array('mainMediaNid' => $node->nid)), 'setting');
-          $main_player_rendered = TRUE;
-        }
-        // Render media thumbnail
-        else {
-          $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
-            'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
-            'label' => 'hidden',
-            'settings' => array(
-              'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
-            ),
-          ));
-
-          $classes[] = 'media-type-' . $node->field_media_file[$node->language][0]['file']->type;
-
-          $row = isset($element['#data']['delta']) ? $element['#data']['delta'] : $row;
-          $link = bg_reference_ajax_text_button('', "node/{$node->nid}", t('View @title', array('@title' => $node->title)), "{$node->nid}|{$row}");
-          $link_close_length = strlen('</a>');
-
-          $node_array['field_media_file'][0]['#prefix'] = substr($link, 0, -$link_close_length);
-          $node_array['field_media_file'][0]['#suffix'] = substr($link, -$link_close_length);
-
-          $content = drupal_render($node_array['field_media_file']);
+        if (isset($match['nid']) && $node = node_load($match['nid'])) {
+          
+          $node_array = node_view($node, 'full');
+  
+          // Render main media player
+          if ($element['#data']['width'] == 4 && $element['#data']['height'] == 4 && !$main_player_rendered) {
+            $content = drupal_render($node_array);
+            $classes[] = 'main-media-player';
+            $classes[] = 'main-media-player-type-' . $node->field_media_file[$node->language][0]['file']->type;
+            drupal_add_js(array('bg_reference' => array('mainMediaNid' => $node->nid)), 'setting');
+            $main_player_rendered = TRUE;
+          }
+          // Render media thumbnail
+          else {
+            $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
+              'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
+              'label' => 'hidden',
+              'settings' => array(
+                'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+              ),
+            ));
+  
+            $classes[] = 'media-type-' . $node->field_media_file[$node->language][0]['file']->type;
+  
+            $row = isset($element['#data']['delta']) ? $element['#data']['delta'] : $row;
+            $link = bg_reference_ajax_text_button('', "node/{$node->nid}", t('View @title', array('@title' => $node->title)), "{$node->nid}|{$row}");
+            $link_close_length = strlen('</a>');
+  
+            $node_array['field_media_file'][0]['#prefix'] = substr($link, 0, -$link_close_length);
+            $node_array['field_media_file'][0]['#suffix'] = substr($link, -$link_close_length);
+  
+            $content = drupal_render($node_array['field_media_file']);
+          }
         }
       }
       break;
@@ -660,4 +664,51 @@ function bg_reference_ajax_switch_main_media($dossier_node, $old_main_media_node
 
   print ajax_render($commands);
   exit;
+}
+
+/*
+ * Implements hook_form_alter().
+ */
+function bg_reference_form_alter(&$form, &$form_state, $form_id) {
+
+  /*
+   * Warns the user when deleting a node that is referenced by a bg_reference field.
+   */
+  if ($form_id == 'node_delete_confirm' || ($form_id == 'node_admin_content' && isset($form['operation']['#value']) && $form['operation']['#value'] == 'delete')) {
+    // First, put the available data in a uniform array format.
+    // Get the node info from the single node confirmation form.
+    if ($form_id == 'node_delete_confirm') {
+      $parent_nodes[$form['#node']->nid] = $form['#node']->title;
+    }
+    // Get the node info from the multiple delete confirmation form. 
+    else {
+      foreach ($form['nodes'] as $nodes_nid => $nodes_node) {
+        if (is_int($nodes_nid)) {
+          $parent_nodes[$nodes_nid] = strip_tags($nodes_node['#suffix']);
+        }
+      }
+      // Make sure the list of nodes stays on top of the form.
+      $form['nodes']['#weight'] = -10;
+    }
+    
+    // Loop over the nodes and display which nodes are referencing them.
+    $warning = '';
+    foreach ($parent_nodes as $parent_nid => $parent_title) {
+      $result = db_query("SELECT rc.entity_id, n.title FROM {field_data_field_referenced_content} rc JOIN {node} n ON rc.entity_id = n.nid  WHERE rc.entity_type = 'node' AND field_referenced_content_content LIKE :like", array(':like' => '%[nid:'. $parent_nid .']%'));
+      if ($result->rowCount() > 0) {
+        $warning .= '<p>' . t("The following nodes reference %title:", array('%title' => $parent_title)) . '</p><ul>';
+        foreach($result as $record) {
+          $warning .= '<li>' . l($record->title, 'node/' . $record->entity_id) . '</li>';
+        }
+        $warning .= '</ul>';
+      }
+    }
+    
+    // Add the warning to the form.
+    $form['warning'] = array(
+      '#markup' => $warning,
+      '#weight' => -1,
+    );
+  }
+  
 }
