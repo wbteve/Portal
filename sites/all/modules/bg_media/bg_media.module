@@ -69,6 +69,7 @@ function bg_media_library() {
  * Implements hook_media_internet_providers();
  */
 function bg_media_media_internet_providers() {
+  $path = drupal_get_path('module', 'bg_media');
   return array(
     'MediaInternetOIHandler' => array(
       'title' => 'Open Images',
@@ -77,6 +78,9 @@ function bg_media_media_internet_providers() {
     'MediaInternetBVDHandler' => array(
       'title' => 'Barend en Van Dorp',
       'hidden' => TRUE,
+    ),
+    'MediaInternetProlocationHandler' => array(
+      'title' => 'Prolocation',
     ),
   );
 }
