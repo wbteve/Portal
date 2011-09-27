@@ -513,6 +513,14 @@ function _bg_reference_validate($element, &$form_state) {
       $values = $form_state['values'][$field['name']][$field['langcode']][$field['delta']];
 
       if(!empty($values['content'])) {
+        
+        // Validate referenced node
+        if (preg_match('/\[nid:(?P<nid>\d+)\]/', $values['content'], $match)) {
+          if (db_query("SELECT nid FROM node WHERE nid = :nid", array(':nid' => $match['nid']))->rowCount() == 0) {
+            form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][wrapper][ref_{$values['type']}", t('The referenced node in Item #!number does not exist.', array('!number' => $field['delta'] + 1)));
+          }
+        }
+
         // Validate x position
         if (!_bg_reference_is_int($values['pos_x'])) {
           form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_x", t('X position should be an integer value'));
