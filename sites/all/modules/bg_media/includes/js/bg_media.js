@@ -17,31 +17,33 @@
 
   Drupal.behaviors.bgDossierMediaBehavior = {
     attach: function (context, settings) {
-      $('.dossier-element-media a.use-ajax:not(.main-media-player)').each(function(){
-        linkInfo = $(this).attr('rel').split('|');
+      if($('body').hasClass('node-type-dossier')) {
+        $('.dossier-element-media a.use-ajax:not(.main-media-player)').each(function(){
+          linkInfo = $(this).attr('rel').split('|');
 
-        // Set new href
-        $(this).attr('href', '/ajax/switch-media/'
-            + Drupal.settings.bg_reference.dossierNid + '/'
-            + Drupal.settings.bg_reference.mainMediaNid + '/'
-            + linkInfo[0] + '/'
-            + linkInfo[1])
-          // Unbind existing handlers
-          .unbind('click')
-          // Force rebinding of AJAX handlers
-          .removeClass('ajax-processed');
-      });
+          // Set new href
+          $(this).attr('href', '/ajax/switch-media/'
+              + Drupal.settings.bg_reference.dossierNid + '/'
+              + Drupal.settings.bg_reference.mainMediaNid + '/'
+              + linkInfo[0] + '/'
+              + linkInfo[1])
+            // Unbind existing handlers
+            .unbind('click')
+            // Force rebinding of AJAX handlers
+            .removeClass('ajax-processed');
+        });
 
-      $('.main-media-player').bind('mouseover', function(){
-        $(this).addClass('dossier-element-focus');
-      });
+        $('.main-media-player').bind('mouseover', function(){
+          $(this).addClass('dossier-element-focus');
+        });
 
-      $('.main-media-player').bind('mouseout', function(){
-        $(this).removeClass('dossier-element-focus');
-      });
+        $('.main-media-player').bind('mouseout', function(){
+          $(this).removeClass('dossier-element-focus');
+        });
 
-      // Force reattachment of AJAX behavior
-      Drupal.behaviors.AJAX.attach(context, settings);
+        // Force reattachment of AJAX behavior
+        Drupal.behaviors.AJAX.attach(context, settings);
+      }
     }
   }
 
