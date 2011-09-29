@@ -158,14 +158,18 @@ li a.active {
   left: -34px;
 }
 
-#page #header .block-nice-menus ul ul li.menuparent{
+#page #header .block-nice-menus ul ul li.menuparent {
   background: url("../images/arrow_right.png") no-repeat scroll 95% center #FFF;
 }
 
 #header .block-nice-menus .content ul ul li a:hover {
-    background-color: #C7C2BA;
-    margin: 0 -15px;
-    padding: 0 15px;
+  background-color: #C7C2BA;
+  margin: 0 -15px;
+  padding: 0 15px;
+}
+
+#page #header .block-nice-menus ul ul li.menuparent a:hover {
+  background: url("../images/arrow_right.png") no-repeat scroll 95% center #C7C2BA;
 }
 
 #page #header .block-nice-menus ul ul ul{
