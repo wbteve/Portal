@@ -79,13 +79,6 @@ html, body {
   width: 720px;
 }
 
-.front #main {
-  width: 1533px;
-  position: relative;
-  left: 50%;
-  margin-left: -767px;
-}
-
 /*
  * Content
  */
@@ -97,12 +90,6 @@ html, body {
   margin-right: -720px; /* LTR */ /* Negative value of #content's width + left margin. */
   padding: 0; /* DO NOT CHANGE. Add padding or margin to #content .section. */
   margin-bottom: 5em; 
-}
-
-.front #content,
-.front.no-sidebars #content {
-  width: 1533px;
-  margin-right: -1533px;
 }
 
 .sidebar-first #content {
