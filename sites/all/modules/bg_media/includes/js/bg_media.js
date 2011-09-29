@@ -17,8 +17,9 @@
 
   Drupal.behaviors.bgDossierMediaBehavior = {
     attach: function (context, settings) {
-      if($('body').hasClass('node-type-dossier')) {
-        $('.dossier-element-media a.use-ajax:not(.main-media-player)').each(function(){
+      var mediaPreviews = $('.dossier-element-media a.use-ajax:not(.main-media-player)');
+      if($('body').hasClass('node-type-dossier') && mediaPreviews.length > 0) {
+        mediaPreviews.each(function(){
           linkInfo = $(this).attr('rel').split('|');
 
           // Set new href
