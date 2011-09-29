@@ -133,8 +133,8 @@ li a.active {
   color: #4A4A4A;
 }
 
-#header .block-nice-menus .content ul ul li a:hover {
-
+#header .block-nice-menus .content ul ul li:hover {
+  background-color: #C7C2BA;
 }
 
 /* Aligning the drop down menu for each parent item until there's a script to calculate the center */
@@ -161,11 +161,19 @@ li a.active {
 #page #header .block-nice-menus ul ul li.menuparent{
   background: url("../images/arrow_right.png") no-repeat scroll 95% center #FFF;
 }
+
+#header .block-nice-menus .content ul ul li a:hover {
+    background-color: #C7C2BA;
+    margin: 0 -15px;
+    padding: 0 15px;
+}
+
 #page #header .block-nice-menus ul ul ul{
   left: 179px;
   top: -10px;
   background: #FFF;
-  padding: 0 5px;
+  padding: 0;
+  
 }
 
 #page #header .block-nice-menus ul ul ul li.first{
@@ -174,7 +182,6 @@ li a.active {
 }
 
 #page #header .block-nice-menus ul ul ul li{
-  margin-left: -13px;
   margin-bottom: 0px;
   background-color: #FFF;
 }
