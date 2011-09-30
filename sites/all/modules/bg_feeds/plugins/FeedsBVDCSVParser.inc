@@ -67,19 +67,16 @@ class FeedsBVDCSVParser extends FeedsCSVParser {
       // Parse tags
       $tags = explode(';', $row['tags']);
       foreach($tags as &$tag) {
-        $tag = utf8_encode(trim($tag));
+        $tag = trim($tag);
       }
       $row['tags'] = array_filter($tags, 'strlen');
 
       // Parse people
       $people = explode(';', $row['people']);
       foreach($people as &$person) {
-        $person = utf8_encode(trim($person));
+        $person = trim($person);
       }
       $row['people'] = array_filter($people, 'strlen');
-
-      // UTF8 encode description
-      $row['description'] = utf8_encode($row['description']);
     }
 
     // Create a result object and return it.
