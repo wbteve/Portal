@@ -20,7 +20,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     $vars['video'] = theme('media_youtube_video', array('uri' => $vars['file']->uri, 'width' => $vars['width'], 'height' => $vars['height']));
   }
   // Theming of Barend en Van Dorp items
-  if($wrapper instanceof MediaBVDStreamWrapper) {
+  if($wrapper instanceof MediaBVDStreamWrapper || $wrapper instanceof MediaProlocationStreamWrapper) {
     $vars['video'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '" class="flowplayer"></div>';
     flowplayer_add('#' . BG_MEDIA_FLASH_PLAYER_ID, array(
       'logo'  => array(

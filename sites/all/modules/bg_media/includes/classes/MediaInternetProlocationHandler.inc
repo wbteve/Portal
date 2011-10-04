@@ -5,29 +5,15 @@
  * @see hook_media_internet_providers().
  */
 class MediaInternetProlocationHandler extends MediaInternetBaseHandler {
-  protected $mime_type;
-  protected $type;
-
-  public function __construct($embedCode) {
-    parent::__construct($embedCode);
-
-    // Set (MIME) type
-    $this->mime_type = 'video/prolocation';
-    $this->type = 'video';
+  public function parse($embedCode) {
+    if(preg_match('@rtmpe://stream10.bevd.prolocation.net/simplevideostreaming/(.+)@i', $embedCode, $matches) && isset($matches[1])) {
+      return file_stream_wrapper_uri_normalize('prolocation://' . $matches[1]);
+    }
   }
 
   public function claim($embedCode) {
-    $scheme = parse_url($embedCode, PHP_URL_SCHEME);
-    return $scheme == 'prolocation';
-  }
-
-  public function validate() {
-    // @todo Media module currently fails when two files try to have the same
-    //   URI, so catch that in the validation step. Some day, it would be nice
-    //   to allow it, however. See http://drupal.org/node/952422.
-    $existing_files = file_load_multiple(array(), array('uri' => $this->embedCode));
-    if (count($existing_files)) {
-      throw new MediaInternetValidationException(t('You have entered a URL for a video that is already in your library.'));
+    if ($this->parse($embedCode)) {
+      return TRUE;
     }
   }
 
@@ -38,21 +24,9 @@ class MediaInternetProlocationHandler extends MediaInternetBaseHandler {
   }
 
   public function getFileObject() {
-    $file = NULL;
-
-    if ($this->embedCode && !is_null($this->type)) {
-      $file = file_uri_to_object($this->embedCode);
-      // Override file MIME
-      $file->filemime = $this->mime_type;
-      // Append file entity type
-      $file->type = $this->type;
-
-      // We couldn't make sense of this enclosure, throw an exception.
-      if (!$file) {
-        throw new Exception(t('Invalid enclosure %enclosure', array('%enclosure' => $this->embedCode)));
-      }
-    }
-
-    return $file;
+    $uri = $this->parse($this->embedCode);
+    //@todo: this is terribly broken in some ways because the function is really
+    // made for local files which are 'real'
+    return file_uri_to_object($uri);
   }
 }

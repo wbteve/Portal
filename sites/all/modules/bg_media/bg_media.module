@@ -81,7 +81,6 @@ function bg_media_media_internet_providers() {
     ),
     'MediaInternetProlocationHandler' => array(
       'title' => 'Prolocation',
-      'hidden' => TRUE,
     ),
   );
 }
@@ -101,6 +100,12 @@ function bg_media_stream_wrappers() {
       'name' => t('Barend en Van Dorp media'),
       'class' => 'MediaBVDStreamWrapper',
       'description' => t('Media provided by Barend en Van Dorp.'),
+      'type' => STREAM_WRAPPERS_READ_VISIBLE,
+    ),
+    'prolocation' => array(
+      'name' => t('Prolocation media'),
+      'class' => 'MediaProlocationStreamWrapper',
+      'description' => t('Media provided by Prolocation.'),
       'type' => STREAM_WRAPPERS_READ_VISIBLE,
     ),
   );

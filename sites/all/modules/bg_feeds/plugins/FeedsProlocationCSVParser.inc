@@ -24,7 +24,7 @@
  * WHERE `type` = 'broadcast' AND `field_task_id_value` IS NOT NULL
  * GROUP BY `id`
  */
-class FeedsBVDCSVParser extends FeedsCSVParser {
+class FeedsProlocationCSVParser extends FeedsCSVParser {
   /**
    * Implements FeedsParser::parse().
    */
@@ -61,9 +61,6 @@ class FeedsBVDCSVParser extends FeedsCSVParser {
 
     // Process rows for Beeld en Geluid media nodes
     foreach($rows as &$row) {
-      $row['file']    = 'barendenvandorp://' . $row['videofile'];
-      $row['source']  = 'Barend en Van Dorp';
-
       // Parse tags
       $tags = explode(';', $row['tags']);
       foreach($tags as &$tag) {
