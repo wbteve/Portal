@@ -33,27 +33,50 @@ function bg_custom_customize_comment_form(&$form) {
 function bg_custom_node_load($nodes, $types) {
   if(arg(0) == 'node') {
     foreach($nodes as &$node){
-      if ($node->type == 'media') {
-        /*
-         * Set Open Graph default image. Open Graph Meta module handles everything else.
-         */
-        $file     = file_load($node->field_media_file[$node->language][0]['fid']);
-        $wrapper  = file_stream_wrapper_get_instance_by_uri($file->uri);
+      switch($node->type) {
+        // Entity types which have no image data attached
+        case 'agenda':
+        case 'article':
+        case 'flash':
+        case 'iframe':
+        case 'news':
+        case 'webform':
+        case 'blog':
+        case 'dossier':
+          /*
+           * Set Open Graph default image. Open Graph Meta module handles everything else.
+           */
+          if(isset($node->field_image[$node->language][0]['uri'])) {
+            $node->dummy_field_og_image = array(
+              'uri'       => $node->field_image[$node->language][0]['uri'],
+              'filemime'  => 'image',
+            );
+          }
+          break;
 
-        if($wrapper instanceof BGMediaStreamWrapper || $wrapper instanceof MediaYouTubeStreamWrapper) {
-          $uri = $wrapper->getLocalThumbnailPath();
-        }
-        else if($wrapper instanceof DrupalPublicStreamWrapper) {
-          $uri = $file->uri;
-        }
+        case 'media':
+          /*
+           * Set Open Graph default image. Open Graph Meta module handles everything else.
+           */
+          $file     = file_load($node->field_media_file[$node->language][0]['fid']);
+          $wrapper  = file_stream_wrapper_get_instance_by_uri($file->uri);
 
-        if(isset($uri)) {
-          $node->dummy_field_og_image = array(
-            'uri'       => $uri,
-            'filemime'  => 'image',
-          );
-        }
+          if($wrapper instanceof BGMediaStreamWrapper || $wrapper instanceof MediaYouTubeStreamWrapper) {
+            $uri = $wrapper->getLocalThumbnailPath();
+          }
+          else if($wrapper instanceof DrupalPublicStreamWrapper) {
+            $uri = $file->uri;
+          }
+
+          if(isset($uri)) {
+            $node->dummy_field_og_image = array(
+              'uri'       => $uri,
+              'filemime'  => 'image',
+            );
+          }
+          break;
       }
+
     }
   }
 }

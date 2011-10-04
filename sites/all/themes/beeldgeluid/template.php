@@ -304,42 +304,46 @@ function beeldgeluid_preprocess_search_result(&$variables) {
   if($variables['result']['entity_type'] == 'node') {
     // Load node
     $node = array_shift(entity_load('node', array($variables['result']['node']->entity_id)));
+    if(isset($node->type)){
+      switch($node->type) {
+        // Entity types which have no image data attached
+        case 'agenda':
+        case 'article':
+        case 'flash':
+        case 'iframe':
+        case 'news':
+        case 'webform':
+        case 'blog':
+        case 'dossier':
+          if(isset($node->field_image[$node->language][0]['uri'])) {
+            $variables['image'] = array(
+              '#theme'       => 'image_style',
+              '#style_name'  => $style,
+              '#path'        => $node->field_image[$node->language][0]['uri'],
+            );
+          }
+          break;
 
-    switch($node->type) {
-      // Entity types which have no image data attached
-      case 'agenda':
-      case 'article':
-      case 'flash':
-      case 'iframe':
-      case 'news':
-      case 'webform':
-        break;
+        case 'media':
+          $file = file_load($node->field_media_file[$node->language][0]['fid']);
+          $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
 
-      case 'blog':
-        break;
+          if($wrapper instanceof BGMediaStreamWrapper) {
+            $image_uri = $wrapper->getLocalThumbnailPath();
+          }
+          else if($wrapper instanceof DrupalPublicStreamWrapper && $file->type == 'image') {
+            $image_uri = $wrapper->getUri();
+          }
 
-      case 'dossier':
-        break;
-
-      case 'media':
-        $file = file_load($node->field_media_file[$node->language][0]['fid']);
-        $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
-
-        if($wrapper instanceof BGMediaStreamWrapper) {
-          $image_uri = $wrapper->getLocalThumbnailPath();
-        }
-        else if($wrapper instanceof DrupalPublicStreamWrapper && $file->type == 'image') {
-          $image_uri = $wrapper->getUri();
-        }
-
-        if(isset($image_uri)) {
-          $variables['image'] = array(
-            '#theme'       => 'image_style',
-            '#style_name'  => $style,
-            '#path'        => $image_uri,
-          );
-        }
-        break;
+          if(isset($image_uri)) {
+            $variables['image'] = array(
+              '#theme'       => 'image_style',
+              '#style_name'  => $style,
+              '#path'        => $image_uri,
+            );
+          }
+          break;
+      }
     }
   }
 }
