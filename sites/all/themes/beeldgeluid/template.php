@@ -325,22 +325,24 @@ function beeldgeluid_preprocess_search_result(&$variables) {
           break;
 
         case 'media':
-          $file = file_load($node->field_media_file[$node->language][0]['fid']);
-          $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
+          if(isset($node->field_media_file[$node->language][0]['fid'])){
+            $file = file_load($node->field_media_file[$node->language][0]['fid']);
+            $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
 
-          if($wrapper instanceof BGMediaStreamWrapper) {
-            $image_uri = $wrapper->getLocalThumbnailPath();
-          }
-          else if($wrapper instanceof DrupalPublicStreamWrapper && $file->type == 'image') {
-            $image_uri = $wrapper->getUri();
-          }
+            if($wrapper instanceof BGMediaStreamWrapper) {
+              $image_uri = $wrapper->getLocalThumbnailPath();
+            }
+            else if($wrapper instanceof DrupalPublicStreamWrapper && $file->type == 'image') {
+              $image_uri = $wrapper->getUri();
+            }
 
-          if(isset($image_uri)) {
-            $variables['image'] = array(
-              '#theme'       => 'image_style',
-              '#style_name'  => $style,
-              '#path'        => $image_uri,
-            );
+            if(isset($image_uri)) {
+              $variables['image'] = array(
+                '#theme'       => 'image_style',
+                '#style_name'  => $style,
+                '#path'        => $image_uri,
+              );
+            }
           }
           break;
       }
