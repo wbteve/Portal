@@ -51,6 +51,12 @@ function bg_feeds_oi_feature_field_default_fields() {
           'type' => 'text_default',
           'weight' => 0,
         ),
+        'dossier' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
         'teaser' => array(
           'label' => 'hidden',
           'module' => 'text',
