@@ -115,10 +115,10 @@ function bg_feeds_oi_feature_feeds_importer_default() {
     ),
     'content_type' => 'oai_oi_repository',
     'update' => 0,
-    'import_period' => '-1',
+    'import_period' => '86400',
     'expire_period' => 3600,
     'import_on_create' => 0,
-    'process_in_background' => 0,
+    'process_in_background' => 1,
   );
   $export['oai'] = $feeds_importer;
 
