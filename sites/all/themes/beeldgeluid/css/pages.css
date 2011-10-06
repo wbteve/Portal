@@ -158,6 +158,11 @@ body#tinymce {
 #content .section {
 }
 
+/* Remove top-margin from first element in the body content for proper vertical alignment. */
+#content .field-name-body .field-item>:first-child {
+  margin-top: 0;
+}
+
 /*.sidebar-first #content,
 .page-views #content, */
 .node-type-blog #content,
@@ -166,11 +171,13 @@ body#tinymce {
   background-color: #f8f6f5;
   color: #000000;
 }
+
 .sidebar-first #content .section,
 .node-type-page #content .section,
 .page-views #content .section {
-  padding: 10px;
+  padding: 0 10px 10px;
 }
+
 .region-content-top /* Wrapper for any blocks placed in the "content top" region */ {
 }
 
