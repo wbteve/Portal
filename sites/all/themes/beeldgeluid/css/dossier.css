@@ -219,8 +219,7 @@
   cursor: pointer;
 }
 
-#flash-media-player,
-.field-type-media .field-item {
+#flash-media-player {
   width: 420px;
   height: 280px;
 }
