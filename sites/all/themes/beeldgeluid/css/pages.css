@@ -192,6 +192,11 @@ body#tinymce {
   padding: 0 5px;
 }
 
+/* Avoid double padding when breadcrum link is wrapped in span. */
+.breadcrumb a span {
+  padding: 0;
+}
+
 .breadcrumb a.first {
   padding-left: 0;
 }
