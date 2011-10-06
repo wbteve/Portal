@@ -116,3 +116,11 @@ h2.block-title /* Block title */ {
   list-style: none;
   margin-bottom: 1em;
 }
+
+.region-sidebar-first .block-nodeblock {
+  margin: 0 10px;
+}
+
+.region-sidebar-first .block-nodeblock img {
+  display: block;
+}
