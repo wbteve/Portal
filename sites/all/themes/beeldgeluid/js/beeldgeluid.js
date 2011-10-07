@@ -124,6 +124,16 @@
     }
   };
 
+  Drupal.behaviors.searchLabel = {
+    attach: function (context, settings) {
+      $('.search-advanced-more-info').hide().before('<span class="search-advanced-more-trigger">&nbsp;</span>');
+      $('.search-advanced-more-trigger').click(function(){
+        $(this).toggleClass('active');
+        $('.search-advanced-more-info').toggle();
+      });
+    }
+  };
+
   function bgCollapseComments() {
     $('#comments h2.title').each(function() {
       $(this).click(function() {

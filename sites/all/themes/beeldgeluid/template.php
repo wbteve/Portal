@@ -178,6 +178,8 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
     $variables['search_info'] = '<p class="search-info-top">' . t('Search results for') . '</p>' .
       '<p class="search-info-bottom">' . t('@result_count results', array('@result_count' => $adapter->getResultCount()));
 
+    $variables['search_advanced_info'] = '<p class="search-advanced-link"><a href="http://zoeken.beeldengeluid.nl">Duik nog dieper in onze archieven.</a></p> <p class="search-advanced-more-info">U zoekt nu binnen deze website en de media-items die we online kunnen vertonen. Ga naar <a href="http://zoeken.beeldengeluid.nl">zoeken.beeldengeluid.nl</a> voor uitgebreid zoeken in het hele Beeld en Geluid archief en direct bestellen van fragmenten.</p>';
+    
     $variables['search_display_switch'] = array(
       '#markup' => l(t('Block view'), 'search/site/' . $adapter->getSearchKeys(), array(
           'query' => $adapter->getParams(),
@@ -204,6 +206,7 @@ function beeldgeluid_page_alter(&$page) {
     unset($page['content']['system_main']['search_form']);
   }
 }
+
 
 /**
  * Override or insert variables into the node templates.

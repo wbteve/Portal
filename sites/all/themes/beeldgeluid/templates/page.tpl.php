@@ -131,6 +131,12 @@
       <?php print render($title_suffix); ?>
     </div>
 
+    <?php if(isset($search_advanced_info)) : ?>
+    <div id="search-advanced-info">
+      <?php print $search_advanced_info; ?>
+    </div>
+    <?php endif; ?>
+    
     <?php if(isset($search_display_switch)) : ?>
     <div id="search-display-switch">
       <?php print render($search_display_switch); ?>

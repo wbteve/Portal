@@ -129,7 +129,7 @@ body.page-search #page-title {
 /******************************** SEARCH DISPLAY SWITCH ********************************/
 #search-display-switch {
   float:right;
-  margin-bottom: 10px;
+  margin: 2px 0 10px;
 }
 
 #search-display-switch a.search-display-switch-btn {
@@ -164,3 +164,39 @@ body.page-search #page-title {
 }
 
 /**************************** END SEARCH DISPLAY SWITCH ********************************/
+
+#search-advanced-info {
+  float: left;
+  height: 20px;
+}
+
+.search-advanced-link {
+  float: left;
+  margin: 0;
+}
+
+.search-advanced-more-trigger {
+  background: url('../images/btn_search_display_switch.png') no-repeat -40px 0;
+  width: 20px;
+  height: 18px;
+  margin: 2px 0 0 5px;
+  float: left;
+  display: block;
+  cursor: pointer;
+}
+
+.search-advanced-more-trigger:hover,
+.search-advanced-more-trigger.active {
+  background-position: -40px -18px;
+}
+
+.search-advanced-more-info {
+  background: none repeat scroll 0 0 #FFFFFF;
+  color: #4A4A4A;
+  left: 0;
+  margin: 24px 0 0;
+  padding: 10px;
+  position: relative;
+  top: 0;
+  width: 460px;
+}
