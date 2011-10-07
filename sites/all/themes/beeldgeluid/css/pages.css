@@ -687,6 +687,7 @@ ul.links li {
   margin-bottom: 0;
 }
 
-#content .region-content .node p{
+#content .region-content .node p,
+#content .region-content .node ul {
   margin-top: 0;
 }
