@@ -681,3 +681,12 @@ ul.links li {
   width: 100px;
   height: 60px;
 }
+
+/* h3's & p tags in region-content */
+#content .region-content .node h3 {
+  margin-bottom: 0;
+}
+
+#content .region-content .node p{
+  margin-top: 0;
+}
