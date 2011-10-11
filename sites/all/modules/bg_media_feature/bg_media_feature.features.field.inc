@@ -66,7 +66,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '10',
+          'weight' => '18',
         ),
         'full' => array(
           'label' => 'inline',
@@ -170,17 +170,9 @@ function bg_media_feature_field_default_fields() {
         ),
         'embed' => array(
           'label' => 'above',
-          'module' => 'date',
-          'settings' => array(
-            'format_type' => 'hidden',
-            'fromto' => 'both',
-            'multiple_from' => '',
-            'multiple_number' => '',
-            'multiple_to' => '',
-            'show_repeat_rule' => 'show',
-          ),
-          'type' => 'date_default',
-          'weight' => '2',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '1',
         ),
         'full' => array(
           'label' => 'inline',
@@ -306,7 +298,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '5',
+          'weight' => '12',
         ),
         'full' => array(
           'label' => 'hidden',
@@ -401,7 +393,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '8',
+          'weight' => '15',
         ),
         'full' => array(
           'label' => 'inline',
@@ -593,7 +585,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '7',
+          'weight' => '14',
         ),
         'full' => array(
           'label' => 'inline',
@@ -694,7 +686,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '6',
+          'weight' => '13',
         ),
         'full' => array(
           'label' => 'inline',
@@ -794,7 +786,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '9',
+          'weight' => '16',
         ),
         'full' => array(
           'label' => 'above',
@@ -894,7 +886,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '1',
+          'weight' => '9',
         ),
         'full' => array(
           'label' => 'inline',
@@ -986,7 +978,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '3',
+          'weight' => '10',
         ),
         'full' => array(
           'label' => 'inline',
@@ -1095,7 +1087,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '4',
+          'weight' => '11',
         ),
         'full' => array(
           'label' => 'above',
@@ -1188,7 +1180,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '6',
         ),
         'full' => array(
           'label' => 'above',
@@ -1273,7 +1265,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '5',
         ),
         'full' => array(
           'label' => 'above',
@@ -1358,7 +1350,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '2',
         ),
         'full' => array(
           'label' => 'above',
@@ -1444,7 +1436,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '4',
         ),
         'full' => array(
           'label' => 'above',
@@ -1491,8 +1483,8 @@ function bg_media_feature_field_default_fields() {
       'indexes' => array(),
       'module' => 'metatags_quick',
       'settings' => array(
-        'meta_name' => 'canonical',
         0 => 'meta_name',
+        'meta_name' => 'canonical',
       ),
       'translatable' => '0',
       'type' => 'metatags_quick',
@@ -1520,7 +1512,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '7',
         ),
         'full' => array(
           'label' => 'above',
@@ -1564,8 +1556,8 @@ function bg_media_feature_field_default_fields() {
       'indexes' => array(),
       'module' => 'metatags_quick',
       'settings' => array(
-        'meta_name' => 'description',
         0 => 'meta_name',
+        'meta_name' => 'description',
       ),
       'translatable' => '0',
       'type' => 'metatags_quick',
@@ -1593,7 +1585,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '3',
         ),
         'full' => array(
           'label' => 'above',
@@ -1637,8 +1629,8 @@ function bg_media_feature_field_default_fields() {
       'indexes' => array(),
       'module' => 'metatags_quick',
       'settings' => array(
-        'meta_name' => 'keywords',
         0 => 'meta_name',
+        'meta_name' => 'keywords',
       ),
       'translatable' => '0',
       'type' => 'metatags_quick',
@@ -1666,7 +1658,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '8',
         ),
         'full' => array(
           'label' => 'above',
