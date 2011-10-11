@@ -1,9 +1,16 @@
 (function($) {
   Drupal.BGMediaPlayerLoadHandler = function() {
     if(typeof(VideoJS) == 'function') {
-      var player = VideoJS.setup();
-      $('#media-video').bind('play', function(){Drupal.BGMediaPlayerPlayHandler();});
-      $('#media-video').bind('pause', function(){Drupal.BGMediaPlayerStopHandler();});
+      var video = document.createElement("video");
+      var videotagsupport = !!video.canPlayType;
+
+      // Check if video tag is supported
+      if(videotagsupport) {
+        VideoJS.setup();
+      }
+
+      // RVW: Removed $('#media-video').bind('play', function(){Drupal.BGMediaPlayerPlayHandler();});
+      // RVW: Removed $('#media-video').bind('pause', function(){Drupal.BGMediaPlayerStopHandler();});
     }
   }
 
