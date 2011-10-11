@@ -77,3 +77,7 @@ h2.node-title /* Node title */ {
   display: block;
   margin: auto;
 }
+
+body.page-node-embed {
+  font-size: 0.75em;
+}

@@ -224,6 +224,11 @@
   height: 280px;
 }
 
+body.page-node-embed #flash-media-player {
+  width: 480px;
+  height: 320px;
+}
+
 #main .dossier-element .field-type-media .field-item  {
   height: inherit;
   width: inherit;

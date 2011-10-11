@@ -4,8 +4,15 @@ define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
 define('BG_MEDIA_DISPLAY_TYPE_LENGTH', 'bg_media_length');
 define('BG_MEDIA_FLASH_PLAYER_ID', 'flash-media-player');
-define('BG_MEDIA_PLAYER_WIDTH', 420);
-define('BG_MEDIA_PLAYER_HEIGHT', 280);
+
+if(arg(2) == 'embed') {
+  define('BG_MEDIA_PLAYER_WIDTH', 480);
+  define('BG_MEDIA_PLAYER_HEIGHT', 320);
+}
+else {
+  define('BG_MEDIA_PLAYER_WIDTH', 420);
+  define('BG_MEDIA_PLAYER_HEIGHT', 280);
+}
 
 function bg_media_node_view($node, $view_mode, $langcode) {
   if($node->type == CONTENT_TYPE_DOSSIER) {
