@@ -1,0 +1,45 @@
+Index: sites/all/modules/globalredirect/globalredirect.module
+===================================================================
+--- globalredirect/globalredirect.module	(revision 13525601410c3c6a952e494f8bc5f8a696f13142)
++++ globalredirect/globalredirect.module	(revision )
+@@ -91,9 +91,17 @@
+ 
+   // Do a check if this is a front page
+   if (drupal_is_front_page()) {
++    $langcode_replacement = '';
++    // Load current langcode from i18n module.
++    if (function_exists('i18n_langcode')) {
++      if ($current_langcode = i18n_langcode()) {
++        $langcode_replacement = $current_langcode;
++      }
++    }
++
+     // Redirect if the current request does not refer to the front page in the
+     // configured fashion (with or without a prefix)
+-    if ($request_path != $prefix) {
++    if (str_replace($langcode_replacement, '', $request_path) != $prefix) {
+       drupal_goto('', $options, 301);
+     }
+     elseif ($settings['nonclean_to_clean'] &&
+@@ -214,12 +222,19 @@
+     $alias = $settings['case_sensitive_urls'] ? $alias : request_path();
+   }
+ 
++  $langcode_replacement = '';
++  // Load current langcode from i18n module.
++  if (function_exists('i18n_langcode')) {
++    if ($current_langcode = i18n_langcode()) {
++      $langcode_replacement = $current_langcode . '/';
++    }
++  }
+ 
+   // Compare the request to the alias. This also works as a 'deslashing'
+   // agent. If we have a language prefix then prefix the alias
+-  if ($request_path != $prefix . $alias) {
++  if (str_replace($langcode_replacement, '', $request_path) != $prefix . $alias) {
+     // If it's not just a slash or user has deslash on, redirect
+-    if (str_replace($prefix . $alias, '', $request_path) != '/' || $settings['deslash']) {
++    if (str_replace($prefix . $alias, '', $request_path) != '/' || $settings['deslash']) {    
+       drupal_goto($alias, $options, 301);
+     }
+   }
