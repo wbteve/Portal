@@ -611,6 +611,11 @@ ul.links li {
   text-transform: uppercase;
 }
 
+.view-agenda .field-name-field-image {
+  float: left;
+  margin-right: 20px;
+}
+
 /* SEARCH */
 .search-result h3 a {
   color: #FFF;
