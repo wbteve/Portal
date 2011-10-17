@@ -354,12 +354,16 @@ function beeldgeluid_preprocess_search_result(&$variables) {
 }
 
 function _beeldgeluid_get_style($id, $display_type) {
+  // List
+  if ($display_type == 'list') {
+    return 'grid-1x1';
+  }
   // Large
-  if($display_type != 'list'  && $id <= 4) {
+  else if ($display_type != 'list'  && $id <= 4) {
     return 'grid-3x3';
   }
   // Medium
-  else if($display_type != 'list' && $id <= 10) {
+  else if ($display_type != 'list' && $id <= 10) {
     return 'grid-2x2';
   }
   // Small
