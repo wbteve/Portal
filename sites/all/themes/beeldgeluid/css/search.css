@@ -21,7 +21,7 @@ body.page-search.sidebar-second #content {
 
 body.page-search #page-title {
   float: left;
-  width: 565px;
+  width: 560px;
   text-align: left;
 }
 
@@ -73,7 +73,7 @@ body.page-search #page-title {
 
 #search-info {
   float: left;
-  width: 155px
+  width: 160px;
 }
 
 #search-info p {
@@ -93,7 +93,7 @@ body.page-search #page-title {
 .page-search-list-site .search-result img {
   position: static;
   float: left;
-  margin-right: 10px;
+  margin-right: 20px;
 }
 
 .page-search-list-site .search-result .info-box {
@@ -101,11 +101,10 @@ body.page-search #page-title {
   overflow: visible;
   background: none;
 }
+
 .page-search-list-site #content {
-  }
-.page-search-list-site #content div.section {
-  margin: 10px;
 }
+
 .page-search-list-site #content a {
 }
 
