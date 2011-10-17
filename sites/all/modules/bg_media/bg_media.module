@@ -295,3 +295,12 @@ function bg_media_duration($seconds_count) {
   return "$hours$minutes$seconds";
 }
 
+function bg_media_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == 'media_internet_add') {
+    $form = array_slice($form, 0, 1) +
+            array('info' => array('#markup' => '<p>Youtube: Voeg de korte link naar het fimpje toe, bv http://youtu.be/XIhhxLgUYZs</p>' .
+                                               '<p>Prolocation: Voeg de locatie van de Prolocation streaming server toe + bestandsnaam, bv rtmpe://stream10.bevd.prolocation.net/simplevideostreaming/20050527_102830_barendenvandorp.mp4</p>')) +
+            array_slice($form, 1);
+    dsm($form);
+  }
+}
