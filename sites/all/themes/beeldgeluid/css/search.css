@@ -167,6 +167,7 @@ body.page-search #page-title {
 #search-advanced-info {
   float: left;
   height: 20px;
+  margin-top: 2px;
 }
 
 .search-advanced-link {
@@ -174,11 +175,27 @@ body.page-search #page-title {
   margin: 0;
 }
 
+.search-advanced-link a {
+  display: block;
+  line-height: 14px;
+  padding: 0 12px 0 3px;
+  height: 16px;
+  border: 1px solid #C7C2BA;
+  color: #C7C2BA;
+  text-decoration: none;
+}
+
+.search-advanced-link a:hover {
+  background: #1C7CA1;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
 .search-advanced-more-trigger {
   background: url('../images/btn_search_display_switch.png') no-repeat -40px 0;
   width: 20px;
   height: 18px;
-  margin: 2px 0 0 5px;
+  margin: 0 0 0 -9px;
   float: left;
   display: block;
   cursor: pointer;
