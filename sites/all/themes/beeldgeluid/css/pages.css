@@ -581,10 +581,11 @@ ul.links li {
 }
 
 /* Agenda */
-.view-agenda .views-field-title a {
-  color: #4A4A4A;
+.view-agenda .node-title a {
   font-weight: bold;
   text-decoration: none;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .view-agenda .views-field-title a:hover {
@@ -611,10 +612,15 @@ ul.links li {
   text-transform: uppercase;
 }
 
-.view-agenda .field-name-field-image {
+.view-agenda .views-field-field-image {
   float: left;
-  margin-right: 20px;
+  margin: 20px 10px 0 0;
 }
+
+.view-agenda .views-field-field-image img {
+  display: block;
+}
+
 
 /* SEARCH */
 .search-result h3 a {
