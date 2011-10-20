@@ -205,6 +205,7 @@ function serviceconnect_login_with_existing_user($scpid, $uid, $expires) {
   $existing_user = user_load(array('uid' => $uid));
   if (isset($existing_user->uid)) {
     $user = $existing_user;
+    $_SESSION['serviceconnect'] = TRUE;
   }
   else {
     drupal_set_message(t('Unable to login, user was not found'), 'error');
