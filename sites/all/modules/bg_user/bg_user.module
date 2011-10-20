@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * Implements hook_menu.
+ */
+function bg_sitemap_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == 'user_profile_form' && $_SESSION['serviceconnect']){
+    // Require e-mail if it wasn't updated yet
+    if(strpos($form['account']['mail']['#default_value'],'@nvt.nl') !== false){
+      $form['account']['mail']['#default_value'] = '';
+    }
+    // Unset passwords fields because they are not used for serviceconnect logins
+    unset($form['account']['current_pass']);
+    unset($form['account']['pass']);
+    // Remove pass validation
+    foreach($form['#validate'] as $key => $validation){
+      if($validation == 'user_validate_current_pass'){
+        unset($form['#validate'][$key]);
+      }
+    }
+  }
+}
+
+

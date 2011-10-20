@@ -1,0 +1,5 @@
+name = Beeld en Geluid user
+description = User register/edit enhancements for Social Accounts.
+package = "Beeld en Geluid"
+core = 7.x
+
