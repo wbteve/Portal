@@ -31,3 +31,27 @@
   top: -25px;
 }
 
+#header .block-nice-menus .content ul ul li a:hover {
+  margin: 0 0px;
+}
+
+#page-wrapper #page #header .block-nice-menus ul ul li.menuparent {
+  background: url("../images/bg_subnav_parent.png") no-repeat top left transparent;
+}
+
+#page-wrapper  #page #header .block-nice-menus .content ul ul li.menuparent a:hover {
+  background: url("../images/bg_subnav_parent_hover.png") no-repeat top left transparent;
+}
+
+#page-wrapper  #page #header .block-nice-menus .content ul ul li a:hover {
+  background: url("../images/bg_subnav_hover.png") no-repeat top left transparent;
+}
+
+
+#header .block-nice-menus .content ul ul {
+  background: none;
+  -moz-box-shadow: none
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
