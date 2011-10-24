@@ -2,8 +2,9 @@
   Drupal.behaviors.bgReference = {
     attach: function(context) {
       // Handle input from text input/textarea
-      $('.input-wrapper input[type="text"]', context)
+      $('.input-wrapper input[type="text"]:not(.input-processed)', context)
         .bind('blur', handleInput)
+        .addClass('input-processed')
         .trigger('blur');
 
       // Handle input from tinyMCE
@@ -59,6 +60,22 @@
   }
 
   function handleInput(evt) {
-    $('input.bg_reference_content', $(this).closest('fieldset')).val( $(this).val() );
+    var value = '';
+
+    // If type = search result
+    if($(this).hasClass('bg_reference_search_result_input')) {
+      var $fieldset = $(this).closest('fieldset');
+      var obj = {
+        "query": $('.bg_reference_search_result_query', $fieldset).val(),
+        "limit": $('.bg_reference_search_result_limit', $fieldset).val()
+      }
+
+      value = JSON.stringify(obj);
+    }
+    else {
+      value = $(this).val();
+    }
+
+    $('input.bg_reference_content', $(this).closest('fieldset')).val( value );
   }
 })(jQuery);

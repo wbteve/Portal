@@ -90,9 +90,9 @@ function theme_bg_reference($variables) {
       if (is_numeric($match['nid'])) {
         $classes[] = 'node-id-' . $match['nid'];
         if (isset($match['nid']) && $node = node_load($match['nid'])) {
-          
+
           $node_array = node_view($node, 'full');
-  
+
           // Render main media player
           if ($element['#data']['width'] == 4 && $element['#data']['height'] == 4 && !$main_player_rendered) {
             $content = drupal_render($node_array);
@@ -110,16 +110,16 @@ function theme_bg_reference($variables) {
                 'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
               ),
             ));
-  
+
             $classes[] = 'media-type-' . $node->field_media_file[$node->language][0]['file']->type;
-  
+
             $row = isset($element['#data']['delta']) ? $element['#data']['delta'] : $row;
             $link = bg_reference_ajax_text_button('', "node/{$node->nid}", t('View @title', array('@title' => $node->title)), "{$node->nid}|{$row}");
             $link_close_length = strlen('</a>');
-  
+
             $node_array['field_media_file'][0]['#prefix'] = substr($link, 0, -$link_close_length);
             $node_array['field_media_file'][0]['#suffix'] = substr($link, -$link_close_length);
-  
+
             $content = drupal_render($node_array['field_media_file']);
           }
         }
@@ -127,7 +127,9 @@ function theme_bg_reference($variables) {
       break;
 
     case CONTENT_TYPE_SEARCH_RESULT:
-      $searchterm = check_plain($element['#data']['content']);
+      $value = _bg_reference_search_parse_value($element['#data']['content']);
+
+      $searchterm = check_plain($value['query']);
       $search_title = '<h2>' . l(t('Search results for "@searchterm"', array('@searchterm' => $searchterm)), 'zoek/' . $searchterm) . '</h2>';
 
       // Check if Solr server is available, eg. for development environments.
@@ -140,7 +142,7 @@ function theme_bg_reference($variables) {
         }
       }
 
-      $search = apachesolr_search_run('dossier_search', array('q' => $searchterm));
+      $search = apachesolr_search_run('dossier_search', array('q' => $searchterm, 'rows' => $value['limit']));
       $list['items'] = array();
       foreach ($search as $result) {
         $list['items'][] = l($result['title'], $result['link']);
@@ -337,6 +339,7 @@ function bg_reference_field_widget_info() {
  */
 function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
   $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
+  $module_path = drupal_get_path('module', 'bg_reference');
 
   // Get type and value from form values
   if(isset($form_state['values']) && isset($form_state['values']['field_referenced_content'][$langcode][$delta])) {
@@ -368,7 +371,9 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
     // TODO: This should not be necessary.
     '#langcode' => $langcode,
     '#attached' => array(
-      'js'  => array(drupal_get_path('module', 'bg_reference') . '/js/bg_reference.js')
+      'js'  => array(
+        $module_path . '/js/bg_reference.js',
+      )
     ),
     'type' => array(
       '#type'       => 'select',
@@ -482,11 +487,21 @@ function _bg_reference_get_form($type, $value) {
       break;
 
     case CONTENT_TYPE_SEARCH_RESULT:
+      $value = _bg_reference_search_parse_value($value);
+
       $element['ref_' . CONTENT_TYPE_SEARCH_RESULT] = array(
-        '#type'               => 'textfield',
-        '#title'              => t('Search result'),
-        '#attributes'         => array('class' => array('bg_reference_search_result')),
-        '#default_value'      => check_plain($value),
+        'ref_' . CONTENT_TYPE_SEARCH_RESULT . '_query' => array(
+          '#type'               => 'textfield',
+          '#title'              => t('Search query'),
+          '#attributes'         => array('class' => array('bg_reference_search_result_query', 'bg_reference_search_result_input')),
+          '#default_value'      => check_plain($value['query']),
+        ),
+        'ref_' . CONTENT_TYPE_SEARCH_RESULT . '_limit' => array(
+          '#type'               => 'textfield',
+          '#title'              => t('Amount of results'),
+          '#attributes'         => array('class' => array('bg_reference_search_result_limit', 'bg_reference_search_result_input')),
+          '#default_value'      => check_plain($value['limit']),
+        ),
       );
       break;
 
@@ -504,6 +519,21 @@ function _bg_reference_get_form($type, $value) {
   return $element;
 }
 
+function _bg_reference_search_parse_value($value) {
+  $return_value = array(
+    'query' => $value,
+    'limit' => 5
+  );
+
+  // If the search data is stored as a JSON object
+  if( ($obj = json_decode($value)) !== NULL ) {
+    $return_value['query'] = $obj->query;
+    $return_value['limit'] = $obj->limit;
+  }
+
+  return $return_value;
+}
+
 /**
  * Do validation and set form values
  */
@@ -513,7 +543,7 @@ function _bg_reference_validate($element, &$form_state) {
       $values = $form_state['values'][$field['name']][$field['langcode']][$field['delta']];
 
       if(!empty($values['content'])) {
-        
+
         // Validate referenced node
         if (preg_match('/\[nid:(?P<nid>\d+)\]/', $values['content'], $match)) {
           if (db_query("SELECT nid FROM node WHERE nid = :nid", array(':nid' => $match['nid']))->rowCount() == 0) {
@@ -688,7 +718,7 @@ function bg_reference_form_alter(&$form, &$form_state, $form_id) {
     if ($form_id == 'node_delete_confirm') {
       $parent_nodes[$form['#node']->nid] = $form['#node']->title;
     }
-    // Get the node info from the multiple delete confirmation form. 
+    // Get the node info from the multiple delete confirmation form.
     else {
       foreach ($form['nodes'] as $nodes_nid => $nodes_node) {
         if (is_int($nodes_nid)) {
@@ -698,7 +728,7 @@ function bg_reference_form_alter(&$form, &$form_state, $form_id) {
       // Make sure the list of nodes stays on top of the form.
       $form['nodes']['#weight'] = -10;
     }
-    
+
     // Loop over the nodes and display which nodes are referencing them.
     $warning = '';
     foreach ($parent_nodes as $parent_nid => $parent_title) {
@@ -711,12 +741,12 @@ function bg_reference_form_alter(&$form, &$form_state, $form_id) {
         $warning .= '</ul>';
       }
     }
-    
+
     // Add the warning to the form.
     $form['warning'] = array(
       '#markup' => $warning,
       '#weight' => -1,
     );
   }
-  
+
 }
