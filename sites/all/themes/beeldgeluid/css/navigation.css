@@ -172,6 +172,10 @@ li a.active {
   background: url("../images/arrow_right.png") no-repeat scroll 95% center #C7C2BA;
 }
 
+#page #header .block-nice-menus ul ul li.menuparent li a:hover {
+  background-image: none;
+}
+
 #page #header .block-nice-menus ul ul ul{
   left: 179px;
   top: -10px;
