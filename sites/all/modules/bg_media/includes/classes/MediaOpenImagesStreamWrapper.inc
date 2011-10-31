@@ -159,7 +159,16 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
 
     // Start at back for image
     if($type == 'image') {
-      foreach($this->qualified_media[$type] as $qualified_mime_type) {
+      for($i = $media_amount; $i >= 0; $i--) {
+        $path = parse_url( (string)$media[$i], PHP_URL_PATH );
+
+        if( strpos($path, '/images') === 0 ) {
+          $candidates[] = (string)$media[$i];
+        }
+      }
+      /*
+       * RVW: Removed MIME type check because of incomplete API
+       foreach($this->qualified_media[$type] as $qualified_mime_type) {
         for($i = $media_amount; $i >= 0; $i--) {
           $mime_type = file_get_mimetype( (string)$media[$i] );
 
@@ -167,7 +176,7 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
             $candidates[] = (string)$media[$i];
           }
         }
-      }
+      }*/
     }
     // Otherwise start at front
     else {
