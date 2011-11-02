@@ -158,6 +158,10 @@ body#tinymce {
 #content .section {
 }
 
+#content p a {
+  text-decoration: underline;
+}
+
 /* Remove top-margin from first element in the body content for proper vertical alignment. */
 #content .field-name-body .field-item>:first-child {
   margin-top: 0;
