@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap.generate.inc,v 1.26 2011/02/07 22:11:54 davereid Exp $
 
 /**
  * @file

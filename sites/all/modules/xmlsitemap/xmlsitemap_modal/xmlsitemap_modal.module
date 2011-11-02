@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_modal.module,v 1.2 2010/08/24 18:22:05 davereid Exp $
 
 /**
  * Implements hook_menu_alter().

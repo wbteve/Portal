@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_engines.admin.inc,v 1.5 2010/05/02 21:59:52 davereid Exp $
 
 /**
  * @file

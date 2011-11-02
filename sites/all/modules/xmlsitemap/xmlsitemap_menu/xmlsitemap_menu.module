@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_menu.module,v 1.28 2011/02/09 22:37:53 davereid Exp $
 
 /**
  * Implements hook_entity_info_alter().
@@ -36,7 +35,7 @@ function xmlsitemap_menu_entity_info_alter(&$info) {
 
     foreach (menu_get_menus() as $type => $name) {
       $info['menu_link']['bundles'][$type] = array(
-        'label' => t('@menu-name menu', array('@menu-name' => $name)),
+        'label' => $name,
         'admin' => array(
           'path' => 'admin/structure/menu/manage/%menu/edit',
           'bundle argument' => 4,
@@ -146,6 +145,10 @@ function xmlsitemap_menu_menu_insert(array $menu) {
   if (isset($menu['xmlsitemap'])) {
     xmlsitemap_link_bundle_settings_save('menu_link', $menu['menu_name'], $menu['xmlsitemap']);
   }
+
+  // When menus change, the bundles we defined in
+  // xmlsitemap_menu_entity_info_alter() change, so we need to clear the cache.
+  entity_info_cache_clear();
 }
 
 /**
@@ -155,6 +158,10 @@ function xmlsitemap_menu_menu_update(array $menu) {
   if (isset($menu['xmlsitemap'])) {
     xmlsitemap_link_bundle_settings_save('menu_link', $menu['menu_name'], $menu['xmlsitemap']);
   }
+
+  // When menus change, the bundles we defined in
+  // xmlsitemap_menu_entity_info_alter() change, so we need to clear the cache.
+  entity_info_cache_clear();
 }
 
 /**
@@ -162,6 +169,10 @@ function xmlsitemap_menu_menu_update(array $menu) {
  */
 function xmlsitemap_menu_menu_delete(array $menu) {
   xmlsitemap_link_bundle_delete('menu_link', $menu['menu_name']);
+
+  // When menus change, the bundles we defined in
+  // xmlsitemap_menu_entity_info_alter() change, so we need to clear the cache.
+  entity_info_cache_clear();
 }
 
 /**

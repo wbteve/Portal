@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap.module,v 1.104 2011/02/09 21:45:59 davereid Exp $
 
 /**
  * @defgroup xmlsitemap XML sitemap
@@ -909,48 +908,52 @@ function xmlsitemap_get_link_info($type = NULL, $reset = FALSE) {
 
   if ($reset) {
     $link_info = NULL;
-    entity_info_cache_clear();
-  }
-  elseif ($cached = cache_get('xmlsitemap:link_info:' . $language->language)) {
-    $link_info = $cached->data;
+    cache_clear_all('xmlsitemap:link_info:', 'cache', TRUE);
   }
 
   if (!isset($link_info)) {
-    $link_info = entity_get_info();
-    foreach ($link_info as $key => $info) {
-      if (empty($info['uri callback']) || !isset($info['xmlsitemap'])) {
-        // Remove any non URL-able or XML sitemap un-supported entites.
-        unset($link_info[$key]);
-      }
-      foreach ($info['bundles'] as $bundle_key => $bundle) {
-        if (!isset($bundle['xmlsitemap'])) {
-          // Remove any un-supported entity bundles.
-          //unset($link_info[$key]['bundles'][$bundle_key]);
+    $cid = 'xmlsitemap:link_info:' . $language->language;
+    if ($cache = cache_get($cid)) {
+      $link_info = $cache->data;
+    }
+    else {
+      entity_info_cache_clear();
+      $link_info = entity_get_info();
+      foreach ($link_info as $key => $info) {
+        if (empty($info['uri callback']) || !isset($info['xmlsitemap'])) {
+          // Remove any non URL-able or XML sitemap un-supported entites.
+          unset($link_info[$key]);
+        }
+        foreach ($info['bundles'] as $bundle_key => $bundle) {
+          if (!isset($bundle['xmlsitemap'])) {
+            // Remove any un-supported entity bundles.
+            //unset($link_info[$key]['bundles'][$bundle_key]);
+          }
         }
       }
-    }
-    $link_info = array_merge($link_info, module_invoke_all('xmlsitemap_link_info'));
-    foreach ($link_info as $key => &$info) {
-      $info += array(
-        'type' => $key,
-        'base table' => FALSE,
-        'bundles' => array(),
-        'xmlsitemap' => array(),
-      );
-      if (!isset($info['xmlsitemap']['rebuild callback']) && !empty($info['base table']) && !empty($info['entity keys']['id']) && !empty($info['xmlsitemap']['process callback'])) {
-        $info['xmlsitemap']['rebuild callback'] = 'xmlsitemap_rebuild_batch_fetch';
-      }
-      foreach ($info['bundles'] as $bundle => &$bundle_info) {
-        $bundle_info += array(
+      $link_info = array_merge($link_info, module_invoke_all('xmlsitemap_link_info'));
+      foreach ($link_info as $key => &$info) {
+        $info += array(
+          'type' => $key,
+          'base table' => FALSE,
+          'bundles' => array(),
           'xmlsitemap' => array(),
         );
-        $bundle_info['xmlsitemap'] += xmlsitemap_link_bundle_load($key, $bundle, FALSE);
+        if (!isset($info['xmlsitemap']['rebuild callback']) && !empty($info['base table']) && !empty($info['entity keys']['id']) && !empty($info['xmlsitemap']['process callback'])) {
+          $info['xmlsitemap']['rebuild callback'] = 'xmlsitemap_rebuild_batch_fetch';
+        }
+        foreach ($info['bundles'] as $bundle => &$bundle_info) {
+          $bundle_info += array(
+            'xmlsitemap' => array(),
+          );
+          $bundle_info['xmlsitemap'] += xmlsitemap_link_bundle_load($key, $bundle, FALSE);
+        }
       }
+      drupal_alter('xmlsitemap_link_info', $link_info);
+      ksort($link_info);
+      // Cache by language since this info contains translated strings.
+      cache_set($cid, $link_info);
     }
-    drupal_alter('xmlsitemap_link_info', $link_info);
-    ksort($link_info);
-    // Cache by language since this info contains translated strings.
-    cache_set('xmlsitemap:link_info:' . $language->language, $link_info);
   }
 
   if (isset($type)) {
@@ -1042,7 +1045,7 @@ function xmlsitemap_link_type_rename($entity_old, $entity_new, $bundles = NULL) 
     $value = variable_get($variable);
     variable_del($variable);
     if (isset($value)) {
-      $variable_new = str_replace($entity_old, $entity_new, $variable);
+      $variable_new = str_replace('xmlsitemap_settings_' . $entity_old, 'xmlsitemap_settings_' . $entity_new, $variable);
       variable_set($variable_new, $value);
     }
   }

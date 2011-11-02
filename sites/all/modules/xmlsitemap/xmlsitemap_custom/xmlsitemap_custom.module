@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_custom.module,v 1.7 2010/09/29 16:03:44 davereid Exp $
 
 /**
  * Implements hook_menu().

@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap.pages.inc,v 1.19 2010/08/30 04:47:28 davereid Exp $
 
 /**
  * @file
@@ -108,6 +107,9 @@ function xmlsitemap_file_transfer($uri, $headers) {
     drupal_add_http_header($name, $value);
   }
   drupal_send_headers();
+
+  // Attempt to increase time to transfer file.
+  drupal_set_time_limit(240);
 
   $scheme = variable_get('file_default_scheme', 'public');
   // Transfer file in 16 KB chunks to save memory usage.

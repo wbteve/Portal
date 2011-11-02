@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_node.module,v 1.59 2010/10/18 20:15:46 davereid Exp $
 
 /**
  * Implements hook_entity_info_alter().
@@ -102,12 +101,8 @@ function xmlsitemap_node_comment_delete(stdClass $comment) {
  */
 function xmlsitemap_node_field_extra_fields() {
   $extras = array();
-  $bundles = xmlsitemap_get_link_type_enabled_bundles('node');
   foreach (node_type_get_names() as $type => $name) {
-    if (!in_array($type, $bundles)) {
-      continue;
-    }
-    $extras['node'][$type]['xmlsitemap'] = array(
+    $extras['node'][$type]['form']['xmlsitemap'] = array(
       'label' => t('XML sitemap'),
       'description' => t('XML sitemap module element'),
       'weight' => 30,

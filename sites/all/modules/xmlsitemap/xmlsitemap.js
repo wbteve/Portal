@@ -1,4 +1,3 @@
-// $Id: xmlsitemap.js,v 1.4 2010/04/28 20:41:57 davereid Exp $
 
 (function ($) {
 

@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap.drush.inc,v 1.15 2010/10/07 08:42:49 davereid Exp $
 
 /**
  * @file

@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_user.module,v 1.25 2011/02/07 21:44:36 davereid Exp $
 
 /**
  * Implements hook_entity_info_alter().
@@ -80,6 +79,18 @@ function xmlsitemap_user_user_delete($account) {
 }
 
 /**
+ * Implements hook_field_extra_fields().
+ */
+function xmlsitemap_user_field_extra_fields() {
+  $extras['user']['user']['form']['xmlsitemap'] = array(
+    'label' => t('XML sitemap'),
+    'description' => t('XML sitemap module element'),
+    'weight' => 30,
+  );
+  return $extras;
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  *
  * @see user_admin_settings()
@@ -137,7 +148,7 @@ function xmlsitemap_user_create_link(stdClass &$account) {
 
   // The following values must always be checked because they are volatile.
   $account->xmlsitemap['loc'] = $uri['path'];
-  $account->xmlsitemap['access'] = $account->uid && $account->status && $account->login && $account->access;
+  $account->xmlsitemap['access'] = $account->uid && $account->status;
   $account->xmlsitemap['language'] = !empty($account->language) ? $account->language : LANGUAGE_NONE;
 
   return $account->xmlsitemap;

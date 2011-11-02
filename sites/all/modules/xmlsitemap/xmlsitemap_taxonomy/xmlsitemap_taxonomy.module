@@ -1,5 +1,4 @@
 <?php
-// $Id: xmlsitemap_taxonomy.module,v 1.31 2011/02/07 22:11:52 davereid Exp $
 
 /**
  * Implements hook_entity_info_alter().
@@ -131,12 +130,8 @@ function xmlsitemap_taxonomy_term_delete(stdClass $term) {
  */
 function xmlsitemap_taxonomy_field_extra_fields() {
   $extras = array();
-  $bundles = xmlsitemap_get_link_type_enabled_bundles('taxonomy_term');
   foreach (taxonomy_vocabulary_get_names() as $machine_name => $vocabulary) {
-    if (!in_array($vocabulary->machine_name, $bundles)) {
-      continue;
-    }
-    $extras['taxonomy_term'][$machine_name]['xmlsitemap'] = array(
+    $extras['taxonomy_term'][$machine_name]['form']['xmlsitemap'] = array(
       'label' => t('XML sitemap'),
       'description' => t('XML sitemap module element'),
       'weight' => 30,
