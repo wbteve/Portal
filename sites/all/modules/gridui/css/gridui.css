@@ -51,7 +51,9 @@
 }
 
 #edit-quick-actions {
-  position: relative;
-  left: 1035px;
+  margin-top: -15px;
+  position: absolute;
+  text-align: right;
+  width: 1050px;
 }
 
