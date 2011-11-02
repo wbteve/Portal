@@ -12,6 +12,7 @@ body.page-search.two-sidebars #content {
   width: 480px;
 }
 
+body.page-taxonomy.sidebar-second #content,
 body.page-search.sidebar-second #content {
   clear: both;
   margin-right: -720px;
