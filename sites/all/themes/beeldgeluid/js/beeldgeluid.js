@@ -47,7 +47,8 @@
 
       $(".verbreding-embed-code", context).focus(function(event){
         this.select();
-      });
+      }).mouseup(function(e){ e.preventDefault(); });
+;
 
       $('.embed-copy', context).click(function(event){
         event.preventDefault();
