@@ -702,7 +702,7 @@ ul.links li {
 #content .region-content .node h3 {
   font-size: 1.67em;
   letter-spacing: 0.1em;
-  margin: 0.83em 0 0.41em;
+  margin: 0.83em 0 0 0;
 }
 
 #content .region-content .node p,
