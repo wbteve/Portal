@@ -698,8 +698,11 @@ ul.links li {
 }
 
 /* h3's & p tags in region-content */
+#content .region-content .node h2,
 #content .region-content .node h3 {
-  margin-bottom: 0;
+  font-size: 1.67em;
+  letter-spacing: 0.1em;
+  margin: 0.83em 0 0.41em;
 }
 
 #content .region-content .node p,
