@@ -373,6 +373,10 @@ ul.links li {
 .region-content-bottom /* Wrapper for any blocks placed in the "content bottom" region */ {
 }
 
+.region-bottom #block-block-5 {
+  position: static;
+}
+
 /*
  * First sidebar (on left in LTR languages, on right in RTL)
  *
