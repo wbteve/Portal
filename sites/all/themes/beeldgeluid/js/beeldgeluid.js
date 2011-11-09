@@ -1,5 +1,7 @@
 (function ($) {
-
+  
+  var dossierWidth = 0;
+  
   Drupal.behaviors.bgSearchResults = {
     attach: function (context, settings) {
       $('.search-result').css({'cursor': 'pointer'});
@@ -62,13 +64,23 @@
     var calc = main_info_pos.left - (Drupal.settings.bg_reference.unitSizeWidth*2);
     dossier.css('left', calc);
     dossier.css('position', 'absolute');
-    $('body').width($('.dossier-content').width());
+    if($(window).width() < dossierWidth){
+      $('body').width(dossierWidth);
+    }else{
+      $('body').width($(window).width());
+    }
   }
 
   Drupal.behaviors.bgDossierPosition = {
     attach: function (context, settings) {
       var dossier = $('#dossier-container');
       if (dossier.length > 0) {
+        if(!dossierWidth){
+          $(".dossier-element").each(function() {
+            var width = $(this).position().left + $(this).width();
+            if(dossierWidth < width) dossierWidth = width;
+          });
+        }
         resizeDossier(dossier);
         $(window).resize(function() {
           resizeDossier(dossier);
