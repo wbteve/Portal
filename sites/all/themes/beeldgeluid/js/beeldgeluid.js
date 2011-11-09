@@ -1,5 +1,14 @@
 (function ($) {
 
+  if($('.dossier-content').width() > $('body').width()){
+    $('body').width($('.dossier-content').width());
+  }
+  $(window).resize(function() {
+    if($('.dossier-content').width() > $('body').width()){
+      $('body').width($('.dossier-content').width());
+    }
+  }
+
   Drupal.behaviors.bgSearchResults = {
     attach: function (context, settings) {
       $('.search-result').css({'cursor': 'pointer'});
@@ -202,4 +211,6 @@
       );
     }
   }
+  
+  
 }(jQuery));
