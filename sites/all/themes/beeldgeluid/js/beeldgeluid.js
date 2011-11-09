@@ -1,14 +1,5 @@
 (function ($) {
 
-  if($('.dossier-content').width() > $('body').width()){
-    $('body').width($('.dossier-content').width());
-  }
-  $(window).resize(function() {
-    if($('.dossier-content').width() > $('body').width()){
-      $('body').width($('.dossier-content').width());
-    }
-  }
-
   Drupal.behaviors.bgSearchResults = {
     attach: function (context, settings) {
       $('.search-result').css({'cursor': 'pointer'});
@@ -67,10 +58,11 @@
   };
 
   function resizeDossier(dossier) {
-      var main_info_pos = $('#main-info').offset();
-      var calc = main_info_pos.left - (Drupal.settings.bg_reference.unitSizeWidth*2);
-      dossier.css('left', calc);
-      dossier.css('position', 'absolute');
+    var main_info_pos = $('#main-info').offset();
+    var calc = main_info_pos.left - (Drupal.settings.bg_reference.unitSizeWidth*2);
+    dossier.css('left', calc);
+    dossier.css('position', 'absolute');
+    $('body').width($('.dossier-content').width());
   }
 
   Drupal.behaviors.bgDossierPosition = {
@@ -211,6 +203,4 @@
       );
     }
   }
-  
-  
 }(jQuery));
