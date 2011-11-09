@@ -60,15 +60,15 @@
   };
 
   function resizeDossier(dossier) {
-    var main_info_pos = $('#main-info').offset();
-    var calc = main_info_pos.left - (Drupal.settings.bg_reference.unitSizeWidth*2);
-    dossier.css('left', calc);
-    dossier.css('position', 'absolute');
     if($(window).width() < dossierWidth){
       $('body').width(dossierWidth);
     }else{
       $('body').width($(window).width());
     }
+    var main_info_pos = $('#main-info').offset();
+    var calc = main_info_pos.left - (Drupal.settings.bg_reference.unitSizeWidth*2);
+    dossier.css('left', calc);
+    dossier.css('position', 'absolute');
   }
 
   Drupal.behaviors.bgDossierPosition = {
