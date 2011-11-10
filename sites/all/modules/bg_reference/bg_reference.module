@@ -510,7 +510,7 @@ function _bg_reference_get_form($type, $value) {
         '#type'               => 'text_format',
         '#title'              => t('Text'),
         '#attributes'         => array('class' => array('bg_reference_text')),
-        '#format'             => 'dossier_text', //filter_default_format(),
+        '#format'             => 'full_html', //filter_default_format(),
         '#default_value'      => $value,
       );
       break;
