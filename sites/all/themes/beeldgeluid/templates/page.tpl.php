@@ -125,7 +125,7 @@
       </div>
       <?php endif; ?>
       <?php print render($title_prefix); ?>
-      <?php if ($title): ?>
+      <?php if ($title && !$is_front): ?>
         <<?php print $page_title_tag; ?> class="title" id="page-title"><?php print $title; ?></<?php print $page_title_tag; ?>>
       <?php endif; ?>
       <?php print render($title_suffix); ?>
