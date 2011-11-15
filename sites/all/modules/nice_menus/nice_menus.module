@@ -77,7 +77,6 @@ function nice_menus_menu() {
   return $items;
 }
 
-
 /**
  * Settings form as implemented by hook_menu
  */
@@ -181,6 +180,7 @@ function nice_menus_init() {
  * Implements hook_block_info().
  */
 function nice_menus_block_info() {
+  $blocks = array();
   for ($i = 1; $i <= variable_get('nice_menus_number', '2'); $i++) {
     $blocks[$i]['info'] = variable_get('nice_menus_name_' . $i, 'Nice menu ' . $i) . ' (Nice menu)';
     // We have too many things changing per user, per page to cache.
@@ -279,27 +279,14 @@ function nice_menus_theme() {
     'nice_menus' => array(
       'variables' => array('id' => NULL, 'menu_name' => NULL, 'mlid' => NULL, 'direction' => 'right', 'depth' => -1, 'menu' => NULL),
     ),
-    'nice_menus_primary_links' => array(
-      'variables' => array('direction' => 'down', 'depth' => -1, 'menu' => NULL),
+    'nice_menus_main_menu' => array(
+      'variables' => array('direction' => 'down', 'depth' => -1),
     ),
-    'nice_menus_secondary_links' => array(
-      'variables' => array('direction' => 'down', 'depth' => -1, 'menu' => NULL),
+    'nice_menus_secondary_menu' => array(
+      'variables' => array('direction' => 'down', 'depth' => -1),
     ),
     'nice_menus_menu_item_link' => array(
       'variables' => array('element' => array()),
-    ),
-    // Deprecated theme functions that will be removed in 7.x.
-    'nice_menu_tree' => array(
-      'variables' => array('menu_name' => NULL, 'mlid' => NULL, 'depth' => -1, 'menu' => NULL),
-    ),
-    'nice_menu_build' => array(
-      'variables' => array('menu' => NULL, 'depth' => -1, 'trail' => NULL),
-    ),
-    'nice_menu' => array(
-      'variables' => array('id' => NULL, 'menu_name' => NULL, 'mlid' => NULL, 'direction' => 'right', 'depth' => -1, 'menu' => NULL),
-    ),
-    'nice_menu_primary_links' => array(
-      'variables' => array('direction' => 'down', 'depth' => -1, 'menu' => NULL),
     ),
   );
 }
@@ -309,6 +296,7 @@ function nice_menus_theme() {
  *
  * @param $page_menu
  *   The menu data for a page.
+ *
  * @return
  *   An array of parent menu item ids.
  */
@@ -330,7 +318,7 @@ function nice_menus_build_page_trail($page_menu) {
  *
  * @param $menu_name
  *   The top-level menu name that contains the menu to use (e.g. navigation
- *   or primary-links) for Drupal menus. For custom $menus this is just the
+ *   or main-menu) for Drupal menus. For custom $menus this is just the
  *   name for menu display.
  * @param $mlid
  *   The menu ID from which to start building the items, i.e. the parent
@@ -341,6 +329,7 @@ function nice_menus_build_page_trail($page_menu) {
  * @param $menu
  *   Optional. A custom menu array to use for theming -- it should have
  *   the same structure as that returned by menu_tree_all_data().
+ *
  * @return
  *   An HTML string of properly nested Nice menu lists.
  */
@@ -358,10 +347,13 @@ function theme_nice_menus_tree($variables) {
   }
 
   // Allow i18n module to translate strings where available.
-  if (module_exists('i18nmenu')) {
-    i18nmenu_localize_tree($menu);
+  if (module_exists('i18n_menu')) {
+    $menu = i18n_menu_localize_tree($menu);
   }
-
+  
+  // Assume depth == 0 by default, overriden if mlid is specified.
+  $parent_depth = 0;
+  
   // For custom $menus and menus built all the way from the top-level we
   // don't need to "create" the specific sub-menu and we need to get the title
   // from the $menu_name since there is no "parent item" array.
@@ -457,7 +449,7 @@ function theme_nice_menus_build($variables) {
           '#below' => '',
           '#title' => $menu_item['link']['link_title'],
           '#href' =>  $menu_item['link']['href'],
-          '#localized_options' => array(),
+          '#localized_options' => $menu_item['link']['localized_options'],
           '#attributes' => array(),
         );
         $variables['element'] = $element;
@@ -480,7 +472,7 @@ function theme_nice_menus_build($variables) {
           '#below' => '',
           '#title' => $menu_item['link']['link_title'],
           '#href' =>  $menu_item['link']['href'],
-          '#localized_options' => array(),
+          '#localized_options' => $menu_item['link']['localized_options'],
           '#attributes' => array(),
         );
         $variables['element'] = $element;
@@ -509,17 +501,23 @@ function theme_nice_menus_build($variables) {
  *   Optional. A custom menu array to use for theming --
  *   it should have the same structure as that returned
  *  by menu_tree_all_data(). Default is the standard menu tree.
+ *
  * @return
  *   An HTML string of Nice menu links.
  */
 function theme_nice_menus($variables) {
+  $output = array(
+    'content' => '',
+    'subject' => '',
+  );
+
   $id = $variables['id'];
   $menu_name = $variables['menu_name'];
   $mlid = $variables['mlid'];
   $direction = $variables['direction'];
   $depth = $variables['depth'];
   $menu = $variables['menu'];
-  $output = array();
+
   if ($menu_tree = theme('nice_menus_tree', array('menu_name' => $menu_name, 'mlid' => $mlid, 'depth' => $depth, 'menu' => $menu))) {
     if ($menu_tree['content']) {
       $output['content'] = '<ul class="nice-menu nice-menu-' . $direction . '" id="nice-menu-' . $id . '">' . $menu_tree['content'] . '</ul>' . "\n";
@@ -530,54 +528,44 @@ function theme_nice_menus($variables) {
 }
 
 /**
- * Theme primary links as Nice menus.
+ * Theme the main menu as a Nice menu.
  *
  * @param $direction
  *   Optional. The direction the menu expands. Default is 'down'.
  * @param $depth
  *   The number of children levels to display. Use -1 to display all children
  *   and use 0 to display no children.
- * @param $menu
- *   Optional. A custom menu array to use for theming --
- *   it should have the same structure as that returned
- *   by menu_tree_all_data(). Default is the standard menu tree.
+ *
  * @return
- *   An HTML string of Nice menu primary links.
+ *   An HTML string of Nice main menu links.
  */
-function theme_nice_menus_primary_links($variables) {
+function theme_nice_menus_main_menu($variables) {
   $direction = $variables['direction'];
   $depth = $variables['depth'];
-  $menu = $variables['menu'];
-  $menu_name = variable_get('menu_primary_links_source', 'primary-links');
-  $output = theme('nice_menus', array('id' => 0, 'menu_name' => $menu_name, 'mlid' => 0, 'direction' => $direction, 'depth' => $depth, 'menu' => $menu));
+  $menu_name = variable_get('menu_main_links_source', 'main-menu');
+  $output = theme('nice_menus', array('id' => 0, 'menu_name' => $menu_name, 'mlid' => 0, 'direction' => $direction, 'depth' => $depth));
   return $output['content'];
 }
 
 /**
- * Theme secondary links as nice menus.
+ * Theme the secondary menu as a Nice menu.
  *
  * @param $direction
  *   Optional. The direction the menu expands. Default is 'down'.
  * @param $depth
  *   The number of children levels to display. Use -1 to display all children
  *   and use 0 to display no children.
- * @param $menu
- *   Optional. A custom menu array to use for theming --
- *   it should have the same structure as that returned
- *   by menu_tree_all_data(). Default is the standard menu tree.
+ *
  * @return
- *   An HTML string of nice menu secondary links.
+ *   An HTML string of Nice secondary menu links.
  */
-function theme_nice_menus_secondary_links($variables) {
+function theme_nice_menus_secondary_menu($variables) {
   $direction = $variables['direction'];
   $depth = $variables['depth'];
-  $menu = $variables['menu'];
-  $menu_name = variable_get('menu_secondary_links_source', 'secondary-links');
-  $output = theme('nice_menus', array('id' => 0, 'menu_name' => $menu_name, 'mlid' => 0, 'direction' => $direction, 'depth' => $depth, 'menu' => $menu));
+  $menu_name = variable_get('menu_secondary_links_source', 'user-menu');
+  $output = theme('nice_menus', array('id' => 0, 'menu_name' => $menu_name, 'mlid' => 0, 'direction' => $direction, 'depth' => $depth));
   return $output['content'];
 }
-
-
 
 /**
  * Generate the HTML output for a single menu link.
@@ -590,4 +578,3 @@ function theme_nice_menus_menu_item_link($variables) {
   }
   return l($variables['element']['#title'], $variables['element']['#href'], $variables['element']['#localized_options']);
 }
-

@@ -113,7 +113,7 @@ Advanced theming
 ----------------
 If you're creating or modifying your own theme, you can integrate Nice menus more deeply by making use of these functions:
 theme_nice_menus() -- themes any menu tree as a Nice menu.
-theme_nice_menus_primary_links() -- themes your primary links as a Nice menu.
-theme_nice_menus_secondary_links() -- themes your secondary links as a Nice menu.
+theme_nice_menus_main_menu() -- themes your main menu as a Nice menu.
+theme_nice_menus_secondary_menu() -- themes your secondary menu as a Nice menu.
 
 If you really know what you're doing, you can probably even customize the menu tree in creative ways, as those functions allow you to pass in a custom menu tree.
