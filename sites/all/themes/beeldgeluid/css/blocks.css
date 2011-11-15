@@ -117,6 +117,11 @@ h2.block-title /* Block title */ {
   margin-bottom: 1em;
 }
 
+/* default width for custom blocks */
+.region-sidebar-first .block-block {
+  width: 180px;
+}
+
 .region-sidebar-first .block-nodeblock {
   margin: 0 10px;
 }
