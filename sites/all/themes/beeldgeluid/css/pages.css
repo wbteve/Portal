@@ -134,11 +134,11 @@ body#tinymce {
   margin-top: 0;
 }
 
-/* On blog pages, add some padding around the main content. */
+/* On certain pages, add some padding around the main content and give it a white background. */
 .section-nieuws #content .section,
 .node-type-article #content .section,
 .node-type-news #content .section,
-.node-type-webform #content .section
+.node-type-webform #content .section,
 .node-type-blog #content .section,
 .page-blogs #content .section {
   padding: 10px;
