@@ -22,7 +22,7 @@ function bg_blog_nav_block_info() {
   foreach ($blocks as $name => $info) {
     $blocks[$name] = array(
       'info' => t('!name navigation', array('!name' => $info['title'])),
-      'cache' => DRUPAL_CACHE_PER_ROLE,
+      'cache' => DRUPAL_CACHE_PER_PAGE,
     );
   }
 
