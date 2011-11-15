@@ -144,6 +144,7 @@ h1, h2, h3 {
   font-weight: normal;
   font-family: 'BebasNeue','Verdana','sans-serif';
   text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 h1 {
@@ -155,7 +156,6 @@ h1 {
      pages' base font size. So, for example, if we want a 1.5em margin (relative
      to the base font), we have to divide that length by the element's
      font-size:  1.5em / 2em = 0.5em  */
-  letter-spacing: 0.02em;
 }
 
 h2 {
