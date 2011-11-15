@@ -155,16 +155,15 @@ h1 {
      pages' base font size. So, for example, if we want a 1.5em margin (relative
      to the base font), we have to divide that length by the element's
      font-size:  1.5em / 2em = 0.5em  */
+  letter-spacing: 0.02em;
 }
 
 h2 {
   font-size: 2.08em;
-  letter-spacing: 0.05em;
   margin: 1em 0 0.5em; /* Equivalent to 1.5em in the page's base font: 1.5 / 1.5 = 1em */
 }
 
 h3 {
-  letter-spacing: 0.05em;
   font-size: 1.67em;
   margin: 0.83em 0 0.41em; /* Equivalent to 1.5em in the page's base font: 1.5 / 1.3 = 1.154 */
 }
