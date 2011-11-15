@@ -46,7 +46,7 @@ function render_footer_menu($menu_name = 'menu-footer-menu') {
   $tree = menu_tree_all_data($menu_name);
   $i = 0;
   foreach($tree as $branch) {
-    if(is_array($branch) && is_array($branch['below'])){
+    if(is_array($branch) && is_array($branch['below']) && !$branch['link']['hidden']){
       $i++;
       $footer .= '<div id="column-' . $i . '" class="footer-column">';
       $footer .= '<h2 class="title">' . $branch['link']['title'] . '</h2>';
