@@ -6,19 +6,17 @@
 
  /* Algemene styling voor ALLE lijstpagina/overzicht views. Graag zo algemeen mogelijk houden (RFL) */
 .view-display-id-page h2 {
-  font-size: 1.0833em;
+  font-size: 1.667em;
 }
 
 .view-display-id-page h2,
 .view-display-id-page h2 a {
   color: #4A4A4A;
-  font-weight: bold;
   text-decoration: none;
 }
 
 .view-display-id-page .field-type-date {
   color: #A5A5A4;
-  font-size: 1.0833em;  
 }
 
 .view-display-id-page p {
