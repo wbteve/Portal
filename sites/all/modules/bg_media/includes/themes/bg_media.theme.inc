@@ -35,7 +35,8 @@ function bg_media_preprocess_bg_media_video(&$vars) {
           'url'     => file_create_url($wrapper->getLocalThumbnailPath()),
         ),
         array(
-          'url'       => $wrapper->getExternalPath(),
+          // Replace single quote in URL for IE compatibility
+          'url'       => str_replace("'", '%2527', $wrapper->getExternalPath()),
           'provider'  => 'rtmp',
           'autoPlay'  => false,
           'onStart'	  => 'Drupal.BGMediaPlayerPlayHandler',
@@ -80,7 +81,8 @@ function bg_media_preprocess_bg_media_video(&$vars) {
           'url'       => $vars['thumbnail'],
         ),
         array(
-          'url'       => $fallback_video_url,
+          // Replace single quote in URL for IE compatibility
+          'url'       => str_replace("'", '%2527', $fallback_video_url),
           'autoPlay'  => false,
           'onStart'	  => 'Drupal.BGMediaPlayerPlayHandler',
           'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
@@ -120,7 +122,8 @@ function bg_media_preprocess_bg_media_video(&$vars) {
           'url'       => $vars['thumbnail'],
         ),
         array(
-          'url'       => $fallback_video_url,
+          // Replace single quote in URL for IE compatibility
+          'url'       => str_replace("'", '%2527', $fallback_video_url),
           'autoPlay'  => false,
           'onStart'	  => 'Drupal.BGMediaPlayerPlayHandler',
           'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
