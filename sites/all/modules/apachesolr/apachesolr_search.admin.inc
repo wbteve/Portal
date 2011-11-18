@@ -124,8 +124,6 @@ function apachesolr_search_page_settings_form($form, &$form_state, $search_page 
   }
 
   // Initializes form with common settings.
-
-
   $form['search_page'] = array(
       '#type' => 'value',
       '#value' => $search_page,
@@ -177,6 +175,8 @@ function apachesolr_search_page_settings_form($form, &$form_state, $search_page 
     '#title' => t('Search Page Information'),
     '#type' => 'fieldset',
     '#collapsible' => FALSE,
+    '#prefix' => '<div id="dynamic-search-page">',
+    '#suffix' => '</div>',
   );
 
   $core_search = FALSE;
@@ -204,7 +204,7 @@ function apachesolr_search_page_settings_form($form, &$form_state, $search_page 
     '#type' => 'textfield',
     '#required' => TRUE,
     '#maxlength' => 255,
-    '#description' => '',
+    '#description' => 'You can use %value to place the search term in the title',
     '#default_value' => !empty($search_page->page_title) ? $search_page->page_title : '',
   );
 
@@ -275,10 +275,10 @@ function apachesolr_search_page_settings_form($form, &$form_state, $search_page 
   // Results per page per search page
   $default_value = isset($search_page->settings['apachesolr_search_per_page']) ? $search_page->settings['apachesolr_search_per_page'] : '10';
   $form['advanced']['apachesolr_search_per_page'] = array(
-    '#type' => 'select',
+    '#type' => 'textfield',
+    '#size' => 3,
     '#title' => t('Results per page'),
-    '#description' => t('Select how many items will be displayed on one page of the search result.'),
-    '#options' => drupal_map_assoc(array(5, 10, 20, 30, 40, 50, 60, 80, 100)),
+    '#description' => t('How many items will be displayed on one page of the search result.'),
     '#default_value' => $default_value,
   );
 
@@ -338,21 +338,20 @@ function apachesolr_search_ajax_search_page_default($form, $form_state, $search_
 
   // Helping with sensible defaults for the search path
   $default_search_path = '';
-
   if (!empty($form_state['values']['search_type']) && $form_state['values']['search_type'] != 'custom') {
     $default_search_path = $search_types[$form_state['values']['search_type']]['default menu'];
-    $form['setup']['search_path']['#value'] = $default_search_path;
+    $form['info']['search_path']['#value'] = $default_search_path;
   }
 
   // Helping with sensible defaults for the search title
   $default_search_title = '';
 
-  if (!empty($form_state['values']['page_title']) && $form_state['values']['search_type'] != 'custom') {
+  if (empty($form_state['values']['page_title']) && $form_state['values']['search_type'] != 'custom') {
     $default_search_title_callback = $search_types[$form_state['values']['search_type']]['title callback'];
     $default_search_title = $default_search_title_callback();
-    $form['setup']['page_title']['#value'] = $default_search_title;
+    $form['info']['page_title']['#value'] = $default_search_title;
   }
-  return $form['setup'];
+  return $form['info'];
 }
 
 function apachesolr_search_page_settings_form_validate($form, &$form_state) {
@@ -363,6 +362,12 @@ function apachesolr_search_page_settings_form_validate($form, &$form_state) {
   $form_state['values']['search_path'] = trim($form_state['values']['search_path'], '/');
   if (empty($form_state['values']['search_path'])) {
     form_set_error('search_path', t('Path required.'));
+  }
+  if (empty($form_state['values']['apachesolr_search_per_page'])) {
+    form_set_error('apachesolr_search_per_page', t('The amount of search results cannot be empty.'));
+  }
+  if (!is_numeric($form_state['values']['apachesolr_search_per_page'])) {
+    form_set_error('apachesolr_search_per_page', t('The amount of search results must be an integer.'));
   }
   if ($form_state['values']['page_id'] == 'core_search') {
     if (!preg_match('@^search/[^/%]+$@', $form_state['values']['search_path'])) {
@@ -381,7 +386,7 @@ function apachesolr_search_page_settings_form_submit($form, &$form_state) {
   $settings = array();
   $settings['fq'] = array();
   if ($form_state['values']['filters']) {
-    foreach(explode(',', $form_state['values']['filters']) as $string) {
+    foreach (explode(',', $form_state['values']['filters']) as $string) {
       $string = trim($string);
       // Minimal validation.  ':' must exist and can't be the 1st char..
       if (strpos($string, ':')) {
@@ -445,7 +450,7 @@ function apachesolr_search_delete_search_page_confirm($form, &$form_state, $sear
   $return_path = 'admin/config/search/apachesolr/search-pages';
   $button_text = t('Delete page');
   if (!isset($search_page->settings['apachesolr_search_not_removable'])) {
-    return confirm_form($form, $message, $return_path, $caption, $button_text);
+    return confirm_form($form, filter_xss($message), $return_path, filter_xss($caption), check_plain($button_text));
   }
   else {
     // Maybe this should be solved somehow else
@@ -644,7 +649,7 @@ function apachesolr_search_settings_form($form, &$form_state, $fields, $env_id) 
           '#access' => $field->type == 'text',
           '#type' => 'select',
           '#options' => $weights,
-          '#title' => apachesolr_field_name_map($field_name),
+          '#title' => check_plain(apachesolr_field_name_map($field_name)),
           '#default_value' => isset($qf[$field_name]) ? $qf[$field_name] : '0',
         );
       }
@@ -655,7 +660,7 @@ function apachesolr_search_settings_form($form, &$form_state, $fields, $env_id) 
       $form['apachesolr_search_query_fields'][$field_name] = array(
         '#type' => 'select',
         '#options' => $weights,
-        '#title' => apachesolr_field_name_map($field_name),
+        '#title' => check_plain(apachesolr_field_name_map($field_name)),
         '#default_value' => isset($qf[$field_name]) ? $qf[$field_name] : $defaults[$field_name],
       );
     }

@@ -98,7 +98,7 @@ function apachesolr_environment_edit_form($form, &$form_state, $environment = NU
     '#title' => t('Make this Solr search environment the default'),
     '#default_value' => $is_default,
     '#disabled' => $is_default,
-    '#description' => $is_default ? t('Select this option for a different environment to make this one non-default.') : '',
+    '#description' => t('Set this environment as default one.'),
   );
   $form['name'] = array(
     '#type' => 'textfield',
@@ -380,22 +380,6 @@ function apachesolr_settings($form, &$form_state) {
 }
 
 /**
- * Validation function for the apachesolr_settings() form.
- */
-function apachesolr_settings_validate($form, &$form_state) {
-  $intval = intval($form_state['values']['apachesolr_rows']);
-  // TODO: does the max need to be variable?
-  $max = 200;
-  if (!is_numeric($form_state['values']['apachesolr_rows']) || $intval < 0 || $intval > $max) {
-    form_set_error('apachesolr_rows', t('Results per page should be non-negative integer less than @max.', array('@max' => $max)));
-  }
-  else {
-    // Set the integer value as the one we are saving to the variable.
-    $form_state['values']['apachesolr_rows'] = $intval;
-  }
-}
-
-/**
  * Gets information about the fields already in solr index.
  */
 function apachesolr_index_page($env_id = NULL) {
@@ -570,11 +554,11 @@ function apachesolr_index_action_form() {
     // unique id for each radio button.
     $form['action'][$key] = array(
       '#type' => 'radio',
-      '#title' => $action['title'],
+      '#title' => check_plain($action['title']),
       '#default_value' => 'remaining',
       '#return_value' => $key,
       '#parents' => array('action'),
-      '#description' => $action['description'],
+      '#description' => check_plain($action['description']),
       '#id' => drupal_clean_css_identifier('edit-' . implode('-', array('action', $key))),
     );
   }
@@ -704,30 +688,64 @@ function apachesolr_mlt_add_block_form_submit($form, &$form_state) {
  * Page callback to show available conf files.
  */
 function apachesolr_config_files_overview() {
-  $output = array();
   $xml = NULL;
   try {
     $solr = apachesolr_get_solr();
-    $response = $solr->makeServletRequest('admin/file');
+    $response = $solr->makeServletRequest('admin/file', array('wt' => 'xml'));
     $xml = simplexml_load_string($response->data);
   }
   catch (Exception $e) {
     watchdog('Apache Solr', nl2br(check_plain($e->getMessage())), NULL, WATCHDOG_ERROR);
     drupal_set_message(nl2br(check_plain($e->getMessage())), "warning");
   }
+
   if ($xml) {
-    $files = $xml->xpath('//lst[@name="files"]/lst');
-    $items = array();
-    foreach ($files as $file) {
-      $atr = $file->attributes();
-      $name = (string) $atr[0];
-      $str = l($name, 'admin/reports/apachesolr/conf/' . $name);
-      $str .= '<br />' . format_date(strtotime((string) $file->date));
-      $str .= '<br />' . t('Size (bytes): @bytes', array('@bytes' => (string) $file->long));
-      $items[$name] = $str;
+    // Retrieve our items from the xml using xpath
+    $items = $xml->xpath('//lst[@name="files"]/lst');
+
+    // Add all the data of the file in a files array
+    $files = array();
+    foreach ($items as $item_id => $item) {
+      // Do not list directories. Always a bool
+      if (isset($item->bool)) {
+        break;
+      }
+      // Get data from the files.
+      $name =  $item->attributes();
+      $name = ((string)$item->attributes()) ? (string)$item->attributes() : t('No name found');
+      $files[$item_id]['name'] = l($name, 'admin/reports/apachesolr/conf/' . $name);
+
+      // Retrieve the date attribute
+      if (isset($item->date)) {
+        $modified = ((string)$item->date->attributes() == 'modified') ? (string) $item->date : t('No date found');
+        $files[$item_id]['modified'] = format_date(strtotime($modified));
+      }
+
+      // Retrieve the size attribute
+      if (isset($item->long)) {
+        $size = ((string)$item->long->attributes() == 'size') ? (string) $item->long : t('No size found');
+        $files[$item_id]['size'] = t('Size (bytes): @bytes', array('@bytes' => $size));
+      }
     }
-    ksort($items);
-    $output = theme('item_list', array('items' => array_values($items)));
+    // Sort our files alphabetically
+    ksort($files);
+
+    // Initializes table header.
+    $header = array(
+      'name' => t('File name'),
+      'date' => t('Modified'),
+      'size' => t('Size'),
+    );
+
+    // Display the table of field names, index types, and term counts.
+    $variables = array(
+      'header' => $header,
+      'rows' => $files,
+    );
+    $output = theme('table', $variables);
+  }
+  else {
+    $output = '<p>' . t('No data about any file found.') . "</p>\n";
   }
   return $output;
 }
@@ -952,18 +970,18 @@ function apachesolr_mlt_save_block($block_settings = array(), $delta = NULL) {
   variable_set('apachesolr_mlt_blocks', $blocks);
 }
 
-function apachesolr_mlt_delete_block_form($form_state, $delta) {
+function apachesolr_mlt_delete_block_form($form, &$form_state, $delta) {
   if ($block = apachesolr_mlt_load_block($delta)) {
     $form['delta'] = array(
       '#type' => 'value',
       '#value' => $delta
     );
-
-    return confirm_form($form,
-      t('Are you sure you want to delete the Apache Solr content recommendation block %name?', array('%name' => $block['name'])),
-      'admin/structure/block',
-      t('The block will be deleted. This action cannot be undone.'),
-      t('Delete'), t('Cancel'));
+    $question = t('Are you sure you want to delete the Apache Solr content recommendation block %name?', array('%name' => $block['name']));
+    $path = 'admin/structure/block';
+    $description = t('The block will be deleted. This action cannot be undone.');
+    $yes = t('Delete');
+    $no = t('Cancel');
+    return confirm_form($form, $question, $path, $description, $yes, $no);
   }
 }
 
@@ -1060,5 +1078,5 @@ function apachesolr_batch_index_finished($success, $results, $operations) {
     $message .= ' ' . t('An error occurred while processing @num with arguments :', array('@num' => $error_operation[0])) . print_r($error_operation[0], TRUE);
     $type = 'error';
   }
-  drupal_set_message($message, $type);
+  drupal_set_message(check_plain($message), $type);
 }

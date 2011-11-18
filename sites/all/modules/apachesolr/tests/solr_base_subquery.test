@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ *   Unit tests for subquery object methods.
+ */
 class DrupalSolrSubQueryTests extends DrupalWebTestCase {
   public static function getInfo() {
     return array(

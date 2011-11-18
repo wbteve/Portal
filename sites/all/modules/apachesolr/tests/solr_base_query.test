@@ -1,7 +1,10 @@
 <?php
 
 /**
- * Unit tests for query object methods.
+ * @file
+ *   Unit tests for query object methods.
+ *
+ *
  */
 class SolrIndexHelperTests extends DrupalUnitTestCase {
   public static function getInfo() {
@@ -137,7 +140,7 @@ class SolrBaseQueryTests extends DrupalUnitTestCase {
     $subquery->addFilter('hash', apachesolr_site_hash());
     $query->addFilterSubQuery($subquery);
     $this->assertEqual(count($query->getParam('fq')), 3, count($query->getParam('fq')) . ' fq params found, expected 3 after adding subquery');
-    $this->assertEqual(array('sort_label:hello', 'label:hello', '(access__all:0 OR hash:'. apachesolr_site_hash() .')'), $query->getParam('fq'));
+    $this->assertEqual(array('sort_label:hello', 'label:hello', '(access__all:0 OR hash:' . apachesolr_site_hash() . ')'), $query->getParam('fq'));
   }
 }
 

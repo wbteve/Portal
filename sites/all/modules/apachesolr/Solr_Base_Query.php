@@ -1,6 +1,15 @@
 <?php
+/**
+ * This class allows you to make operations on a query that will be sent to
+ * Apache Solr. methods such as adding and removing sorts, remove and replace
+ * parameters, adding and removing filters, getters and setters for various
+ * parameters and more
+ * @file
+ *   Class that defines the base query for the Apache Solr Drupal module.
+ */
 
 class SolrFilterSubQuery {
+
   /**
    * Static shared by all instances, used to increment ID numbers.
    */
@@ -10,7 +19,6 @@ class SolrFilterSubQuery {
    * Each query/subquery will have a unique ID.
    */
   public $id;
-
   public $operator;
 
   /**
@@ -141,11 +149,12 @@ class SolrFilterSubQuery {
       $subfq = $subquery->rebuildFq();
       if ($subfq) {
         $operator = $subquery->operator;
-        $fq[] =  "(" . implode(" $operator ", $subfq) . ")";
+        $fq[] = "(" . implode(" $operator ", $subfq) . ")";
       }
     }
     return $fq;
   }
+
 }
 
 class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterface {
@@ -167,14 +176,13 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
   protected $solr;
   // The array keys must always be real Solr index fields.
   protected $available_sorts;
+
   /**
    * The query name is used to construct a searcher string. Typically something like 'apachesolr'
    */
   protected $name;
-
   // Makes sure we always have a valid sort.
   protected $solrsort = array('#name' => 'score', '#direction' => 'desc');
-
   // A flag to allow the search to be aborted.
   public $abort_search = FALSE;
 
@@ -231,7 +239,7 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
   }
 
   protected $single_value_params = array(
-    'q' => TRUE,    // http://wiki.apache.org/solr/SearchHandler#q
+    'q' => TRUE, // http://wiki.apache.org/solr/SearchHandler#q
     'q.op' => TRUE, // http://wiki.apache.org/solr/SearchHandler#q.op
     'q.alt' => TRUE, // http://wiki.apache.org/solr/SearchHandler#q
     'df' => TRUE,
@@ -242,6 +250,7 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
     'debugQuery' => TRUE,
     'start' => TRUE,
     'rows' => TRUE,
+    'stats' => TRUE,
     'facet' => TRUE,
     'facet.prefix' => TRUE,
     'facet.limit' => TRUE,
@@ -297,7 +306,7 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
     // For certain fields Solr prefers a comma separated list.
     foreach (array('fl', 'hl.fl', 'sort', 'mlt.fl') as $name) {
       if (isset($params[$name])) {
-        $params[$name]  = implode(',', $params[$name]);
+        $params[$name] = implode(',', $params[$name]);
       }
     }
     return $params;
@@ -317,10 +326,11 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
       $exclude = !empty($matches[1]);
       $this->addFilter('', $matches[2], $exclude, $local);
     }
-    elseif (preg_match('/(-|)([^:]+):([\("].+[\)"])/', $string, $matches)) {
+    elseif (preg_match('/(-|)([^:]+):([\("\[].+[\)"\]])/', $string, $matches)) {
       // Something with a complicated right-hand-side.
       // Ex.: bundle:(article OR page)
       // Ex.: title:"double words"
+      // Ex.: field_date:[1970-12-31T23:59:59Z TO NOW]
       $exclude = !empty($matches[1]);
       $this->addFilter($matches[2], $matches[3], $exclude, $local);
     }
@@ -405,7 +415,7 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
   }
 
   protected function parseSortString() {
-        // Substitute any field aliases with real field names.
+    // Substitute any field aliases with real field names.
     $sortstring = strtr($this->sortstring, $this->field_map);
     // Score is a special case - it's the default sort for Solr.
     if ('' == $sortstring || 'score desc' == $sortstring) {
@@ -416,7 +426,7 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
     else {
       // Validate and set sort parameter
       $fields = implode('|', array_keys($this->available_sorts));
-      if (preg_match('/^(?:('. $fields .') (asc|desc),?)+$/', $sortstring, $matches)) {
+      if (preg_match('/^(?:(' . $fields . ') (asc|desc),?)+$/', $sortstring, $matches)) {
         // We only use the last match.
         $this->solrsort['#name'] = $matches[1];
         $this->solrsort['#direction'] = $matches[2];
@@ -433,6 +443,13 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
     // We expect non-aliased sorts to be added.
     $this->available_sorts[$name] = $sort;
     // Re-parse the sortstring.
+    $this->parseSortString();
+    return $this;
+  }
+
+  public function setAvailableSorts($sorts) {
+    // We expect a complete array of valid sorts.
+    $this->available_sorts = $sorts;
     $this->parseSortString();
     return $this;
   }
@@ -468,7 +485,7 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
       if (isset($this->field_map[$solrsort['#name']])) {
         $solrsort['#name'] = $this->field_map[$solrsort['#name']];
       }
-      $queryvalues['solrsort'] = $solrsort['#name'] .' '. $solrsort['#direction'];
+      $queryvalues['solrsort'] = $solrsort['#name'] . ' ' . $solrsort['#direction'];
     }
     else {
       // Return to default relevancy sort.
@@ -487,4 +504,5 @@ class SolrBaseQuery extends SolrFilterSubQuery implements DrupalSolrQueryInterfa
   public function solr($method) {
     return $this->solr->$method();
   }
+
 }

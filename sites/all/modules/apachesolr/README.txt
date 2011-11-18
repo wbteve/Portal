@@ -51,7 +51,7 @@ application is found at apache-solr-1.4.1/example.
 Move apache-solr-1.4.1/example/solr/conf/schema.xml and rename it to
 something like schema.bak. Then move the solr-conf/schema.xml that
 comes with this Drupal module to take its place. If you are using
-Solr 3.3 or later, you can use solr-conf/schema-solr3x.xml instead.
+Solr 3.4 or later, you can use solr-conf/schema-solr3x.xml instead.
 
 Similarly, move apache-solr-1.4.1/example/solr/conf/solrconfig.xml and rename
 it like solrconfig.bak. Then move the solr-conf/solrconfig.xml that comes
@@ -77,7 +77,7 @@ apache-solr-1.4.1/example, and executing the command java -jar start.jar
 Test that your solr server is now available by visiting
 http://localhost:8983/solr/admin/
 
-Now, you should enable the "Apache Solr framework" and "Apache Solr search" 
+Now, you should enable the "Apache Solr framework" and "Apache Solr search"
 modules. Check that you can connect to Solr at ?q=admin/setting/apachesolr
 Now run cron on your Drupal site until your content is indexed. You
 can monitor the index at ?q=admin/settings/apachesolr/index
@@ -86,8 +86,11 @@ The solrconfig.xml that comes with this modules defines auto-commit, so
 it may take a few minutes between running cron and when the new content
 is visible in search.
 
-Enable blocks for facets first at Administer > Site configuration > Apache Solr > Enabled filters,
-then position them as you like at Administer > Site building > Blocks.   
+To use facets you should download facetapi http://drupal.org/project/facetapi
+This module will allow you to define and set facets next to your search pages.
+Once this module is enabled, enable blocks for facets first at
+Administer > Site configuration > Apache Solr > Enabled filters
+then position them as you like at Administer > Site building > Blocks.
 
 Configuration variables
 --------------
@@ -118,7 +121,7 @@ behavior:
    your autocommit delay plus a few seconds.
 
  - apachesolr_query_class: the default query class to use.
- 
+
  - apachesolr_index_comments_with_node: TRUE | FALSE. Whether to index comments
    along with each node.
 
@@ -151,6 +154,6 @@ important because of the on-the-fly folder creation within PHP.
 Themers
 ----------------
 
-See inline docs in apachesolr_theme and apachesolr_search_theme functions 
+See inline docs in apachesolr_theme and apachesolr_search_theme functions
 within apachesolr.module and apachesolr_search.module.
 

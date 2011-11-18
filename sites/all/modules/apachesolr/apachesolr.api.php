@@ -152,18 +152,23 @@ function hook_apachesolr_update_index($document, $node, $namespace) {
  *
  * @param object $document
  *   The ApacheSolrDocument instance.
+ * @param array $extra
+ * @param $query
  */
-function hook_apachesolr_search_result_alter($document) {
+function hook_apachesolr_search_result_alter($document, $extra, DrupalSolrQueryInterface $query) {
 }
 
 /**
- * Called by the sort link block code. Allows other modules to modify, add or
- * remove sorts.
+ * This is invoked by apachesolr_search.module for the whole resultset returned
+ * in a search.
  *
- * @param array $sort_links
- *   An associative array containing the available sorting methods.
+ * @param array $results
+ *   The returned search results.
  */
-function hook_apachesolr_sort_links_alter(&$sort_links) {
+function hook_apachesolr_process_results(&$results, DrupalSolrQueryInterface $query) {
+  foreach ($results as $id => $result) {
+    $results[$id]['title'] = t('[Result] !title', array('!title' => $result['title']));
+  }
 }
 
 /**
@@ -176,4 +181,15 @@ function hook_apachesolr_sort_links_alter(&$sort_links) {
  *   The environment object that is being deleted. No need for &.
  */
 function hook_apachesolr_environment_delete($environment) {
+}
+
+/**
+ * Modify the build array for any search output build by Apache Solr
+ * This includes core and custom pages and makes it very easy to modify both
+ * of them at once
+ */
+function hook_apachesolr_search_page_alter(&$build, $search_page) {
+  // Adds a text to the top of the page
+  $info = array('#markup' => t('Add information to every search page'));
+  array_unshift($build, $info);
 }

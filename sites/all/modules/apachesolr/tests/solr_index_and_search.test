@@ -1,9 +1,10 @@
 <?php
 
 /**
- * A test class that prvides the setUp and tearDown of a solr core on the
- * default localhost server. This server must be configured for multiple cores
- * with a solr.xml file.
+ * @file
+ *   Unit test class that provides the setUp and tearDown of a solr core on the
+ *   default localhost server. This server must be configured for multiple cores
+ *   with a solr.xml file.
  */
 class DrupalSolrWebTestCase extends DrupalWebTestCase {
   /**

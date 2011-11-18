@@ -153,7 +153,7 @@ function apachesolr_node_to_document($node, $namespace) {
  */
 function apachesolr_term_reference_indexing_callback($node, $field_name, $index_key, $field_info) {
   // Keep ancestors cached
-  static $ancestors = array();
+  $ancestors = &drupal_static(__FUNCTION__, array());
 
   $fields = array();
   $vocab_names = array();
@@ -213,7 +213,7 @@ function apachesolr_term_reference_indexing_callback($node, $field_name, $index_
  * Helper function - return a safe (PHP identifier) vocabulary name.
  */
 function apachesolr_vocab_name($vid) {
-  static $names = array();
+  $names = &drupal_static(__FUNCTION__, array());
 
   if (!isset($names[$vid])) {
     $vocab_name = db_query('SELECT v.name FROM {taxonomy_vocabulary} v WHERE v.vid = :vid', array(':vid' => $vid))->fetchField();

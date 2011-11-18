@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @file
+ *   Unit tests for the access control functionalities that are added by
+ *   apachesolr_access.
+ */
 class DrupalApacheSolrNodeAccess extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
@@ -66,7 +70,7 @@ class DrupalApacheSolrNodeAccess extends DrupalWebTestCase {
     $document = new ApacheSolrDocument();
     apachesolr_access_apachesolr_update_index($document, $role_restricted_node, 'apachesolr_search');
     $field = 'access_node_' . apachesolr_site_hash() . '_nodeaccess_rid';
-    $this->assertEqual($document->{$field}[0], $assigned_role, 'Solr Document being indexed is restricted by the proper role' . print_r(db_query('SELECT * FROM {node_access}')->fetchAllAssoc('nid'),1));
+    $this->assertEqual($document->{$field}[0], $assigned_role, 'Solr Document being indexed is restricted by the proper role' . print_r(db_query('SELECT * FROM {node_access}')->fetchAllAssoc('nid'), 1));
     $this->drupalGet('node');
 
     $document = new ApacheSolrDocument();

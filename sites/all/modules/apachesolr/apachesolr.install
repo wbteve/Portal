@@ -64,9 +64,9 @@ function apachesolr_install() {
   require_once(drupal_get_path('module', 'apachesolr') . '/apachesolr.admin.inc');
   apachesolr_mlt_save_block(array('name' => st('More like this')));
   db_insert('apachesolr_environment')->fields(array('env_id' => 'solr', 'name' => 'localhost server', 'url' => 'http://localhost:8983/solr'))->execute();
-  drupal_set_message(st('Apache Solr is enabled. Visit the <a href="!settings_link">settings page</a>.', array('!settings_link' => url('admin/config/search/apachesolr'))));
+  $message = st('Apache Solr is enabled. Visit the <a href="!settings_link">settings page</a>.', array('!settings_link' => url('admin/config/search/apachesolr')));
+  drupal_set_message(check_plain($message));
 }
-
 /**
  * Implements hook_enable().
  */
@@ -471,4 +471,36 @@ function apachesolr_update_7008() {
   variable_del('apachesolr_facet_query_sorts');
   variable_del('apachesolr_facet_sort_active');
   variable_del('apachesolr_operator');
+}
+
+/**
+ * Update Facet API block deltas to account for removal of numeric ID from field names.
+ */
+function apachesolr_update_7009() {
+  // Only run when facetapi is available and/or installed
+  if (module_exists('facetapi')) {
+    module_load_include('inc', 'facetapi', 'facetapi.block');
+    // Get all searchers
+    $searchers = facetapi_get_searcher_info();
+    $realms = facetapi_get_realm_info();
+    foreach ($searchers as $searcher_id => $searcher) {
+      foreach ($realms as $realm_id => $realm) {
+        foreach (field_info_fields() as $field_name => $field) {
+          // Generate the old delta
+          $facet_name_old = $field['id'] . '_' . $field['field_name'];
+          $delta_old = facetapi_build_delta($searcher['name'], $realm['name'], $facet_name_old);
+          $delta_old = substr(drupal_hash_base64($delta_old), 0, 32);
+          // Generate the new delta
+          $facet_name = $field['field_name'];
+          $delta = facetapi_build_delta($searcher['name'], $realm['name'], $facet_name);
+          $delta = substr(drupal_hash_base64($delta), 0, 32);
+          db_update('block')
+            ->fields(array('delta' => $delta))
+            ->condition('module', 'facetapi')
+            ->condition('delta', $delta_old)
+            ->execute();
+        }
+      }
+    }
+  }
 }
