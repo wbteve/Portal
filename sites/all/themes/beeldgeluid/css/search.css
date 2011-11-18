@@ -1,9 +1,8 @@
 @CHARSET "UTF-8";
 body.page-search #content {
- /* width: 720px;*/
+  width: 720px;
   clear: both;
   margin-right: -720px;
-  width: 480px;
 }
 body.page-search.two-sidebars #content {
  /* width: 720px;*/
