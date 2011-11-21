@@ -10,6 +10,11 @@
   background-repeat: repeat-y;
 }
 
+#facebook-page-node-form #gridui-frame {
+  height: 640px;
+  width: 240px;
+}
+
 .gridui-header {
   cursor: pointer;
 }

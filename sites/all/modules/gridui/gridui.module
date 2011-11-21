@@ -6,7 +6,7 @@ function gridui_form_alter(&$form, &$form_state, $form_id) {
   if(GRIDUI_DEBUG) dsm($form);
   if(GRIDUI_DEBUG) dsm($form_id);
 
-  if($form_id == "dossier_node_form") {
+  if(in_array($form_id, array("dossier_node_form", "facebook_page_node_form"))) {
     // Add quick actions bar.
     $form['quick_actions'] = array(
       '#type' => 'container',
