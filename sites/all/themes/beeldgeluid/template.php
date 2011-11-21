@@ -124,8 +124,6 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   global $language;
   global $user;
 
-  array_unshift($variables['theme_hook_suggestions'], 'page__'.$variables['node']->type);
-
   // Hide admin menu in embed-mode.
   if (end($variables['theme_hook_suggestions']) == 'page__node__embed') {
     module_invoke('admin_menu', 'suppress');
@@ -149,6 +147,8 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   $variables['page_title_tag'] = 'h1';
   // Code that should only run when a node is being displayed.
   if (isset($variables['node'])) {
+    array_unshift($variables['theme_hook_suggestions'], 'page__'.$variables['node']->type);
+
     // Check if the SEO header is set. If so, the page title must not be a <h1> because the SEO header will be <h1>.
     if (isset($variables['node']->field_seo_h1[$variables['node']->language])) {
       $variables['page_title_tag'] = 'h2';
