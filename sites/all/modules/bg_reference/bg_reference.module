@@ -5,6 +5,7 @@ define('CONTENT_TYPE_SEARCH_RESULT', 'search_result');
 define('CONTENT_TYPE_BANNER', 'banner');
 define('CONTENT_TYPE_EVENT', 'agenda');
 define('CONTENT_TYPE_DOSSIER', 'dossier');
+define('CONTENT_TYPE_FACEBOOK', 'facebook_page');
 
 define('UNIT_SIZE_WIDTH', 120);
 define('UNIT_SIZE_HEIGHT', 80);
@@ -29,6 +30,15 @@ function bg_reference_menu() {
   );
 
   return $items;
+}
+
+/**
+* Implements hook_preprocess_node().
+*/
+function bg_reference_preprocess_node(&$vars) {
+  if($vars['view_mode'] == 'facebook') {
+    $vars['theme_hook_suggestions'][] = 'node__' . $vars['type'] . '__facebook';
+  }
 }
 
 function bg_reference_node_view($node, $view_mode, $langcode) {
@@ -91,36 +101,45 @@ function theme_bg_reference($variables) {
         $classes[] = 'node-id-' . $match['nid'];
         if (isset($match['nid']) && $node = node_load($match['nid'])) {
 
-          $node_array = node_view($node, 'full');
+          // Render media as player for Facebook
+          if($element['#display_type'] == 'bg_reference_facebook') {
+            $node_array = node_view($node, 'facebook');
 
-          // Render main media player
-          if ($element['#data']['width'] == 4 && $element['#data']['height'] == 4 && !$main_player_rendered) {
             $content = drupal_render($node_array);
-            $classes[] = 'main-media-player';
-            $classes[] = 'main-media-player-type-' . $node->field_media_file[$node->language][0]['file']->type;
-            drupal_add_js(array('bg_reference' => array('mainMediaNid' => $node->nid)), 'setting');
-            $main_player_rendered = TRUE;
           }
-          // Render media thumbnail
+          // Else render default
           else {
-            $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
-              'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
-              'label' => 'hidden',
-              'settings' => array(
-                'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
-              ),
-            ));
+            $node_array = node_view($node, 'full');
 
-            $classes[] = 'media-type-' . $node->field_media_file[$node->language][0]['file']->type;
+            // Render main media player
+            if ($element['#data']['width'] == 4 && $element['#data']['height'] == 4 && !$main_player_rendered) {
+              $content = drupal_render($node_array);
+              $classes[] = 'main-media-player';
+              $classes[] = 'main-media-player-type-' . $node->field_media_file[$node->language][0]['file']->type;
+              drupal_add_js(array('bg_reference' => array('mainMediaNid' => $node->nid)), 'setting');
+              $main_player_rendered = TRUE;
+            }
+            // Render media thumbnail
+            else {
+              $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
+                'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
+                'label' => 'hidden',
+                'settings' => array(
+                  'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+                ),
+              ));
 
-            $row = isset($element['#data']['delta']) ? $element['#data']['delta'] : $row;
-            $link = bg_reference_ajax_text_button('', "node/{$node->nid}", t('View @title', array('@title' => $node->title)), "{$node->nid}|{$row}");
-            $link_close_length = strlen('</a>');
+              $classes[] = 'media-type-' . $node->field_media_file[$node->language][0]['file']->type;
 
-            $node_array['field_media_file'][0]['#prefix'] = substr($link, 0, -$link_close_length);
-            $node_array['field_media_file'][0]['#suffix'] = substr($link, -$link_close_length);
+              $row = isset($element['#data']['delta']) ? $element['#data']['delta'] : $row;
+              $link = bg_reference_ajax_text_button('', "node/{$node->nid}", t('View @title', array('@title' => $node->title)), "{$node->nid}|{$row}");
+              $link_close_length = strlen('</a>');
 
-            $content = drupal_render($node_array['field_media_file']);
+              $node_array['field_media_file'][0]['#prefix'] = substr($link, 0, -$link_close_length);
+              $node_array['field_media_file'][0]['#suffix'] = substr($link, -$link_close_length);
+
+              $content = drupal_render($node_array['field_media_file']);
+            }
           }
         }
       }
@@ -185,6 +204,10 @@ function theme_bg_reference($variables) {
 function bg_reference_entity_info_alter(&$entity_info) {
   $entity_info['node']['view modes']['dossier'] = array(
     'label' => t('In dossier'),
+    'custom settings' => TRUE,
+  );
+  $entity_info['node']['view modes']['facebook'] = array(
+    'label' => t('In Facebook'),
     'custom settings' => TRUE,
   );
 }
@@ -284,6 +307,10 @@ function bg_reference_field_formatter_info() {
       'label' => t('Default display'),
       'field types' => array('bg_reference'),
     ),
+    'bg_reference_facebook' => array(
+      'label' => t('Facebook display'),
+      'field types' => array('bg_reference'),
+    ),
   );
 }
 
@@ -292,29 +319,37 @@ function bg_reference_field_formatter_info() {
  */
 function bg_reference_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
   $element = array();
+  $height = 0;
 
-  if($display['type'] == 'bg_reference_default') {
-    // We want to center the dossier.
-    $x_high = 1;
-    foreach ($items as $delta => $item) {
-      $item_x_high = $item['pos_x']+$item['width']-1;
-      if ($item_x_high > $x_high) {
-        $x_high = $item_x_high;
+  switch($display['type']) {
+    case 'bg_reference_facebook':
+    case 'bg_reference_default':
+      // We want to center the dossier.
+      $x_high = 1;
+      foreach ($items as $delta => $item) {
+        $item_x_high = $item['pos_x']+$item['width']-1;
+        if ($item_x_high > $x_high) {
+          $x_high = $item_x_high;
+        }
+
+        $item_height = $item['pos_y'] + $item['height'];
+        $height = $item_height > $height ? $item_height : $height;
+
+        $element[$delta] = array(
+          '#theme'        => 'bg_reference',
+          '#data'         => $item,
+          '#display_type' => $display['type'],
+        );
       }
-    }
-
-    foreach ($items as $delta => $item) {
-      $element[$delta] = array(
-        '#theme'  => 'bg_reference',
-        '#data'   => $item
-      );
-    }
+      break;
   }
+
+  $height = $height * UNIT_SIZE_HEIGHT;
 
   $width = ($x_high) * UNIT_SIZE_WIDTH;
   $element['#type'] = 'container';
   // Set styling for non-js browsers.
-  $element['#attributes'] = array('id' => 'dossier-container', 'style' => 'width: ' . $width . 'px; margin: 0 auto');
+  $element['#attributes'] = array('id' => 'dossier-container', 'style' => 'width: ' . $width . 'px; height: ' . $height . 'px; margin: 0 auto');
 
   return $element;
 }

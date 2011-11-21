@@ -16,13 +16,18 @@ function bg_media_preprocess_bg_media_video(&$vars) {
   $js_path = drupal_get_path('module', 'bg_media') . '/includes/js';
   drupal_add_js($js_path . '/bg_media.js');
 
+  $player_id = drupal_html_id(BG_MEDIA_FLASH_PLAYER_ID);
+
+  // Add the videojs library to the page.
+  bg_media_load_videojs();
+
   if($wrapper instanceof MediaYouTubeStreamWrapper) {
     $vars['video'] = theme('media_youtube_video', array('uri' => $vars['file']->uri, 'width' => $vars['width'], 'height' => $vars['height']));
   }
   // Theming of Barend en Van Dorp items
   if($wrapper instanceof MediaBVDStreamWrapper || $wrapper instanceof MediaProlocationStreamWrapper) {
-    $vars['video'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '" class="flowplayer"></div>';
-    flowplayer_add('#' . BG_MEDIA_FLASH_PLAYER_ID, array(
+    $vars['video'] = '<div id="' . $player_id . '" class="flowplayer"></div>';
+    flowplayer_add('#' . $player_id, array(
       'logo'  => array(
         'url' => 'branding.png',
         'fullscreenOnly' => false,
@@ -57,9 +62,6 @@ function bg_media_preprocess_bg_media_video(&$vars) {
   else if($wrapper instanceof BGMediaStreamWrapper) {
     $fallback_video_url = null;
 
-    // Add the videojs library to the page.
-    bg_media_load_videojs();
-
     $vars['videos']           = array();
     $vars['thumbnail']        = file_create_url($wrapper->getLocalThumbnailPath());
     $vars['video_candidates'] = $wrapper->getMultiExternalUrl();
@@ -67,8 +69,8 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     // Extract fallback video and HTML5 playable video's
     bg_media_get_videos($vars['video_candidates'], $vars['videos'], $fallback_video_url);
 
-    $vars['flash_video'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '" class="flowplayer vjs-flash-fallback"></div>';
-    flowplayer_add('#' . BG_MEDIA_FLASH_PLAYER_ID, array(
+    $vars['flash_video'] = '<div id="' . $player_id . '" class="flowplayer vjs-flash-fallback"></div>';
+    flowplayer_add('#' . $player_id, array(
       'logo'  => array(
         'url' => 'branding.png',
         'fullscreenOnly' => false,
@@ -98,9 +100,6 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     $poster_path  = base_path() . file_icon_path((object)$vars['file'], $icon_path);
     $fallback_video_url = null;
 
-    // Add the videojs library to the page.
-    bg_media_load_videojs();
-
     $vars['videos']           = array();
     $vars['thumbnail']        = file_create_url($poster_path);
     $vars['video_candidates'] = array($vars['file']->uri);
@@ -108,8 +107,8 @@ function bg_media_preprocess_bg_media_video(&$vars) {
     // Extract fallback video and HTML5 playable video's
     bg_media_get_videos($vars['video_candidates'], $vars['videos'], $fallback_video_url);
 
-    $vars['flash_video'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '" class="flowplayer vjs-flash-fallback"></div>';
-    flowplayer_add('#' . BG_MEDIA_FLASH_PLAYER_ID, array(
+    $vars['flash_video'] = '<div id="' . $player_id . '" class="flowplayer vjs-flash-fallback"></div>';
+    flowplayer_add('#' . $player_id, array(
       'logo'  => array(
         'url' => 'branding.png',
         'fullscreenOnly' => false,
@@ -143,6 +142,8 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
   $js_path      = drupal_get_path('module', 'bg_media') . '/includes/js';
   drupal_add_js($js_path . '/bg_media.js');
 
+  $player_id = drupal_html_id(BG_MEDIA_FLASH_PLAYER_ID);
+
   $icon_path    = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
   $poster_path  = base_path() . file_icon_path((object)$vars['file'], $icon_path);
 
@@ -151,8 +152,8 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
   $vars['url'] = base_path() . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename;
   $vars['mimetype'] = $vars['file']->filemime;
 
-  $vars['flash_audio'] = '<div id="' . BG_MEDIA_FLASH_PLAYER_ID . '" class="flowplayer"></div>';
-  flowplayer_add('#' . BG_MEDIA_FLASH_PLAYER_ID, array(
+  $vars['flash_audio'] = '<div id="' . $player_id . '" class="flowplayer"></div>';
+  flowplayer_add('#' . $player_id, array(
     'playlist'  => array(
       array(
         'url'       => $poster_path,
@@ -199,6 +200,15 @@ function theme_bg_media_image(&$vars) {
 }
 
 function bg_media_load_videojs() {
+  static $loaded;
+
+  if(!isset($loaded)) {
+    $loaded = false;
+  }
+  else if($loaded) {
+    return;
+  }
+
   $videojs_file_types = videojs_add(FALSE);
   foreach($videojs_file_types as $type => $file_type) {
     $function = "drupal_add_$type";
@@ -213,6 +223,8 @@ function bg_media_load_videojs() {
       $function($file['data'], $file['type']);
     }
   }
+
+  $loaded = TRUE;
 }
 
 function bg_media_get_videos($candidates, &$videos, &$fallback_video_url) {

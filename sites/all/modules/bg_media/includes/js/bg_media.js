@@ -1,6 +1,8 @@
 (function($) {
+  var initializedVideoPlayer = false;
+
   Drupal.BGMediaPlayerLoadHandler = function() {
-    if(typeof(VideoJS) == 'function') {
+    if(typeof(VideoJS) == 'function' && (!Drupal.settings.bgMedia.initOnce || (Drupal.settings.bgMedia.initOnce && !initializedVideoPlayer))) {
       var video = document.createElement("video");
       var videotagsupport = !!video.canPlayType;
 
@@ -12,6 +14,8 @@
       // RVW: Removed $('#media-video').bind('play', function(){Drupal.BGMediaPlayerPlayHandler();});
       // RVW: Removed $('#media-video').bind('pause', function(){Drupal.BGMediaPlayerStopHandler();});
     }
+
+    initializedVideoPlayer = true;
   }
 
   Drupal.BGMediaPlayerPlayHandler = function() {

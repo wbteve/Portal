@@ -1,9 +1,13 @@
 <?php
 define('BG_MEDIA_THEME_FUNCTION_PREFIX', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
+define('BG_MEDIA_DISPLAY_TYPE_MEDIA_FACEBOOK', 'bg_media_facebook');
 define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
 define('BG_MEDIA_DISPLAY_TYPE_LENGTH', 'bg_media_length');
 define('BG_MEDIA_FLASH_PLAYER_ID', 'flash-media-player');
+
+define('BG_MEDIA_FACEBOOK_PLAYER_WIDTH', 360);
+define('BG_MEDIA_FACEBOOK_PLAYER_HEIGHT', 240);
 
 if(arg(2) == 'embed') {
   define('BG_MEDIA_PLAYER_WIDTH', 480);
@@ -15,7 +19,8 @@ else {
 }
 
 function bg_media_node_view($node, $view_mode, $langcode) {
-  if($node->type == CONTENT_TYPE_DOSSIER) {
+  if(in_array($node->type, array(CONTENT_TYPE_DOSSIER, CONTENT_TYPE_FACEBOOK))) {
+    drupal_add_js(array('bgMedia' => array('initOnce' => $node->type == CONTENT_TYPE_FACEBOOK)), 'setting');
     drupal_add_js(drupal_get_path('module', 'bg_media') . '/includes/js/bg_media.js');
   }
 }
@@ -123,10 +128,15 @@ function bg_media_stream_wrappers() {
  */
 function bg_media_field_formatter_info() {
   return array(
+    BG_MEDIA_DISPLAY_TYPE_MEDIA_FACEBOOK => array(
+      'label'       => t('Beeld en Geluid: Media for Facebook page'),
+      'field types' => array('file', 'media'),
+      'description' => t('Display Beeld en Geluid media.'),
+    ),
     BG_MEDIA_DISPLAY_TYPE_MEDIA => array(
       'label'       => t('Beeld en Geluid: Media'),
       'field types' => array('file', 'media'),
-      'description' => t('Display a Beeld en Geluid media.'),
+      'description' => t('Display Beeld en Geluid media.'),
     ),
     BG_MEDIA_DISPLAY_TYPE_THUMBNAIL => array(
       'label'       => t('Beeld en Geluid: Media thumbnail'),
@@ -149,6 +159,24 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
 
   list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
   switch ($display['type']) {
+    case BG_MEDIA_DISPLAY_TYPE_MEDIA_FACEBOOK:
+      $theme_registry = array_keys(theme_get_registry());
+
+      foreach($items as $item) {
+        $theme_function = BG_MEDIA_THEME_FUNCTION_PREFIX . '_' . $item['file']->type;
+
+        // Check if theme function exists for this media type
+        if(in_array($theme_function, $theme_registry)) {
+          $element[] = array(
+            '#theme' => $theme_function,
+            '#file' => $item['file'],
+            '#width' => BG_MEDIA_FACEBOOK_PLAYER_WIDTH,
+            '#height' => BG_MEDIA_FACEBOOK_PLAYER_HEIGHT,
+          );
+        }
+      }
+      break;
+
     case BG_MEDIA_DISPLAY_TYPE_MEDIA:
       $theme_registry = array_keys(theme_get_registry());
 
