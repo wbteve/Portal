@@ -18,6 +18,10 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+body.node-type-facebook-page {
+  background: #FFFFFF url(../images/facebook_page_bg.jpg) repeat-y;
+}
+
 body.page-node-embed {
   background-color: #4a4a4a;
 }

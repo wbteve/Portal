@@ -1,7 +1,7 @@
 (function ($) {
-  
+
   var dossierWidth = 0;
-  
+
   Drupal.behaviors.bgSearchResults = {
     attach: function (context, settings) {
       $('.search-result').css({'cursor': 'pointer'});
@@ -73,7 +73,7 @@
 
   Drupal.behaviors.bgDossierPosition = {
     attach: function (context, settings) {
-      var dossier = $('#dossier-container');
+      var dossier = $('body.node-type-dossier #dossier-container');
       if (dossier.length > 0) {
         if(!dossierWidth){
           $(".dossier-element").each(function() {

@@ -124,6 +124,8 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   global $language;
   global $user;
 
+  array_unshift($variables['theme_hook_suggestions'], 'page__'.$variables['node']->type);
+
   // Hide admin menu in embed-mode.
   if (end($variables['theme_hook_suggestions']) == 'page__node__embed') {
     module_invoke('admin_menu', 'suppress');
@@ -141,6 +143,8 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
   if ($user->uid == 1) {
     $show_tabs = TRUE;
   }
+
+
 
   $variables['page_title_tag'] = 'h1';
   // Code that should only run when a node is being displayed.
@@ -179,7 +183,7 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
       '<p class="search-info-bottom">' . t('@result_count results', array('@result_count' => $adapter->getResultCount()));
 
     $variables['search_advanced_info'] = '<p class="search-advanced-link"><a href="http://zoeken.beeldengeluid.nl" target="_blank">Duik nog dieper in onze archieven.</a></p> <p class="search-advanced-more-info">U zoekt nu binnen deze website en de media-items die we online kunnen vertonen. Ga naar <a href="http://zoeken.beeldengeluid.nl">zoeken.beeldengeluid.nl</a> voor uitgebreid zoeken in het hele Beeld en Geluid archief en direct bestellen van fragmenten.</p>';
-    
+
     $variables['search_display_switch'] = array(
       '#markup' => l(t('Block view'), 'search/site/' . $adapter->getSearchKeys(), array(
           'query' => $adapter->getParams(),

@@ -283,3 +283,13 @@ body.page-node-embed #flash-media-player {
 .ui-effects-transfer {
   border: 5px solid #E00034;
 }
+
+body.node-type-facebook-page .node-media .video-titlebar {
+  position: absolute;
+  width: 340px;
+}
+
+body.node-type-facebook-page .node-media .field-name-field-media-file {
+  width: auto;
+  float: none;
+}
