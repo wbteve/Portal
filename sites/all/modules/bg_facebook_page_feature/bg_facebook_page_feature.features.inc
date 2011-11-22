@@ -9,6 +9,10 @@
  */
 function bg_facebook_page_feature_ctools_plugin_api() {
   list($module, $api) = func_get_args();
+  if ($module == "apachesolr" && $api == "default_apachesolr_environment_variables") {
+    return array("version" => 1);
+  }
+  list($module, $api) = func_get_args();
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => 1);
   }
@@ -24,7 +28,7 @@ function bg_facebook_page_feature_node_info() {
       'base' => 'node_content',
       'description' => '',
       'has_title' => '1',
-      'title_label' => t('Title'),
+      'title_label' => t('Titel'),
       'help' => '',
     ),
   );
