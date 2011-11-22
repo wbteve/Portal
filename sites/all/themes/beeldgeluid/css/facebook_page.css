@@ -2,6 +2,7 @@
 
 body.node-type-facebook-page {
   font-size: 0.8em;
+  overflow-x: hidden;
 }
 
 body.node-type-facebook-page h2,
