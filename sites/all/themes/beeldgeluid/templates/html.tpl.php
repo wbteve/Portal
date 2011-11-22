@@ -78,8 +78,16 @@
   <div id="fb-root"></div>
   <script>
     window.fbAsyncInit = function() {
-      FB.init({appId: '<?php echo variable_get('serviceconnect_facebook_application_id', ''); ?>', status: true, cookie: true,
-               xfbml: true});
+      FB.init({
+        appId: '<?php echo variable_get('serviceconnect_facebook_application_id', ''); ?>',
+        status: true,
+        cookie: true,
+        xfbml: true
+      });
+
+      // this resizes the the i-frame
+      // on an interval of 100ms
+      FB.Canvas.setAutoResize(100);
     };
     (function() {
       var e = document.createElement('script');
