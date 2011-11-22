@@ -73,17 +73,21 @@
 
   Drupal.behaviors.bgDossierPosition = {
     attach: function (context, settings) {
-      var dossier = $('body.node-type-dossier #dossier-container');
-      if (dossier.length > 0) {
+      var $dossierContent = $('body.node-type-dossier .dossier-content');
+      var $dossierContainer = $('body.node-type-dossier #dossier-container');
+
+      if ($dossierContainer.length > 0) {
+        $dossierContent.height($dossierContainer.height());
+
         if(!dossierWidth){
           $(".dossier-element").each(function() {
             var width = $(this).position().left + $(this).width();
             if(dossierWidth < width) dossierWidth = width;
           });
         }
-        resizeDossier(dossier);
+        resizeDossier($dossierContainer);
         $(window).resize(function() {
-          resizeDossier(dossier);
+          resizeDossier($dossierContainer);
         });
       }
     }
