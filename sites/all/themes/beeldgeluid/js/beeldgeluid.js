@@ -95,13 +95,13 @@
 
   Drupal.behaviors.bgImgHover = {
     attach: function (context, settings) {
-      $('.dossier-element-1x1 .dossier-element-text-inner, .dossier-element-agenda-1x1 .node-agenda-view-mode-dossier').each(function() {
+      $('.node-type-dossier .dossier-element-1x1 .dossier-element-text-inner, .node-type-dossier .dossier-element-agenda-1x1 .node-agenda-view-mode-dossier').each(function() {
         $(this).hover(
           function() { $(this).addClass('dossier-text-hover'); },
           function() { $(this).removeClass('dossier-text-hover'); }
         );
       });
-      $('.dossier-element .use-ajax').each(function() {
+      $('.node-type-dossier .dossier-element .use-ajax').each(function() {
         $(this).hover(
           function() {
             // MouseIn
