@@ -10,6 +10,15 @@
  * Preprocess function for theme('media_youtube_video').
  */
 function media_youtube_preprocess_media_youtube_video(&$variables) {
+
+  // Check which protocal to use
+  $ssl = (!empty($_SERVER['HTTPS']));
+  if ($ssl) {
+      $str_protocol = "https";
+  } else {
+      $str_protocol = "http";
+  }
+
   // Build the URL for display.
   $uri = $variables['uri'];
   $wrapper = file_stream_wrapper_get_instance_by_uri($uri);
@@ -29,10 +38,10 @@ function media_youtube_preprocess_media_youtube_video(&$variables) {
   // by an iframe, so that we can support users without Flash.
   $variables['output'] = <<<OUTPUT
     <object width="{$variables['width']}" height="{$variables['height']}">
-      <param name="movie" value="http://www.youtube.com/v/{$variables['video_id']}"></param>
+      <param name="movie" value="{$str_protocol}://www.youtube.com/v/{$variables['video_id']}"></param>
       <param name="allowFullScreen" value="{$variables['fullscreen']}"></param>
       <param name="wmode" value="transparent" />
-      <embed src="http://www.youtube.com/v/{$variables['video_id']}" type="application/x-shockwave-flash" width="{$variables['width']}" height="{$variables['height']}" allowfullscreen="{$variables['fullscreen']}"></embed>
+      <embed src="{$str_protocol}://www.youtube.com/v/{$variables['video_id']}" type="application/x-shockwave-flash" width="{$variables['width']}" height="{$variables['height']}" allowfullscreen="{$variables['fullscreen']}"></embed>
     </object>
 OUTPUT;
 
