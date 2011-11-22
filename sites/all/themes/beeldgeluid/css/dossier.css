@@ -228,6 +228,11 @@ body.page-node-embed #flash-media-player {
   height: 320px;
 }
 
+body.node-type-facebook-page .flowplayer {
+  width: 360px !important;
+  height: 240px !important;
+}
+
 #main .dossier-element .field-type-media .field-item  {
   height: inherit;
   width: inherit;

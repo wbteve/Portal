@@ -1,0 +1,36 @@
+@CHARSET "UTF-8";
+
+body.node-type-facebook-page {
+  font-size: 0.8em;
+}
+
+body.node-type-facebook-page h2,
+body.node-type-facebook-page h3,
+body.node-type-facebook-page h4 {
+  color: #FFFFFF;
+  margin: 0;
+  line-height: 1em;
+}
+
+body.node-type-facebook-page .dossier-element-black h2,
+body.node-type-facebook-page .dossier-element-black h3,
+body.node-type-facebook-page .dossier-element-black h4 {
+  color: #000000;
+}
+
+body.node-type-facebook-page h2 {
+  font-size: 2.5em;
+}
+
+body.node-type-facebook-page h3 {
+  font-size: 1.6em;
+}
+
+body.node-type-facebook-page h4 {
+  font-size: 0.9em;
+}
+
+body.node-type-facebook-page p {
+  font-size: 0.9em;
+  line-height: 1.6667em;
+}
