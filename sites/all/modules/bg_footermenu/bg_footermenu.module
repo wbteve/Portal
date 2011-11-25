@@ -45,11 +45,12 @@ function render_footer_menu($menu_name = 'menu-footer-menu') {
   $footer = '';
   $tree = menu_tree_all_data($menu_name);
   $i = 0;
+  dsm($tree);
   foreach($tree as $branch) {
     if(is_array($branch) && is_array($branch['below']) && !$branch['link']['hidden']){
       $i++;
       $footer .= '<div id="column-' . $i . '" class="footer-column">';
-      $footer .= '<h2 class="title">' . $branch['link']['title'] . '</h2>';
+      $footer .= '<h2 class="title">' . l($branch['link']['title'], $branch['link']['link_path']) . '</h2>';
       $footer .= (!empty($branch['below']) ? drupal_render(menu_tree_output($branch['below'])) : '&nbsp;');
       $footer .= '</div>';
     }
