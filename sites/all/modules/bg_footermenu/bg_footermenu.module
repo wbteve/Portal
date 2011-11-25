@@ -45,7 +45,6 @@ function render_footer_menu($menu_name = 'menu-footer-menu') {
   $footer = '';
   $tree = menu_tree_all_data($menu_name);
   $i = 0;
-  dsm($tree);
   foreach($tree as $branch) {
     if(is_array($branch) && is_array($branch['below']) && !$branch['link']['hidden']){
       $i++;
