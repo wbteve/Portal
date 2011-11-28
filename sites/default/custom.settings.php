@@ -458,3 +458,13 @@ ini_set('session.cookie_lifetime', 2000000);
  * Remove the leading hash signs to disable.
  */
 # $conf['allow_authorize_operations'] = FALSE;
+
+/**
+ * Varnish configuration
+ */
+// Add Varnish as the page cache handler.
+$conf['cache_backends'] = array('sites/all/modules/varnish/varnish.cache.inc');
+$conf['cache_class_cache_page'] = 'VarnishCache';
+// Drupal 7 does not cache pages when we invoke hooks during bootstrap. This needs
+// to be disabled.
+$conf['page_cache_invoke_hooks'] = FALSE;
