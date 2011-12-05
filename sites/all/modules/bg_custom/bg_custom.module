@@ -66,7 +66,12 @@ function bg_custom_node_load($nodes, $types) {
               $uri = $wrapper->getLocalThumbnailPath();
             }
             else if($wrapper instanceof DrupalPublicStreamWrapper) {
-              $uri = $file->uri;
+              if ($file->type == 'audio') {
+                $uri = url(drupal_get_path('module', 'media') . '/images/icons/default/audio-mpeg.png', array('absolute' => true));
+              }
+              else {
+                $uri = $file->uri;
+              }
             }
             
             if(isset($uri)) {
