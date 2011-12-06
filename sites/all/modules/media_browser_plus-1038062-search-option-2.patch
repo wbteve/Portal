@@ -1,0 +1,376 @@
+diff --git a/includes/media_browser_plus.pages.inc b/includes/media_browser_plus.pages.inc
+index 2e50494..0fee4de 100644
+--- a/includes/media_browser_plus.pages.inc
++++ b/includes/media_browser_plus.pages.inc
+@@ -5,38 +5,6 @@
+  */
+ 
+ /**
+- * Create a form to edit multiple file entities.
+- *
+- * @param $fids Array with file id's.
+- */
+-function media_browser_plus_edit_multiple_form($fids) {
+-  $ids = explode(' ', $fids);
+-  $variables = array('ids' => $ids, 'paging' => FALSE, 'apply_filter' => FALSE);
+-  $media_items = media_browser_plus_load_multiple($variables)->results;
+-
+-  // Produce form via multiform.
+-  module_load_include('inc', 'media', 'includes/media.pages');
+-  $form = media_page_multiedit($media_items);
+-
+-  // @TODO: change to normale redirect once this works with multiform
+-  if (isset($_POST['op'])) {
+-    if (isset($_GET['destination'])) {
+-      $destination = drupal_get_destination();
+-      unset($_GET['destination']);
+-    }
+-    $destination = isset($destination['destination']) ? $destination['destination'] : 'admin/content/media';
+-    if ($_POST['op'] === 'Save' && !form_get_errors()) {
+-      drupal_set_message(t('Media items changed successfully'));
+-      drupal_goto($destination);
+-    }
+-    if ($_POST['op'] === 'Cancel') {
+-      drupal_goto($destination);
+-    }
+-  }
+-  return $form;
+-}
+-
+-/**
+  * Provide a form to confirm the deletion of multiple file entites.
+  *
+  * @param $form
+diff --git a/js/media_browser_plus.admin.js b/js/media_browser_plus.admin.js
+index 649a55d..1ba292a 100644
+--- a/js/media_browser_plus.admin.js
++++ b/js/media_browser_plus.admin.js
+@@ -125,6 +125,15 @@
+         Drupal.behaviors.media_browser_folders.selectMediaItems();
+         return false;
+       });
++      $('fieldset.filters').bind('collapsed', function( event ) {
++        Drupal.behaviors.media_browser_folders.resizeForFieldset(this, 0);
++      });
++    },
++    // Resized wrapper iframe when fieldset is expanding/colapsing.
++    resizeForFieldset : function (context, i) {
++      Drupal.media.browser.resizeIframe();
++      if (context.animating && i < 200)
++        setTimeout(function() {Drupal.behaviors.media_browser_folders.resizeForFieldset(context, i+1)}, 10);
+     },
+     // function which moves an image into a new folder
+     moveImage : function (event , ui) {
+@@ -209,8 +218,19 @@
+       }
+     },
+     loadFolderContents: function ($item, $page) {
++      /* We added this lines for ajax filters on popup library to work. Content was not re-loaded, when this kind of ajax filter was
++       * used before, since if-statement from below stoped it. 
++       * 
++       * Then we added this line, which checks if this reload is triggered by ajax filters and reload contents anyway (even if we change same folder
++       * and same page - which we want to do here.)
++       * 
++       * We immediatley set this to false, to prevent reloads of same folder/page right after this initial load was executed.
++       */
++      var ajax_filters = Drupal.settings.media_browser_plus.ajax_filters != undefined && Drupal.settings.media_browser_plus.ajax_filters == 1;
++      Drupal.settings.media_browser_plus.ajax_filters = 0;
++
+       // check against double loading of the same folder
+-      if($item.hasClass('selectedFolder') && $page == Drupal.settings.media_browser_plus.page) {
++      if(!ajax_filters && $item.hasClass('selectedFolder') && $page == Drupal.settings.media_browser_plus.page) {
+         return;
+       }
+       $('.selectedFolder').removeClass('selectedFolder');
+diff --git a/media_browser_plus.info b/media_browser_plus.info
+index b7fd56d..57604fd 100644
+--- a/media_browser_plus.info
++++ b/media_browser_plus.info
+@@ -5,4 +5,3 @@ core = 7.x
+ 
+ dependencies[] = media
+ dependencies[] = taxonomy
+-dependencies[] = multiform
+diff --git a/media_browser_plus.module b/media_browser_plus.module
+index ae565a6..6566261 100644
+--- a/media_browser_plus.module
++++ b/media_browser_plus.module
+@@ -81,7 +81,7 @@ function media_browser_plus_media_admin_validate($form, &$form_state) {
+ function media_browser_plus_edit_multiple_redirect($form, &$form_state) {
+   $fids = implode(' ', array_keys(array_filter($form_state['values']['files'])));
+   $form_state['redirect'] = array(
+-    'admin/content/media/edit_multiple/' . $fids,
++    'media/' . $fids . '/multiedit',
+     array('query' => array('destination' => 'admin/content/media/thumbnails')),
+   );
+ }
+@@ -130,22 +130,12 @@ function media_browser_plus_download_images_submit($form, &$form_state) {
+         $zip->addFile(drupal_realpath($media->uri), $media->filename);
+       }
+       $zip->close();
+-      /** OLD
+-      header('Content-type: application/zip');
+-      header('Content-Disposition: attachment; filename=' . $zip_file);
+-      header('Content-Length: ' . filesize($zip_file));
+-      header('Pragma: no-cache');
+-      header('Expires: 0');
+-      */
+       header('Cache-Control: public');
+       header('Pragma: public');
+       header('Expires: 0');
+       header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+       header('Cache-Control: public');
+-      // header('Content-Description: File Transfer');
+-      // header('Content-type: application/zip');
+       header('Content-Disposition: attachment; filename=' . $zip_file);
+-      // header('Content-Transfer-Encoding: binary');
+       header('Content-length: ' . filesize($zip_file));
+       readfile($zip_file);
+       unlink($zip_file);
+@@ -605,10 +595,15 @@ function media_browser_plus_submit($form, &$form_state) {
+ function media_browser_plus_edit_file_submit($form, &$form_state) {
+   $media = $form_state['file'];
+   $folder_id = $media->field_folder[LANGUAGE_NONE][0]['tid'];
+-  // Only save it if the folder id is changed
+-  if ($form['field_folder'][LANGUAGE_NONE]['#default_value'][0] != $folder_id) {
+-    media_browser_plus_move_file($folder_id, $media);
++  // Check for folder change
++  if (isset($form['field_folder'][LANGUAGE_NONE]['#default_value'][0]) &&
++      $form['field_folder'][LANGUAGE_NONE]['#default_value'][0] != $folder_id) {
++    // and move file if folder changed
++    if (!media_browser_plus_move_file($folder_id, $media)) {
++      form_set_error('field_folder', t('Unable to change the folder!'));
++    }
+   }
++  
+ }
+ 
+ /**
+@@ -796,14 +791,6 @@ function media_browser_plus_menu() {
+     'access callback' => 'media_access',
+     'access arguments' => array('administer'),
+   );
+-  $items['admin/content/media/edit_multiple/%'] = array(
+-    'title' => 'Edit Media Items',
+-    'page callback' => 'media_browser_plus_edit_multiple_form',
+-    'page arguments' => array(4),
+-    'file' => 'includes/media_browser_plus.pages.inc',
+-    'access callback' => 'media_access',
+-    'access arguments' => array('edit'),
+-  );
+   $items['admin/content/media/delete_multiple/%'] = array(
+     'title' => 'Delete Media Items',
+     'page callback' => 'drupal_get_form',
+@@ -1016,19 +1003,6 @@ function media_browser_plus_file_download_access_alter(&$grants, $field, $entity
+ }
+ 
+ /**
+- * Implements hook_media_operations().
+- */
+-function media_browser_plus_media_operations() {
+-  return array(
+-    'edit_multiple' => array(
+-      'label' => t('Edit'),
+-      'callback' => NULL,
+-      'redirect' => 'admin/content/media/edit_multiple/%fids',
+-    ),
+-  );
+-}
+-
+-/**
+  * Manages access for media browser plus actions.
+  *
+  * @param $op
+@@ -1821,16 +1795,187 @@ function media_browser_plus_library_browser($form, &$form_state, $multiselect, $
+   drupal_add_library('system', 'ui.droppable');
+   // Removing options form part.
+   unset($form['options']);
+-  if (!media_browser_plus_access('media list view') || !media_browser_plus_access('media grid view')) {
++  if (!media_browser_plus_access('media list view') ||
++    !media_browser_plus_access('media grid view')) {
+     unset($form['switch']);
+   }
+-  // Add main grid view window.
+-  $form['admin'] = media_browser_plus_grid_view_form(TRUE, $multiselect);
+-  // Append media basket only for multi select.
++  // Wrapper for ajax replace.
++  $form['ajax_wrapper'] = array(
++    '#type' => 'container',
++    '#attributes' => array(
++      'id' => 'ajax-wrapper',
++    ),
++  );
++
++  // Add filters.
++  _media_browser_plus_library_browser_filters($form, $form_state);
++
++  // add main grid view window
++  $form['ajax_wrapper']['admin'] = media_browser_plus_grid_view_form(true, $multiselect);
++  // append media basket only for multi select
+   if ($multiselect) {
+-    $form['media-basket'] = media_browser_plus_media_basket_form(TRUE);
++    $form['ajax_wrapper']['media-basket'] = media_browser_plus_media_basket_form(true);
+   }
+   return $form;
++  }
++
++/**
++ * Adds filters fieldset to form.
++ */
++function _media_browser_plus_library_browser_filters(&$form, &$form_state) {
++  /*
++   *  Calculate default filter values.
++   */
++  $filter_active = FALSE;
++  
++  // Tags.
++  $field_tags = '';
++  if (isset($_SESSION['media-filter']['field_tags']) && count($_SESSION['media-filter']['field_tags'])) {
++    // use name buffer array...
++    $names = array();
++    foreach ($_SESSION['media-filter']['field_tags'] as $tid) {
++      $term = taxonomy_term_load($tid);
++      $names[] = $term->name;
++    }
++    // .. to be able to nicely implode with clean comma seperation
++    $field_tags = implode(", ", $names);
++    $filter_active = TRUE;
++  }
++
++  // Filename.
++  $filename = '';
++  if (!empty($_SESSION['media-filter']['filename'])) {
++    $filename = $_SESSION['media-filter']['filename'];
++    $filter_active = TRUE;
++  }
++
++  // Reset file type and folder filters, as we do not support this filters at popup browser. For now....
++  if (!empty($_SESSION['media-filter'])) {
++    $_SESSION['media-filter']['type'] = implode(",", array_keys(media_type_get_types()));
++    $_SESSION['media-filter']['include_subfolders'] = TRUE;
++    $temp = array();
++    $vocabulary = taxonomy_vocabulary_machine_name_load('media_folders');
++    $all = taxonomy_get_tree($vocabulary->vid);    
++    foreach ($all as $key => $term) {
++      $temp[$term->tid] = $term->tid;
++    }
++    $_SESSION['media-filter']['field_folder'] = array_keys($temp);
++  }
++  
++  /*
++   * Prepare form.
++   */
++  $form['ajax_wrapper']['filters'] = array(
++    '#type' => 'fieldset',
++    '#title' => t('Filters'),
++    '#collapsible' => TRUE,
++    '#collapsed' => !$filter_active,
++    //'#description' => t('Enter a part or whole filename to search for.'),
++    '#attached' => array(
++      'css' => array(drupal_get_path('module', 'media_browser_plus') . '/css/media_browser_plus.browser_filters.css'),
++    ),
++    '#attributes' => array('class' => array('filters')),
++  );
++  $form['ajax_wrapper']['filters']['filename'] = array(
++    '#type' => 'textfield',
++    '#title' => t('Filename'),
++    '#value' => $filename,
++    '#default_value' => $filename,
++  );
++  $form['ajax_wrapper']['filters']['tags'] = array(
++    '#type' => 'textfield',
++    '#value' => $field_tags,
++    '#default_value' => $field_tags,
++    '#field_name' => 'field_tags',
++    '#columns' => array('tid'),
++    '#title' => 'Tags',
++    '#size' => 40,
++    //'#description' => t('Enter a comma-separated list of tags, attached to media files.'),
++    '#required' => FALSE,
++    '#delta' => 0,
++    '#language' => LANGUAGE_NONE,
++    '#type' => 'textfield',
++    '#autocomplete_path' => 'taxonomy/autocomplete/field_tags',
++    '#element_validate' => array('media_browser_plus_prepare_taxonomy_autocomplete_validate', 'taxonomy_autocomplete_validate'),
++  );
++  $form['ajax_wrapper']['filters']['submit'] = array(
++    '#type' => 'submit',
++    '#value' => t('Filter'),
++    '#submit' => array('_media_browser_plus_library_browser_filters_submit'),
++    '#ajax' => array(
++      'callback' => '_media_browser_plus_library_browser_filters_ajax',
++      'wrapper' => 'ajax-wrapper',
++      'method' => 'replace',
++    ),
++  );
++  $form['ajax_wrapper']['filters']['clear'] = array(
++    '#type' => 'submit',
++    '#value' => t('Reset'),
++    '#submit' => array('_media_browser_plus_library_browser_filters_clear'),
++    '#ajax' => array(
++      'callback' => '_media_browser_plus_library_browser_filters_ajax',
++      'wrapper' => 'ajax-wrapper',
++      'method' => 'replace',
++    ),
++    '#attributes' => array('class' => array('clear-submit')),
++  );
++}
++
++
++/**
++ * Submit function for AJAX filter request.
++ */
++function _media_browser_plus_library_browser_filters_submit($form, &$form_state) {
++  // Load filename filter.
++  // check_plain() should be called at display, but this module does it like this. Keeping the same
++  //  approach to prevent confusing and potential danger situations.
++  $_SESSION['media-filter']['filename'] = check_plain($form_state['input']['filename']);
++  
++  // Load tags filter.
++  $tags = check_plain($form_state['input']['tags']);
++  $tags = explode(",", $tags);
++  $vocabulary = taxonomy_vocabulary_machine_name_load('tags');
++  // process tags filter entry
++  $_SESSION['media-filter']['field_tags'] = array();
++  foreach ($tags as $tag) {
++    // check if tag exists
++    $result = db_query('SELECT tid FROM {taxonomy_term_data} ttd WHERE ttd.name = :name AND ttd.vid = :vocabulary',
++      array('name' => trim($tag), 'vocabulary' => $vocabulary->vid));
++    foreach ($result as $item) {
++      $_SESSION['media-filter']['field_tags'][] = $item->tid;
++    }
++  }
++
++  // Rebuild form, as we need to display new set of assets.
++  $form_state['rebuild'] = TRUE;
++}
++
++
++/**
++ * Submit function for AJAX reset request.
++ */
++function _media_browser_plus_library_browser_filters_clear($form, &$form_state) {
++  unset($_SESSION['media-filter']);
++  $form_state['rebuild'] = TRUE;
++}
++
++/**
++ * Callback for AJAX requests.
++ */
++function _media_browser_plus_library_browser_filters_ajax($form, $form_state) {
++  /* This setting is used by a JS function, to allow reload of same folder. 
++   * see Drupal.behaviors.media_browser_folders.loadFolderContents() in media_browser_plus.admin.js
++   * for more info.
++   */
++  $form['ajax_wrapper']['#attached']['js'][] = array(
++    'type' => 'setting',
++    'data' => array(
++      'media_browser_plus' => array(
++        'ajax_filters' => 1,
++      ),
++    )
++  );
++  return $form['ajax_wrapper'];
+ }
+ 
+ /**

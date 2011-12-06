@@ -125,6 +125,15 @@
         Drupal.behaviors.media_browser_folders.selectMediaItems();
         return false;
       });
+      $('fieldset.filters').bind('collapsed', function( event ) {
+        Drupal.behaviors.media_browser_folders.resizeForFieldset(this, 0);
+      });
+    },
+    // Resized wrapper iframe when fieldset is expanding/colapsing.
+    resizeForFieldset : function (context, i) {
+      Drupal.media.browser.resizeIframe();
+      if (context.animating && i < 200)
+        setTimeout(function() {Drupal.behaviors.media_browser_folders.resizeForFieldset(context, i+1)}, 10);
     },
     // function which moves an image into a new folder
     moveImage : function (event , ui) {
@@ -209,8 +218,19 @@
       }
     },
     loadFolderContents: function ($item, $page) {
+      /* We added this lines for ajax filters on popup library to work. Content was not re-loaded, when this kind of ajax filter was
+       * used before, since if-statement from below stoped it. 
+       * 
+       * Then we added this line, which checks if this reload is triggered by ajax filters and reload contents anyway (even if we change same folder
+       * and same page - which we want to do here.)
+       * 
+       * We immediatley set this to false, to prevent reloads of same folder/page right after this initial load was executed.
+       */
+      var ajax_filters = Drupal.settings.media_browser_plus.ajax_filters != undefined && Drupal.settings.media_browser_plus.ajax_filters == 1;
+      Drupal.settings.media_browser_plus.ajax_filters = 0;
+
       // check against double loading of the same folder
-      if($item.hasClass('selectedFolder') && $page == Drupal.settings.media_browser_plus.page) {
+      if(!ajax_filters && $item.hasClass('selectedFolder') && $page == Drupal.settings.media_browser_plus.page) {
         return;
       }
       $('.selectedFolder').removeClass('selectedFolder');
