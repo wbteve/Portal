@@ -1,0 +1,69 @@
+### Eclipse Workspace Patch 1.0
+#P beeldgeluid
+Index: sites/all/modules/media_browser_plus/media_browser_plus.module
+===================================================================
+--- sites/all/modules/media_browser_plus/media_browser_plus.module	(revision 20359)
++++ sites/all/modules/media_browser_plus/media_browser_plus.module	(working copy)
+@@ -1868,9 +1868,17 @@
+     $filter_active = TRUE;
+   }
+ 
++  // File type
++  $type = 'all';
++  if (!empty($_SESSION['media-filter']['type']) && strpos($_SESSION['media-filter']['type'], ',') === FALSE) {
++    $type = $_SESSION['media-filter']['type'];
++
++    $filter_active = TRUE;
++  }
++
+   // Reset file type and folder filters, as we do not support this filters at popup browser. For now....
+   if (!empty($_SESSION['media-filter'])) {
+-    $_SESSION['media-filter']['type'] = implode(",", array_keys(media_type_get_types()));
++    //$_SESSION['media-filter']['type'] = implode(",", array_keys(media_type_get_types()));
+     $_SESSION['media-filter']['include_subfolders'] = TRUE;
+     $temp = array();
+     $vocabulary = taxonomy_vocabulary_machine_name_load('media_folders');
+@@ -1881,6 +1889,14 @@
+     $_SESSION['media-filter']['field_folder'] = array_keys($temp);
+   }
+ 
++  // Create file type filter options
++  $file_type_options = media_type_get_types();
++  foreach($file_type_options as &$option) {
++    $option = t($option->label);
++  }
++  asort($file_type_options);
++  $file_type_options = array('all' => t('All')) + $file_type_options;
++
+   /*
+    * Prepare form.
+    */
+@@ -1904,6 +1920,13 @@
+     '#value' => $filename,
+     '#default_value' => $filename,
+   );
++  $form['ajax_wrapper']['filters']['type'] = array(
++    '#type' => 'select',
++    '#title' => t('Type'),
++    '#options' => $file_type_options,
++    '#value' => $type,
++    '#default_value' => $type,
++  );
+   $form['ajax_wrapper']['filters']['tags'] = array(
+     '#type' => 'textfield',
+     '#value' => $field_tags,
+@@ -1953,6 +1976,14 @@
+   //  approach to prevent confusing and potential danger situations.
+   $_SESSION['media-filter']['filename'] = check_plain($form_state['input']['filename']);
+ 
++  // Load file type filter.
++  // check_plain() should be called at display, but this module does it like this. Keeping the same
++  //  approach to prevent confusing and potential danger situations.
++  $_SESSION['media-filter']['type'] = check_plain($form_state['input']['type']);
++  if($_SESSION['media-filter']['type'] == 'all') {
++    $_SESSION['media-filter']['type'] = implode(",", array_keys(media_type_get_types()));
++  }
++
+   // Load tags filter.
+   $tags = check_plain($form_state['input']['tags']);
+   $tags = explode(",", $tags);
