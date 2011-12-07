@@ -44,7 +44,7 @@ class OpenGraphMeta {
   /** Db field name for optional tags (not to be used by external code) */
   const __OPTIONAL_DB_FIELD = 'optional';
 
-  
+
   /** Singleton instance. */
   private static $instance = NULL;
 
@@ -326,7 +326,7 @@ class OpenGraphMeta {
   public function warn($msg) {
     watchdog('opengraph_meta', $msg, array(), WATCHDOG_WARNING);
   }
-  
+
 
   /**
    * FOR TESTING PURPOSES ONLY!
@@ -556,6 +556,17 @@ class OpenGraphMetaDrupalLayer {
         array_push($resultarray, array(
           'title' => !empty($fields['title']) ? $fields['title'] : $url,
           'alt' => !empty($fields['alt']) ? $fields['alt'] : $url,
+          'url' => $url,
+        ));
+      }
+      else if (!empty($fields['fid']) && is_numeric($fields['fid'])) {
+        $file = file_load($fields['fid']);
+        $preview = media_get_thumbnail_preview($file);
+        $url = image_style_url('thumbnail', $preview['#path']);
+
+        array_push($resultarray, array(
+          'title' => '',
+          'alt' => '',
           'url' => $url,
         ));
       }

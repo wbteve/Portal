@@ -1,0 +1,56 @@
+### Eclipse Workspace Patch 1.0
+#P beeldgeluid
+Index: sites/all/modules/opengraph_meta/opengraph_meta.module
+===================================================================
+--- sites/all/modules/opengraph_meta/opengraph_meta.module	(revision 20373)
++++ sites/all/modules/opengraph_meta/opengraph_meta.module	(working copy)
+@@ -118,7 +118,7 @@
+         '#default_value' => !empty($node->opengraph_meta) ? $node->opengraph_meta[OpenGraphMeta::IMAGE] : '',
+         '#description' => t('The thumbnail image that will get shown in e.g. a Facebook preview. If left unset then then the first available image will be used. If none available then the global fallback image will be used.'),
+         '#options' => $image_selector_options,
+-        '#attributes' => array('class' => 'opengraph-thumbs-wrapper clearfix'),
++        '#attributes' => array('class' => array('opengraph-thumbs-wrapper', 'clearfix')),
+       );
+     }
+   }
+Index: sites/all/modules/opengraph_meta/opengraph_meta.common.inc
+===================================================================
+--- sites/all/modules/opengraph_meta/opengraph_meta.common.inc	(revision 20373)
++++ sites/all/modules/opengraph_meta/opengraph_meta.common.inc	(working copy)
+@@ -44,7 +44,7 @@
+   /** Db field name for optional tags (not to be used by external code) */
+   const __OPTIONAL_DB_FIELD = 'optional';
+ 
+-  
++
+   /** Singleton instance. */
+   private static $instance = NULL;
+ 
+@@ -326,8 +326,8 @@
+   public function warn($msg) {
+     watchdog('opengraph_meta', $msg, array(), WATCHDOG_WARNING);
+   }
+-  
+ 
++
+   /**
+    * FOR TESTING PURPOSES ONLY!
+    * Replace the internally used data and config instances with the given ones.
+@@ -559,6 +559,17 @@
+           'url' => $url,
+         ));
+       }
++      else if (!empty($fields['fid']) && is_numeric($fields['fid'])) {
++        $file = file_load($fields['fid']);
++        $preview = media_get_thumbnail_preview($file);
++        $url = image_style_url('thumbnail', $preview['#path']);
++
++        array_push($resultarray, array(
++          'title' => '',
++          'alt' => '',
++          'url' => $url,
++        ));
++      }
+       else {
+         foreach ($fields as $cv) {
+           self::extract_image_fields($cv, $resultarray);
