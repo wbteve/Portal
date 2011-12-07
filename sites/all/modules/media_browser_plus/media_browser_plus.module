@@ -1264,6 +1264,9 @@ function media_browser_plus_load_multiple($variables) {
     if (count($_SESSION['media-filter']['type'])) {
       $params['conditions'][] = array('property' => array('type', explode(',', $_SESSION['media-filter']['type']), 'IN'));
     }
+    if (strlen($_SESSION['media-filter']['title'])) {
+      $params['conditions'][] = array('field' => array('field_file_title', 'value', '%' . $_SESSION['media-filter']['title'] . '%', 'LIKE'));
+    }
     if (count($_SESSION['media-filter']['field_folder'])) {
       $params['conditions'][] = array('field' => array('field_folder', 'tid', $_SESSION['media-filter']['field_folder'], 'IN'));
     }
@@ -1861,7 +1864,14 @@ function _media_browser_plus_library_browser_filters(&$form, &$form_state) {
     $filter_active = TRUE;
   }
 
-  // Filename.
+  // Title
+  $title = '';
+  if (!empty($_SESSION['media-filter']['title'])) {
+    $title = $_SESSION['media-filter']['title'];
+    $filter_active = TRUE;
+  }
+
+  // Filename
   $filename = '';
   if (!empty($_SESSION['media-filter']['filename'])) {
     $filename = $_SESSION['media-filter']['filename'];
@@ -1913,6 +1923,12 @@ function _media_browser_plus_library_browser_filters(&$form, &$form_state) {
       ),
     ),
     '#attributes' => array('class' => array('filters')),
+  );
+  $form['ajax_wrapper']['filters']['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#value' => $title,
+    '#default_value' => $title,
   );
   $form['ajax_wrapper']['filters']['filename'] = array(
     '#type' => 'textfield',
@@ -1971,6 +1987,11 @@ function _media_browser_plus_library_browser_filters(&$form, &$form_state) {
  * Submit function for AJAX filter request.
  */
 function _media_browser_plus_library_browser_filters_submit($form, &$form_state) {
+  // Load file title filter.
+  // check_plain() should be called at display, but this module does it like this. Keeping the same
+  //  approach to prevent confusing and potential danger situations.
+  $_SESSION['media-filter']['title'] = check_plain($form_state['input']['title']);
+
   // Load filename filter.
   // check_plain() should be called at display, but this module does it like this. Keeping the same
   //  approach to prevent confusing and potential danger situations.
