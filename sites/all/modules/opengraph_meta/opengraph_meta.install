@@ -84,9 +84,10 @@ function opengraph_meta_uninstall() {
     variable_del(OPENGRAPH_META_VAR_SITE_NAME);
     variable_del(OPENGRAPH_META_VAR_FALLBACK_IMG);
     variable_del(OPENGRAPH_META_VAR_OPTIONAL_TAGS);
-    $types = node_type_get_types();
+    $types = OpenGraphMetaDrupalLayer::get_node_types();
     foreach ($types as $id => $d) {
       variable_del(OPENGRAPH_META_VAR_CONTENT_TYPE_.$id);
+      variable_del(OPENGRAPH_META_VAR_CONTENT_TYPE_CCK_.$id);
     }
 }
 
