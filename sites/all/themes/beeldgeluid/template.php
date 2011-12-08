@@ -186,14 +186,14 @@ function beeldgeluid_preprocess_page(&$variables, $hook) {
 
     $variables['search_display_switch'] = array(
       '#markup' => l(t('Block view'), 'search/site/' . $adapter->getSearchKeys(), array(
-          'query' => $adapter->getParams(),
+          'query' => $adapter->getUrlProcessor()->getParams(),
           'attributes' => array(
           	'class' => array('search-display-switch-btn', 'search-display-switch-btn-block', ($display_type == 'list' ? '' : 'search-display-switch-btn-block-active')),
             'title' => t('Block view'),
           )
         )) .
         l(t('List view'), 'search/list/site/' . $adapter->getSearchKeys(), array(
-          'query' => $adapter->getParams(),
+          'query' => $adapter->getUrlProcessor()->getParams(),
           'attributes' => array(
           	'class' => array('search-display-switch-btn', 'search-display-switch-btn-list', ($display_type == 'list' ? 'search-display-switch-btn-list-active' : '')),
             'title' => t('List view'),
@@ -316,42 +316,39 @@ function beeldgeluid_preprocess_search_result(&$variables) {
         // Entity types which have no image data attached
         case 'agenda':
         case 'article':
+        case 'blog':
+        case 'dossier':
         case 'flash':
         case 'iframe':
         case 'news':
         case 'webform':
-        case 'blog':
-        case 'dossier':
+          // Check if image field is set
           if(isset($node->field_image[$node->language][0]['uri'])) {
-            $variables['image'] = array(
-              '#theme'       => 'image_style',
-              '#style_name'  => $style,
-              '#path'        => $node->field_image[$node->language][0]['uri'],
-            );
+            $image_uri = $node->field_image[$node->language][0]['uri'];
+          }
+          // Check if meta image field is set
+          else if(isset($node->field_meta_image[$node->language][0]['fid']) && is_numeric($node->field_meta_image[$node->language][0]['fid'])) {
+            $file = file_load($node->field_meta_image[$node->language][0]['fid']);
+            $preview = media_get_thumbnail_preview($file);
+            $image_uri = $preview['#path'];
           }
           break;
 
         case 'media':
-          if(isset($node->field_media_file[$node->language][0]['fid'])){
+          if(isset($node->field_media_file[$node->language][0]['fid']) && is_numeric($node->field_media_file[$node->language][0]['fid'])){
             $file = file_load($node->field_media_file[$node->language][0]['fid']);
-            $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
-
-            if($wrapper instanceof BGMediaStreamWrapper) {
-              $image_uri = $wrapper->getLocalThumbnailPath();
-            }
-            else if($wrapper instanceof DrupalPublicStreamWrapper && $file->type == 'image') {
-              $image_uri = $wrapper->getUri();
-            }
-
-            if(isset($image_uri)) {
-              $variables['image'] = array(
-                '#theme'       => 'image_style',
-                '#style_name'  => $style,
-                '#path'        => $image_uri,
-              );
-            }
+            $preview = media_get_thumbnail_preview($file);
+            $image_uri = $preview['#path'];
           }
           break;
+      }
+
+      if(isset($image_uri) && !empty($image_uri)) {
+        $variables['image'] = array(
+          '#theme'       => 'image_style',
+          '#style_name'  => $style,
+          '#path'        => $image_uri,
+        );
       }
     }
   }
