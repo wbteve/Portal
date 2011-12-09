@@ -136,13 +136,19 @@ function bg_blog_nav_navigation_content($delta) {
         WHERE n.status = 1 AND n.type = :type AND lower(taxonomy_term_data.name) = :termname AND taxonomy_term_data.vid = :vid
         ORDER BY created_year DESC, created_month DESC", array(':type' => $type,':termname' => strtolower($termname),':vid' => variable_get("${delta}_vid", '')));
       foreach ($result as $record) {
-         $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termpath.'/'. $record->created_year);
-        if($year == $record->created_year) $list['items'][$record->created_year]['class'][] = 'active';
-        if(!isset($list['items'][$record->created_year]['children'])) $list['items'][$record->created_year]['children'] = array();
+        $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termpath.'/'. $record->created_year);
+        if ($year == $record->created_year) {
+          $list['items'][$record->created_year]['class'][] = 'active';
+        }
+        if (!isset($list['items'][$record->created_year]['children'])) {
+          $list['items'][$record->created_year]['children'] = array();
+        }
         // Add children
         $listitem = array();
-        $listitem['data'] = l(date('F', mktime(0, 0, 0, $record->created_month, 1, 2000)) .' '. $record->created_year, $path .'/'.$termpath.'/'. $record->created_year .'/'. $record->created_month);
-        if($month == $record->created_month) $listitem['class'][] = 'active';
+        $listitem['data'] = l(format_date(mktime(0, 0, 0, $record->created_month, 1, 2000), 'custom', 'F') .' '. $record->created_year, $path .'/'.$termpath.'/'. $record->created_year .'/'. $record->created_month);
+        if ($month == $record->created_month) {
+          $listitem['class'][] = 'active';
+        }
         $list['items'][$record->created_year]['children'][] = $listitem;
       }
       break;
@@ -160,7 +166,9 @@ function bg_blog_nav_navigation_content($delta) {
         ORDER BY created_year DESC", array(':type' => $type,':termname' => strtolower($termname),':vid' => variable_get("${delta}_vid", '')));
       foreach ($result as $record) {
         $list['items'][$record->created_year]['data'] = l($record->created_year, $path .'/'.$termpath.'/'. $record->created_year);
-        if($year == $record->created_year) $list['items'][$record->created_year]['class'][] = 'active';
+        if ($year == $record->created_year) {
+          $list['items'][$record->created_year]['class'][] = 'active';
+        }
       }
       break;
   }
