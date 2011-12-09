@@ -1,0 +1,36 @@
+<?php
+/**
+ * Implements hook_schema().
+ */
+function bg_feeds_schema() {
+  $schema['bg_feeds_media'] = array(
+    'description' => 'Stores references to media items to be processed by the the meta data updater.',
+    'fields' => array(
+      'fid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique file ID.',
+      ),
+      'queued' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Time when this feed was queued for update, 0 if not queued.',
+      ),
+    ),
+    'primary key' => array('fid'),
+    'indexes' => array(
+      'queued' => array('queued'),
+    ),
+  );
+
+  return $schema;
+}
+
+function bg_feeds_update_7001() {
+  $schema = bg_feeds_schema();
+
+  foreach($schema as $table_name => $table_config) {
+    db_create_table($table_name, $table_config);
+  }
+}
