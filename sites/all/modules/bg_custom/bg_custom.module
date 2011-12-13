@@ -27,6 +27,33 @@ function bg_custom_customize_comment_form(&$form) {
   return $form;
 }
 
+function bg_custom_form_menu_edit_item_alter(&$form, &$form_state, &$form_id) {
+  // Define checkbox.
+  $default_value = isset($form_state['build_info']['args'][1]['options']['main_menu_hide']) ? $form_state['build_info']['args'][1]['options']['main_menu_hide'] : 0;
+  $main_menu_hide = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide in Main Menu'),
+      '#default_value' => $default_value,
+      '#description' => t('Hide this menu item in the main drop-down navigation.'),
+  );
+  // Insert checkbox in array after the 'expanded' element. 
+  $offset = array_search('expanded', array_keys($form)) +1;
+  $form = array_slice($form, 0, $offset, true) +
+          array('main_menu_hide' => $main_menu_hide) +
+          array_slice($form, $offset, NULL, true);
+}
+
+function bg_custom_menu_link_alter(&$item) {
+  // Save main_menu_hide value in the $options array.
+  $item['options']['main_menu_hide'] = $item['main_menu_hide'];
+  if ($item['main_menu_hide']) {
+    $item['options']['attributes']['class']['main_menu_hide'] = 'main-menu-hide';
+  }
+  else if (isset($item['options']['attributes']['class']['main_menu_hide'])) {
+    unset($item['options']['attributes']['class']['main_menu_hide']);
+  }
+}
+
 /**
  * Implements hook_node_load().
  */

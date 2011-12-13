@@ -338,3 +338,7 @@ li a.active {
   list-style: none;
   line-height: 23px;
 }
+
+ul.nice-menu a.main-menu-hide {
+  display: none;
+}
