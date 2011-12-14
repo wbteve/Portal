@@ -45,12 +45,14 @@ function bg_custom_form_menu_edit_item_alter(&$form, &$form_state, &$form_id) {
 
 function bg_custom_menu_link_alter(&$item) {
   // Save main_menu_hide value in the $options array.
-  $item['options']['main_menu_hide'] = $item['main_menu_hide'];
-  if ($item['main_menu_hide']) {
-    $item['options']['attributes']['class']['main_menu_hide'] = 'main-menu-hide';
-  }
-  else if (isset($item['options']['attributes']['class']['main_menu_hide'])) {
-    unset($item['options']['attributes']['class']['main_menu_hide']);
+  if (isset($item['main_menu_hide'])) {
+    $item['options']['main_menu_hide'] = $item['main_menu_hide'];
+    if ($item['main_menu_hide']) {
+      $item['options']['attributes']['class']['main_menu_hide'] = 'main-menu-hide';
+    }
+    else if (isset($item['options']['attributes']['class']['main_menu_hide'])) {
+      unset($item['options']['attributes']['class']['main_menu_hide']);
+    }
   }
 }
 
