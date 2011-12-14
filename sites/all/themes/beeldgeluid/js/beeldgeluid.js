@@ -50,7 +50,6 @@
       $(".verbreding-embed-code", context).focus(function(event){
         this.select();
       }).mouseup(function(e){ e.preventDefault(); });
-;
 
       $('.embed-copy', context).click(function(event){
         event.preventDefault();
@@ -192,6 +191,10 @@
   }
 
   function bgToggleVerbreding(event) {
+    var verbredingWidth = 280;
+    if ($('body').hasClass('node-type-facebook-page')) {
+      verbredingWidth = 360;
+    }
     var $this = $(this);
     if ($this.hasClass('group-verbreding-closed')) {
       $('#block-system-main .dossier-element .node-media-view-mode-full').width(720);
@@ -199,7 +202,7 @@
       .width(60) // width isn't set on initial page load
       .removeClass('group-verbreding-closed') // set the background color
       .animate(
-        {'width': '280px'},
+        {'width': verbredingWidth},
         200,
         function() {
           $(this).bind('mouseleave', bgVerbredingMouseLeave);

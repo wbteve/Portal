@@ -84,10 +84,11 @@
 ?>
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
 
+  <?php print render($content['field_media_file']); ?>
+  <?php print render($content['group_verbreding']); ?>
+
   <div class="video-titlebar">
     <h3><?php print $title; ?></h3>
   </div>
-
-  <?php print render($content['field_media_file']); ?>
 
 </div><!-- /.node -->

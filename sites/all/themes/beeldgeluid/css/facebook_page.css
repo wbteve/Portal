@@ -35,3 +35,69 @@ body.node-type-facebook-page p {
   font-size: 0.9em;
   line-height: 1.6667em;
 }
+
+
+body.node-type-facebook-page .flowplayer {
+  width: 300px !important;
+  height: 200px !important;
+}
+
+body.node-type-facebook-page .node-media .group-verbreding {
+  height: 240px;
+  width: 360px;
+  margin: 0 0 -40px -300px;
+  position: relative;
+  float: right;
+  padding: 0;
+  top: 0;
+  left: 0;
+}
+
+body.node-type-facebook-page .node-media .group-verbreding-closed {
+  width: 60px;
+}
+
+body.node-type-facebook-page .node-media .verbreding-item {
+  padding: 4px 60px 0 0;
+  float: right;
+}
+
+body.node-type-facebook-page .node-media .verbreding-item-inner {
+  width: 282px;
+  color: #fff;
+}
+
+body.node-type-facebook-page .node-media .group-verbreding-closed .verbreding-item-inner {
+  display: none;
+}
+
+body.node-type-facebook-page .node-media .verbreding-item-fb-like {
+  background: url('../images/verbreding-like.png') no-repeat right top;
+}
+
+body.node-type-facebook-page .node-media .verbreding-item-share-online {
+  background: url('../images/verbreding-share.png') no-repeat right top;
+}
+
+body.node-type-facebook-page .node-media .verbreding-item-embed {
+  background: url('../images/verbreding-embed.png') no-repeat right top;
+}
+
+body.node-type-facebook-page .node-media .video-titlebar {
+  background-color: #009FDA;
+  position: static;
+  width: 340px;
+  margin-top: 200px;
+}
+
+body.node-type-facebook-page .node-media .video-titlebar h3 {
+  position: relative;
+  z-index: 300;
+}
+
+body.node-type-facebook-page .node-media .field-name-field-media-file {
+  width: auto;
+  flot: left;
+  height: 200px;
+  width: 300px;
+}

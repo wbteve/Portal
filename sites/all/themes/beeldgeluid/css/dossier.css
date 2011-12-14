@@ -228,11 +228,6 @@ body.page-node-embed #flash-media-player {
   height: 320px;
 }
 
-body.node-type-facebook-page .flowplayer {
-  width: 360px !important;
-  height: 240px !important;
-}
-
 #main .dossier-element .field-type-media .field-item  {
   height: inherit;
   width: inherit;
@@ -289,13 +284,3 @@ body.node-type-facebook-page .flowplayer {
   border: 5px solid #E00034;
 }
 
-body.node-type-facebook-page .node-media .video-titlebar {
-  background-color: #009FDA;
-  position: absolute;
-  width: 340px;
-}
-
-body.node-type-facebook-page .node-media .field-name-field-media-file {
-  width: auto;
-  float: none;
-}
