@@ -303,10 +303,6 @@ ul.links.inline {
   display: block; /* Let the links be inline, but the container be a block. */
 }
 
-.front ul.links.inline {
-  display: none;
-}
-
 ul.links li {
   padding: 0 1em 0 0; /* LTR */
 }
