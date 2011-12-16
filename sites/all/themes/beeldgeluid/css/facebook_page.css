@@ -43,9 +43,9 @@ body.node-type-facebook-page .flowplayer {
 }
 
 body.node-type-facebook-page .node-media .group-verbreding {
-  height: 240px;
+  height: 200px;
   width: 360px;
-  margin: 0 0 -40px -300px;
+  margin: 0 0 0 -300px;
   position: relative;
   float: right;
   padding: 0;
@@ -81,6 +81,10 @@ body.node-type-facebook-page .node-media .verbreding-item-share-online {
 
 body.node-type-facebook-page .node-media .verbreding-item-embed {
   background: url('../images/verbreding-embed.png') no-repeat right top;
+}
+
+body.node-type-facebook-page .node-media .verbreding-item-embed .verbreding-embed-code {
+  width: 272px;
 }
 
 body.node-type-facebook-page .node-media .video-titlebar {
