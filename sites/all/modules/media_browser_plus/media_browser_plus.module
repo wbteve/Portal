@@ -1857,7 +1857,7 @@ function _media_browser_plus_library_browser_filters(&$form, &$form_state) {
     $names = array();
     foreach ($_SESSION['media-filter']['field_tags'] as $tid) {
       $term = taxonomy_term_load($tid);
-      $names[] = $term->name;
+      $names[] = strpos($term->name, ',') === FALSE ? $term->name : "\"$term->name\"";
     }
     // .. to be able to nicely implode with clean comma seperation
     $field_tags = implode(", ", $names);
@@ -2006,8 +2006,8 @@ function _media_browser_plus_library_browser_filters_submit($form, &$form_state)
   }
 
   // Load tags filter.
-  $tags = check_plain($form_state['input']['tags']);
-  $tags = explode(",", $tags);
+  $tags = drupal_explode_tags($form_state['input']['tags']);
+
   $vocabulary = taxonomy_vocabulary_machine_name_load('tags');
   // process tags filter entry
   $_SESSION['media-filter']['field_tags'] = array();
