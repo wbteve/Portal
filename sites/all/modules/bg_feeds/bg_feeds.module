@@ -32,11 +32,12 @@ function bg_feeds_get_unprocesssed_media_items() {
   $items = array();
 
   // Select items which need to be processed
-  /*$query = "SELECT FM.`fid`, DMF.`entity_id` AS `nid` " .
+  $query = "SELECT FM.`fid`, DMF.`entity_id` AS `nid` " .
            "FROM {file_managed} AS FM " .
            "JOIN {field_data_field_media_file} AS DMF ON DMF.`field_media_file_fid` = FM.`fid` AND DMF.`entity_type` = 'node' AND DMF.`bundle` = 'media' " .
-           "add feed table"
-           "WHERE NOT EXISTS (SELECT * FROM `bg_feeds_media` AS BGM WHERE BGM.`fid` = FM.`fid`)";
+           "JOIN {feeds_item} AS FI ON FI.`entity_id` = DMF.`entity_id` AND FI.`entity_type` = 'node' " .
+           "WHERE NOT EXISTS (SELECT * FROM `bg_feeds_media` AS BGM WHERE BGM.`fid` = FM.`fid`) " .
+           "GROUP BY FM.`fid`";
 
   $result = db_query($query);
 
@@ -49,7 +50,7 @@ function bg_feeds_get_unprocesssed_media_items() {
         'queued' => REQUEST_TIME)
       )
       ->execute();
-  }*/
+  }
 
   return $items;
 }
@@ -102,9 +103,11 @@ function bg_feeds_harvest_terms($media_node_terms) {
     foreach($media_node_terms as $term) {
       $term = taxonomy_term_load($term['tid']);
 
-      if(taxonomy_term_lookup_term($term->name, 1)) {
-        $terms[] = array('tid' => $term->tid);
+      // Does the same term exist in the tags vocabulary?
+      if(($tag = taxonomy_term_lookup_term($term->name, 1))) {
+        $terms[] = array('tid' => $tag->tid);
       }
+      // Create term in tags vocabulary
       else {
         unset($term->tid);
         $term->vid = 1;
