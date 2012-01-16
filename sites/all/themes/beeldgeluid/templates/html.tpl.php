@@ -67,6 +67,7 @@
   <?php print $styles; ?>
   <?php print $scripts; ?>
   <?php print $seo_code_head; ?>
+  <meta property="fb:admins" content="192259536687" /> 
 </head>
 <body class="<?php print $classes; ?>" <?php print $attributes;?>>
   <div id="skip-link">
