@@ -322,21 +322,26 @@ function beeldgeluid_preprocess_search_result(&$variables) {
         case 'iframe':
         case 'news':
         case 'webform':
+          $field_image = field_get_items('node', $node, 'field_image', $node->language);
+          $field_meta_image = field_get_items('node', $node, 'field_meta_image', $node->language);
+
           // Check if image field is set
-          if(isset($node->field_image[$node->language][0]['uri'])) {
-            $image_uri = $node->field_image[$node->language][0]['uri'];
+          if(isset($field_image[0]['uri'])) {
+            $image_uri = $field_image[0]['uri'];
           }
           // Check if meta image field is set
-          else if(isset($node->field_meta_image[$node->language][0]['fid']) && is_numeric($node->field_meta_image[$node->language][0]['fid'])) {
-            $file = file_load($node->field_meta_image[$node->language][0]['fid']);
+          else if(isset($field_meta_image[0]['fid']) && is_numeric($field_meta_image[0]['fid'])) {
+            $file = file_load($field_meta_image[0]['fid']);
             $preview = media_get_thumbnail_preview($file);
             $image_uri = $preview['#path'];
           }
           break;
 
         case 'media':
-          if(isset($node->field_media_file[$node->language][0]['fid']) && is_numeric($node->field_media_file[$node->language][0]['fid'])){
-            $file = file_load($node->field_media_file[$node->language][0]['fid']);
+          $field_media_file = field_get_items('node', $node, 'field_media_file', $node->language);
+
+          if(isset($field_media_file[0]['fid']) && is_numeric($field_media_file[0]['fid'])){
+            $file = file_load($field_media_file[0]['fid']);
             $preview = media_get_thumbnail_preview($file);
             $image_uri = $preview['#path'];
           }
@@ -418,7 +423,7 @@ function beeldgeluid_image_style($variables) {
  *   and use 0 to display no children.
  * @param $trail
  *   An array of parent menu items.
- *   
+ *
  * Override of theme_nice_menus_build(). Adds link classes to <li> as well.
  */
 function beeldgeluid_nice_menus_build($variables) {
