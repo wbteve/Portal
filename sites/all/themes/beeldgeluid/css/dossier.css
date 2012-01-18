@@ -218,12 +218,12 @@
   cursor: pointer;
 }
 
-#flash-media-player {
+.flash-media-player {
   width: 420px;
   height: 280px;
 }
 
-body.page-node-embed #flash-media-player {
+body.page-node-embed .flash-media-player {
   width: 480px;
   height: 320px;
 }

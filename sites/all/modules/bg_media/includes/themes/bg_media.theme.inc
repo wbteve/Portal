@@ -26,7 +26,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
   }
   // Theming of Barend en Van Dorp items
   if($wrapper instanceof MediaBVDStreamWrapper || $wrapper instanceof MediaProlocationStreamWrapper) {
-    $vars['video'] = '<div id="' . $player_id . '" class="flowplayer"></div>';
+    $vars['video'] = '<div id="' . $player_id . '" class="flowplayer ' . BG_MEDIA_FLASH_PLAYER_ID . '"></div>';
     flowplayer_add('#' . $player_id, array(
       'logo'  => array(
         'url' => 'branding.png',
