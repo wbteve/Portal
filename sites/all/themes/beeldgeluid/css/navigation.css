@@ -339,8 +339,8 @@ li a.active {
   line-height: 23px;
 }
 
-ul.nice-menu li.main-menu-hide {
-  padding: 0;
+#page #header .block-nice-menus ul ul ul li.main-menu-hide {
+  display: none;
 }
 
 ul.nice-menu a.main-menu-hide {
