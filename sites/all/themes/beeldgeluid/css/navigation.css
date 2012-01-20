@@ -181,7 +181,7 @@ li a.active {
   top: -10px;
   background: #FFF;
   padding: 0;
-  
+
 }
 
 #page #header .block-nice-menus ul ul ul li.first{
@@ -337,6 +337,10 @@ li a.active {
   list-style-image: none;
   list-style: none;
   line-height: 23px;
+}
+
+ul.nice-menu li.main-menu-hide {
+  padding: 0;
 }
 
 ul.nice-menu a.main-menu-hide {

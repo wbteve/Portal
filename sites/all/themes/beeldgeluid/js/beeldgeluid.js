@@ -1,4 +1,11 @@
 (function ($) {
+  $(document).ready(function(){
+    $('.region-header ul.nice-menu li.menuparent').each(function(){
+      if($('li:not(.main-menu-hide)', this).length == 0) {
+        $(this).removeClass('menuparent');
+      }
+    });
+  });
 
   var dossierWidth = 0;
 
