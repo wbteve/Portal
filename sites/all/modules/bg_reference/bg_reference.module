@@ -695,6 +695,9 @@ function bg_reference_ajax_switch_main_media($dossier_node, $old_main_media_node
   $commands = array();
 
   if($dossier_node->type == CONTENT_TYPE_DOSSIER && $old_main_media_node->type == CONTENT_TYPE_MEDIA && $new_main_media_node->type == CONTENT_TYPE_MEDIA) {
+    // Set seen ID's to prevent ID renaming
+    drupal_static('drupal_html_id', array());
+
     // Get settings of main media element
     $main_media_element  = _bg_reference_get_element($dossier_node);
     // Get settings of media elements position which is clicked
