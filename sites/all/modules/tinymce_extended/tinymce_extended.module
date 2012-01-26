@@ -18,13 +18,13 @@ function tinymce_extended_wysiwyg_plugin($editor, $version) {
       return array(
         'iframe' => array(
           'extensions' => array('iframe' => t('Allow iframe')),
-          'extended_valid_elements' => array('iframe[src|width|height|frameborder|scrolling]'),
+          'extended_valid_elements' => array('iframe[src|width|height|frameborder|scrolling|allowfullscreen]'),
           'load' => FALSE,
           'internal' => TRUE,
         ),
         'embed' => array(
           'extensions' => array('embed' => t('Allow object/param/embed')),
-          'extended_valid_elements' => array('object[width|height|classid|codebase],param[name|value],embed[src|type|width|height|flashvars|wmode]'),
+          'extended_valid_elements' => array('object[width|height|classid|codebase],param[name|value],embed[src|type|width|height|flashvars|wmode|allowscriptaccess|allowfullscreen]'),
           'load' => FALSE,
           'internal' => TRUE,
         ),
