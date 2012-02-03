@@ -42,6 +42,12 @@
   z-index: 1000;
 }
 
+.dossier-element-focus .node {
+  /* looks cool, should we do this?
+  box-shadow: 0 0 100px #000;
+  */
+}
+
 .main-media-player .content {
   display: none;
 }
@@ -179,7 +185,7 @@
   overflow: hidden;
   background: transparent url('../images/blue-60.png');
   position: relative;
-  z-index: 199;
+  z-index: 200;
   text-align: center;
   padding: 10px;
   clear: both;
@@ -195,6 +201,16 @@
   margin: 0;
 }
 
+.node-media .video-titlebar .media-verdieping-open {
+  background: url('../images/btn-media-verdieping.png') no-repeat;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  height: 40px;
+  width: 60px;
+  cursor: pointer;
+}
+
 .node-media .field-name-field-media-file {
   width: 480px;
   float: left;
@@ -206,7 +222,7 @@
   height: 312px;
   padding: 4px 0;
   position: absolute;
-  z-index: 200;
+  z-index: 100;
   top: 0;
   left: 420px;
 }

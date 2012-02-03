@@ -28,23 +28,25 @@
 
   Drupal.behaviors.bgDossierMediaBehavior = {
     attach: function (context, settings) {
-      var mediaPreviews = $('.dossier-element-media a.use-ajax:not(.main-media-player)');
-      if($('body').hasClass('node-type-dossier') && mediaPreviews.length > 0) {
-        mediaPreviews.each(function(){
-          linkInfo = $(this).attr('rel').split('|');
+      if($('body').hasClass('node-type-dossier')) {
+        var mediaPreviews = $('.dossier-element-media a.use-ajax:not(.main-media-player)');
+        if (mediaPreviews.length > 0) {
+          mediaPreviews.each(function(){
+            linkInfo = $(this).attr('rel').split('|');
 
-          // Set new href
-          $(this).attr('href', '/ajax/switch-media/'
-              + Drupal.settings.bg_reference.dossierNid + '/'
-              + Drupal.settings.bg_reference.mainMediaNid + '/'
-              + linkInfo[0] + '/'
-              + linkInfo[1])
-            // Unbind existing handlers
-            .unbind('click')
-            // Force rebinding of AJAX handlers
-            .removeClass('ajax-processed');
-        });
-
+            // Set new href
+            $(this).attr('href', '/ajax/switch-media/'
+                + Drupal.settings.bg_reference.dossierNid + '/'
+                + Drupal.settings.bg_reference.mainMediaNid + '/'
+                + linkInfo[0] + '/'
+                + linkInfo[1])
+              // Unbind existing handlers
+              .unbind('click')
+              // Force rebinding of AJAX handlers
+              .removeClass('ajax-processed');
+          });          
+        }
+/*
         $('.main-media-player').bind('mouseover', function(){
           $(this).addClass('dossier-element-focus');
         });
@@ -52,9 +54,16 @@
         $('.main-media-player').bind('mouseout', function(){
           $(this).removeClass('dossier-element-focus');
         });
-
+*/
+        $('.main-media-player .video-titlebar').append($('<div class="media-verdieping-open"></div>'));
+        $('.media-verdieping-open').click(function(){
+          $(this).parents('.main-media-player').toggleClass('dossier-element-focus');
+        });
+        
         // Force reattachment of AJAX behavior
-        Drupal.behaviors.AJAX.attach(context, settings);
+        if (typeof(Drupal.behaviors.AJAX) == 'object') {
+          Drupal.behaviors.AJAX.attach(context, settings);
+        }
       }
     }
   }
