@@ -39,13 +39,13 @@
 /* Override some properties that have been set as inline styles. Sorry for the !important. */
 .dossier-element-focus {
   width: auto!important;
-  z-index: 1000;
 }
 
 .dossier-element-focus .node {
   /* looks cool, should we do this?
   box-shadow: 0 0 100px #000;
   */
+ z-index:1;
 }
 
 .main-media-player .content {
