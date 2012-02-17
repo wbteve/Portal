@@ -36,7 +36,7 @@ function bg_custom_form_menu_edit_item_alter(&$form, &$form_state, &$form_id) {
       '#default_value' => $default_value,
       '#description' => t('Hide this menu item in the main drop-down navigation.'),
   );
-  // Insert checkbox in array after the 'expanded' element. 
+  // Insert checkbox in array after the 'expanded' element.
   $offset = array_search('expanded', array_keys($form)) +1;
   $form = array_slice($form, 0, $offset, true) +
           array('main_menu_hide' => $main_menu_hide) +
@@ -75,9 +75,10 @@ function bg_custom_node_load($nodes, $types) {
           /*
            * Set Open Graph default image. Open Graph Meta module handles everything else.
            */
-          if(isset($node->field_image[$node->language][0]['uri'])) {
+          $image = field_get_items('node', $node, 'field_image');
+          if(isset($image[0]['fid'])) {
             $node->dummy_field_og_image = array(
-              'uri'       => $node->field_image[$node->language][0]['uri'],
+              'uri'       => $image[0]['uri'],
               'filemime'  => 'image',
             );
           }
@@ -87,10 +88,11 @@ function bg_custom_node_load($nodes, $types) {
           /*
            * Set Open Graph default image. Open Graph Meta module handles everything else.
            */
-          if (isset($node->field_media_file[$node->language][0]['fid'])) {
-            $file     = file_load($node->field_media_file[$node->language][0]['fid']);
+          $media_file = field_get_items('node', $node, 'field_media_file');
+          if (isset($media_file[0]['fid'])) {
+            $file     = file_load($media_file[0]['fid']);
             $wrapper  = file_stream_wrapper_get_instance_by_uri($file->uri);
-            
+
             if($wrapper instanceof BGMediaStreamWrapper || $wrapper instanceof MediaYouTubeStreamWrapper) {
               $uri = $wrapper->getLocalThumbnailPath();
             }
@@ -102,7 +104,7 @@ function bg_custom_node_load($nodes, $types) {
                 $uri = $file->uri;
               }
             }
-            
+
             if(isset($uri)) {
               $node->dummy_field_og_image = array(
                   'uri'       => $uri,
