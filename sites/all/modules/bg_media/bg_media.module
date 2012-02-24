@@ -4,6 +4,7 @@ define('BG_MEDIA_DISPLAY_TYPE_MEDIA', 'bg_media');
 define('BG_MEDIA_DISPLAY_TYPE_MEDIA_FACEBOOK', 'bg_media_facebook');
 define('BG_MEDIA_DISPLAY_TYPE_THUMBNAIL', 'bg_media_thumbnail');
 define('BG_MEDIA_DISPLAY_TYPE_LENGTH', 'bg_media_length');
+define('BG_MEDIA_DISPLAY_TYPE_DATE', 'bg_media_date');
 define('BG_MEDIA_FLASH_PLAYER_ID', 'flash-media-player');
 
 define('BG_MEDIA_FACEBOOK_PLAYER_WIDTH', 300);
@@ -148,7 +149,43 @@ function bg_media_field_formatter_info() {
       'field types' => array('number_integer'),
       'description' => t('Display length as H:M:S.'),
     ),
+    BG_MEDIA_DISPLAY_TYPE_DATE => array(
+      'label'       => t('Beeld en Geluid: Media date'),
+      'field types' => array('date'),
+      'description' => t('Display date with accuracy'),
+      'settings' => array(
+        'format_type_year' => 'long',
+        'format_type_month' => 'long',
+        'format_type_day' => 'long'
+      ),
+    ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function bg_media_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  module_load_include('inc', 'bg_media', 'bg_media_admin');
+
+  if ($display['type'] == 'bg_media_date') {
+    date_formatter_process($formatter, $entity_type, $entity, $field, $instance, $langcode, $item, $display);
+     return bg_media_default_formatter_settings_form($field, $instance, $view_mode, $form, $form_state);
+  }
+
+}
+
+function bg_media_field_formatter_settings_summary($field, $instance, $view_mode) {
+
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = '';
+  if ($display['type'] == 'bg_media_date') {
+    $summary = t('Set date format with accuracy');
+  }
+  return $summary;
 }
 
 /**
@@ -237,6 +274,28 @@ function bg_media_field_formatter_view($entity_type, $entity, $field, $instance,
         $element[$delta] = array('#markup' => bg_media_duration($item['value']));
       }
       break;
+
+    case BG_MEDIA_DISPLAY_TYPE_DATE:
+      foreach($items as $delta => $item) {
+        // check for date accuracy field
+        $accuracies = field_get_items($entity_type, $entity, 'field_media_date_accuracy');
+        $accuracy = $accuracies[0];
+        $time = strtotime($item['value']);
+        switch ($accuracy['value']) {
+          case 'year':
+            $formatted_date = format_date($time, $display['settings']['format_type_year']);
+            break;
+          case 'month':
+            $formatted_date = format_date($time, $display['settings']['format_type_month']);
+            break;
+          default:
+            $formatted_date = format_date($time,  $display['settings']['format_type_day']);
+            break;
+        }
+
+        $element[$delta] = array('#markup' => $formatted_date);
+      }
+      break;
   }
 
   return $element;
@@ -321,6 +380,7 @@ function bg_media_duration($seconds_count) {
 
   return "$hours$minutes$seconds";
 }
+
 
 function bg_media_form_alter(&$form, &$form_state, $form_id) {
   if($form_id == 'media_internet_add') {
