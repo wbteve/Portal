@@ -319,7 +319,14 @@ function template_preprocess_media_thumbnail(&$variables) {
 function theme_media_formatter_large_icon($variables) {
   $file = $variables['file'];
   $icon_dir = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
-  $icon = file_icon_path((object)$file, $icon_dir);
+
+  $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
+  if ($wrapper instanceof BGMediaStreamWrapper) {
+    $icon =  $wrapper->getLocalThumbnailPath();
+  }
+  else {
+      $icon = file_icon_path((object)$file, $icon_dir);
+  }
   $variables['path'] = $icon;
   // theme_image() requires the 'alt' attribute passed as its own variable.
   // @see http://drupal.org/node/999338

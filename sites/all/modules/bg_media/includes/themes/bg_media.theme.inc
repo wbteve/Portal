@@ -145,14 +145,17 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
   $player_id = drupal_html_id(BG_MEDIA_FLASH_PLAYER_ID);
 
   $icon_path    = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
-  $poster_path  = base_path() . file_icon_path((object)$vars['file'], $icon_path);
-
   $wrapper      = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
-
+  if ($wrapper instanceof BGMediaStreamWrapper) {
+    $poster_path =  file_create_url($wrapper->getLocalThumbnailPath());
+  }
+  else {
+    $poster_path  = base_path() . file_icon_path((object)$vars['file'], $icon_path);
+  }
   $vars['url'] = base_path() . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename;
   $vars['mimetype'] = $vars['file']->filemime;
 
-  $vars['flash_audio'] = '<div id="' . $player_id . '" class="flowplayer"></div>';
+  $vars['flash_audio'] = '<div id="' . $player_id . '" class="flowplayer ' . BG_MEDIA_FLASH_PLAYER_ID . '"></div>';
   flowplayer_add('#' . $player_id, array(
     'playlist'  => array(
       array(
@@ -165,7 +168,7 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
         'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
         'onStop'	=> 'Drupal.BGMediaPlayerStopHandler',
         'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
-      ),
+      ),media_variable_get('icon_set')
     ),
     'plugins'   => array(
       'audio'  => array(

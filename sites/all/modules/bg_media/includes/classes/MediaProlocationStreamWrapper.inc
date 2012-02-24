@@ -34,7 +34,7 @@ class MediaProlocationStreamWrapper extends BGMediaStreamWrapper {
     if (!file_exists($local_path)) {
       $dirname = drupal_dirname($local_path);
       file_prepare_directory($dirname, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
-      $media = str_replace(array('prolocation://', '.mp4'), array($this->image_base_url, '.jpeg'), $this->uri);
+      $media = str_replace(array('prolocation://', '.mp4', '.mp3'), array($this->image_base_url, '.jpeg', '.jpeg'), $this->uri);
       @copy($media, $local_path);
     }
 
