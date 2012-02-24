@@ -52,11 +52,13 @@ class FeedsOAIOIParser extends FeedsOAIParser {
           }
 
           $item['importSource'] = 'Open Images';
-          
+
           $interval = new DateInterval($item['extent']);
           $item['extent'] = bg_feeds_hms_to_seconds($interval->format('%H:%I:%S'));
-          
-          $item['computedSource'] = "openimages://{$item['guid']}/{$item['type']}";
+
+          $guid = str_replace(':', '.', $item['guid']);
+
+          $item['computedSource'] = "openimages://{$guid}/{$item['type']}";
 
           // Set identifier to GUID because of missing identifiers in some records
           $item['identifier'] = $item['guid'];
@@ -69,7 +71,7 @@ class FeedsOAIOIParser extends FeedsOAIParser {
 
     return $result;
   }
-  
+
   /**
    * Return mapping sources.
    */
@@ -103,10 +105,10 @@ class FeedsOAIOIParser extends FeedsOAIParser {
     // Add Open Images field to mapping sources
     $elements = array(
       // Default set elements (see: http://www.openbeelden.nl/api)
-      'title', 'alternative', 'creator', 'subject',  'description', 'abstract', 
+      'title', 'alternative', 'creator', 'subject',  'description', 'abstract',
       'publisher', 'contributor', 'date', 'type', 'extent', 'medium',
       'identifier', 'source', 'language', 'references', 'spatial', 'attributionName',
-      'attributionURL', 'license', 
+      'attributionURL', 'license',
       // Computed fields
       'computedSource', 'importSource',
       );
@@ -137,20 +139,20 @@ class FeedsOAIOIEnclosure extends FeedsEnclosure {
    */
   public function __construct($value, $type) {
     parent::__construct($value, $type);
-    
+
     // Set (MIME) type
     switch($type) {
       case 'Moving Image':
         $this->mime_type = 'video/openbeelden';
         $this->type = 'video';
         break;
-      
+
       case 'Still Image':
       case 'Image':
         $this->mime_type = 'image/openbeelden';
         $this->type = 'image';
         break;
-      
+
       case 'Sound Recording':
       case 'Sound':
         $this->mime_type = 'audio/openbeelden';
@@ -158,7 +160,7 @@ class FeedsOAIOIEnclosure extends FeedsEnclosure {
         break;
     }
   }
-  
+
   public function getType() {
     return $this->type;
   }
@@ -185,7 +187,7 @@ class FeedsOAIOIEnclosure extends FeedsEnclosure {
       $file->filemime = $this->mime_type;
       // Append file entity type
       $file->type = $this->type;
-      
+
       file_save($file);
 
       // We couldn't make sense of this enclosure, throw an exception.
@@ -199,5 +201,5 @@ class FeedsOAIOIEnclosure extends FeedsEnclosure {
 }
 
 function oi_feeds_set_preview(FeedsSource $source, FeedsParserResult $result, $key) {
-  
+
 }

@@ -11,9 +11,7 @@ class MediaInternetOIHandler extends MediaInternetBaseHandler {
 
   public function __construct($embedCode) {
     parent::__construct($embedCode);
-    // parse_url chockes on : in urls. Do it with substr
-    // $path = parse_url($embedCode, PHP_URL_PATH);
-    $path = substr($embedCode, strrpos($embedCode, '/'));
+    $path = parse_url($embedCode, PHP_URL_PATH);
 
     if(!is_null($path)) {
       $this->uri = str_replace($path, '', $this->embedCode);
@@ -41,9 +39,7 @@ class MediaInternetOIHandler extends MediaInternetBaseHandler {
   }
 
   public function claim($embedCode) {
-    // For some reason this doesn't seem to work
-    // $scheme = parse_url($embedCode, PHP_URL_SCHEME);
-    $scheme = substr($embedCode, 0, strpos($embedCode, ':'));
+    $scheme = parse_url($embedCode, PHP_URL_SCHEME);
     return $scheme == 'openimages';
   }
 
