@@ -179,9 +179,13 @@ function theme_bg_reference($variables) {
       if(strpos($element['#data']['content'], '[[{"type":"media"') !== FALSE) {
         $classes[] = 'dossier-element-media';
       }
-      //Check markup filters out the <script> tags, for #5399 this is not wanted, TODO discuss with mark or robbert. Martijn
-      //$content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], 'dossier_text') . '</div>';
-      $content = '<div class="dossier-element-text-inner">' . $element['#data']['content'] . '</div>';
+      //Check markup filters out the <script> tags, for #5399 this is not wanted, TODO discuss with mark or robbert. Martijn      
+      if (strpos($element['#data']['content'], '<script') !== FALSE ){
+        $content = '<div class="dossier-element-text-inner">' . $element['#data']['content'] . '</div>';
+      }
+      else {
+        $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], 'dossier_text') . '</div>';
+      }
       break;
   }
 
