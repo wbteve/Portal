@@ -179,8 +179,9 @@ function theme_bg_reference($variables) {
       if(strpos($element['#data']['content'], '[[{"type":"media"') !== FALSE) {
         $classes[] = 'dossier-element-media';
       }
-
-      $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], 'dossier_text') . '</div>';
+      //Check markup filters out the <script> tags, for #5399 this is not wanted, TODO discuss with mark or robbert. Martijn
+      //$content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], 'dossier_text') . '</div>';
+      $content = '<div class="dossier-element-text-inner">' . $element['#data']['content'] . '</div>';
       break;
   }
 
@@ -489,7 +490,6 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
  */
 function _bg_reference_get_form($type, $value) {
   $element = array();
-
   switch($type) {
     case CONTENT_TYPE_BANNER:
       $element['ref_' .CONTENT_TYPE_BANNER] = array(
@@ -541,11 +541,22 @@ function _bg_reference_get_form($type, $value) {
       break;
 
     case CONTENT_TYPE_TEXT:
+      $format = 'full_html';
+      //TODO discuss with marc or robbert. martijn
+      if (strpos($value, '<script') !== FALSE) {
+        $format = 'full_html_script';
+      }
+      elseif (strpos($value, '<iframe') !== FALSE) {
+        $format = 'full_html_script';
+      }
+      elseif (strpos($value, '<object') !== FALSE) {
+        $format = 'full_html_script';
+      }
       $element['ref_' . CONTENT_TYPE_TEXT] = array(
         '#type'               => 'text_format',
         '#title'              => t('Text'),
         '#attributes'         => array('class' => array('bg_reference_text')),
-        '#format'             => 'full_html', //filter_default_format(),
+        '#format'             => $format,
         '#default_value'      => $value,
       );
       break;

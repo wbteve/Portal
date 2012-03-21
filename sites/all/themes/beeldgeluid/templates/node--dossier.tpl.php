@@ -25,6 +25,7 @@
   <?php print render($content['comments']); ?>
   
   <div class="dossier-content">
+    <?php //krumo($content); ?>
      <?php print render($content['field_referenced_content']); ?>
   </div> 
 
