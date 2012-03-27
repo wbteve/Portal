@@ -1,0 +1,154 @@
+<?php
+define('PERMISSION_ACCESS_SCRIPTMACHINE_API', 'access scriptmachine api');
+
+/**
+ * Implementation of hook_permission()
+ */
+function bg_scriptmachine_permission() {
+  return array(
+    PERMISSION_ACCESS_SCRIPTMACHINE_API => array(
+      'title' => t('Access Script Machine'),
+      'description' => t('Access API of the Script Machine.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function bg_scriptmachine_menu() {
+  $items = array();
+
+  $items['api/scriptmachine'] = array(
+    'page callback'     => 'bg_scriptmachine_api',
+    'page arguments'    => array(2),
+    'access callback'	=> TRUE,
+    'type'              => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Scriptmachine API call handler
+ * Handles calls to the scriptmachine API from Flash.
+ * @param String $action
+ */
+function bg_scriptmachine_api($action) {
+  if (!user_access(PERMISSION_ACCESS_SCRIPTMACHINE_API)) {
+    $api_action = '_bg_scriptmachine_api_' . $action;
+
+    if (function_exists($api_action)) {
+      try {
+        $xml_response = $api_action();
+      }
+      catch (Exception $e) {
+        $xml_response = _bg_scriptmachine_create_error_document($e->getMessage(), $e->getCode());
+      }
+    }
+    else {
+      // Throw error
+      $xml_response = _bg_scriptmachine_create_error_document('API is not avaialble', '1001');
+    }
+  }
+  else {
+    // Throw error
+    $xml_response = _bg_scriptmachine_create_error_document('Unauthorized', '1002');
+  }
+
+  header('Content-Type: application/xml');
+  echo $xml_response->saveXML();
+  exit;
+}
+
+function _bg_scriptmachine_api_scripts() {
+  $uid = $_GET['user'];
+  $xml_response = new DOMDocument('1.0', 'UTF-8');
+
+  if (!is_numeric($uid)) {
+    throw new Exception('Missing or invalid userid argument', 4);
+  }
+  else {
+    $query = "SELECT `fid` FROM {bg_scriptmachine} WHERE `uid` = :uid";
+    $file = file_load(db_query($query, array(':uid' => $uid))->fetchColumn());
+
+    if ($file === FALSE || !file_exists($file_path = drupal_realpath($file->uri))) {
+      throw new Exception('Missing user document, create a new one if you please.', 8);
+    }
+    else {
+      $xml_response->load($file_path);
+    }
+  }
+
+  return $xml_response;
+}
+
+function _bg_scriptmachine_api_store() {
+  $uid = $_GET['user'];
+  $document = new DOMDocument('1.0', 'UTF-8');
+  $xml_response = _bg_scriptmachine_create_ok_document();
+
+  if (!is_numeric($uid)) {
+    throw new Exception('Missing or invalid userid argument', 4);
+  }
+  else {
+    $document->load('php://input');
+
+    $query = "SELECT `fid` FROM {bg_scriptmachine} WHERE `uid` = :uid";
+    $original_file = file_load(db_query($query, array(':uid' => $uid))->fetchColumn());
+
+    if ($original_file === FALSE || !file_exists(drupal_realpath($original_file->uri))) {
+      $path = file_build_uri('user/' . $uid . '/scriptmachine.xml');
+      file_prepare_directory(drupal_dirname($path), FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
+    }
+    else {
+      $path = $original_file->uri;
+    }
+
+    $new_file = file_save_data($document->saveXML(), $path, FILE_EXISTS_REPLACE);
+
+    if ($new_file === FALSE) {
+      throw new Exception('Could not create script', 8);
+    }
+    else if ($original_file === FALSE) {
+      $fields = array('uid' => $uid, 'fid' => $new_file->fid, 'created' => REQUEST_TIME, 'changed' => REQUEST_TIME);
+      db_insert('bg_scriptmachine')
+        ->fields($fields)
+        ->execute();
+    }
+    else {
+      $fields = array('changed' => REQUEST_TIME);
+      db_update('bg_scriptmachine')
+        ->condition('uid', $uid)
+        ->condition('fid', $new_file->fid)
+        ->fields($fields)
+        ->execute();
+    }
+  }
+
+  return $xml_response;
+}
+
+function _bg_scriptmachine_api_create() {
+  exit('ee');
+}
+
+function _bg_scriptmachine_create_error_document($message, $code) {
+  $document = new DOMDocument('1.0', 'UTF-8');
+  $root = $document->createElement('response');
+  $document->appendChild($root);
+  $e = $document->createElement('error');
+  $root->appendChild($e);
+  $e->setAttribute('code', $code);
+  $e->appendChild($document->createTextNode(t($message)));
+  return $document;
+}
+
+function _bg_scriptmachine_create_ok_document() {
+  $document = new DOMDocument('1.0', 'UTF-8');
+  $root = $document->createElement('response');
+  $document->appendChild($root);
+  $e = $document->createElement('ok');
+  $root->appendChild($e);
+  return $document;
+}

@@ -1,0 +1,56 @@
+<?php
+function bg_scriptmachine_schema() {
+  $schema['bg_scriptmachine'] = array(
+    'description' => 'The base table for scripts created with the script machine.',
+    'fields' => array(
+      'uid' => array(
+        'description' => 'The {users}.uid of the user who is associated with the file.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'fid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'UNIX timestamp for when the script was created.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'UNIX timestamp for when the file was last changed.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'unique keys' => array(
+   	  'uid' => array('uid'),
+    ),
+    'foreign keys' => array(
+      'uid' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+      'fid' => array(
+        'table' => 'file_managed',
+        'columns' => array('fid' => 'fid'),
+      ),
+    ),
+  );
+  return $schema;
+}
+
+function bg_scriptmachine_install() {
+  drupal_install_schema('bg_scriptmachine');
+}
+
+function bg_scriptmachine_uninstall() {
+  drupal_uninstall_schema('bg_scriptmachine');
+}
