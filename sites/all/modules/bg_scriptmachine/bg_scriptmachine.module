@@ -25,8 +25,27 @@ function bg_scriptmachine_menu() {
     'access callback'	=> TRUE,
     'type'              => MENU_CALLBACK,
   );
+  $items['admin/config/scriptmachine'] = array(
+    'title'             => 'Scriptmachine Settings',
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('bg_scriptmachine_admin_settings'),
+    'type'              => MENU_NORMAL_ITEM,
+    'access arguments'  => array('administer site configuration'),
+  );
 
   return $items;
+}
+
+function bg_scriptmachine_admin_settings() {
+  $form = array();
+
+  $form['bg_scriptmachine_url'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Scriptmachine URL',
+    '#default_value' => variable_get('bg_scriptmachine_url',''),
+  );
+
+  return system_settings_form($form);
 }
 
 /**
@@ -35,7 +54,7 @@ function bg_scriptmachine_menu() {
  * @param String $action
  */
 function bg_scriptmachine_api($action) {
-  if (!user_access(PERMISSION_ACCESS_SCRIPTMACHINE_API)) {
+  if (user_access(PERMISSION_ACCESS_SCRIPTMACHINE_API)) {
     $api_action = '_bg_scriptmachine_api_' . $action;
 
     if (function_exists($api_action)) {
@@ -61,9 +80,18 @@ function bg_scriptmachine_api($action) {
   exit;
 }
 
+function bg_scriptmachine_mail($key, &$message, $params) {
+  switch($key) {
+    case 'notify':
+      $langcode = $message['language']->language;
+      $message['subject'] = t('A message from !name', array('!name' => $params['from_name']), array('langcode' => $langcode));
+      break;
+  }
+}
+
 function _bg_scriptmachine_api_scripts() {
-  $uid = $_GET['user'];
   $xml_response = new DOMDocument('1.0', 'UTF-8');
+  $uid = $_GET['user'];
 
   if (!is_numeric($uid)) {
     throw new Exception('Missing or invalid userid argument', 4);
@@ -84,9 +112,9 @@ function _bg_scriptmachine_api_scripts() {
 }
 
 function _bg_scriptmachine_api_store() {
-  $uid = $_GET['user'];
   $document = new DOMDocument('1.0', 'UTF-8');
   $xml_response = _bg_scriptmachine_create_ok_document();
+  $uid = $_GET['user'];
 
   if (!is_numeric($uid)) {
     throw new Exception('Missing or invalid userid argument', 4);
@@ -129,8 +157,37 @@ function _bg_scriptmachine_api_store() {
   return $xml_response;
 }
 
-function _bg_scriptmachine_api_create() {
-  exit('ee');
+function _bg_scriptmachine_api_notify() {
+  global $language;
+  $xml_response = _bg_scriptmachine_create_ok_document();
+  $params = array();
+
+  $params['uid'] = $_POST['uID'];
+  $params['sid'] = $_POST['sID'];
+
+  $params['from_name'] = $_POST['namefrom'];
+  $params['from_email'] = $_POST['emailfrom'];
+
+  $params['to_name'] = $_POST['namefriend'];
+  $params['to_email'] = $_POST['emailfriend'];
+
+  $params['message'] = $_POST['message'];
+
+  if (!is_numeric($params['uid'])) {
+    throw new Exception('Missing or invalid userid argument', 4);
+  }
+  else if (empty($params['from_email'])) {
+    throw new Exception('Afzender adres ontbreekt');
+  }
+  else if (empty($params['to_email'])) {
+    throw new Exception('Ontvanger adres ontbreekt.');
+  }
+  else {
+    $params['script_url'] = url(variable_get('bg_scriptmachine_url', ''), array('absolute' => TRUE, 'query' => array('uID' => $params['uid'], 'sID' => $params['sid'])));
+    drupal_mail('bg_scriptmachine', 'notify', $params['to_email'], $language, $params);
+  }
+
+  return $xml_response;
 }
 
 function _bg_scriptmachine_create_error_document($message, $code) {

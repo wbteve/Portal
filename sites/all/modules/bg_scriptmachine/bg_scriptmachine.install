@@ -54,3 +54,17 @@ function bg_scriptmachine_install() {
 function bg_scriptmachine_uninstall() {
   drupal_uninstall_schema('bg_scriptmachine');
 }
+
+/**
+ * Implements hook_enable().
+ */
+function bg_scriptmachine_enable() {
+  mailsystem_set(array('bg_scriptmachine_notify' => 'HTMLMailSystem'));
+}
+
+/**
+ * Implements hook_disable().
+ */
+function bg_scriptmachine_disable() {
+  mailsystem_clear(array('bg_scriptmachine_notify' => ''));
+}
