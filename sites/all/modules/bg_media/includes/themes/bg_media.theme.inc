@@ -28,13 +28,6 @@ function bg_media_preprocess_bg_media_video(&$vars) {
   if($wrapper instanceof MediaBVDStreamWrapper || $wrapper instanceof MediaProlocationStreamWrapper) {
     $vars['video'] = '<div id="' . $player_id . '" class="flowplayer ' . BG_MEDIA_FLASH_PLAYER_ID . '"></div>';
     flowplayer_add('#' . $player_id, array(
-      'logo'  => array(
-        'url' => 'branding.png',
-        'fullscreenOnly' => false,
-        'displayTime' => 0,
-        'top' => 20,
-        'right' => 20
-      ),
       'playlist'  => array(
         array(
           'url'     => file_create_url($wrapper->getLocalThumbnailPath()),
@@ -71,13 +64,6 @@ function bg_media_preprocess_bg_media_video(&$vars) {
 
     $vars['flash_video'] = '<div id="' . $player_id . '" class="flowplayer vjs-flash-fallback"></div>';
     flowplayer_add('#' . $player_id, array(
-      'logo'  => array(
-        'url' => 'branding.png',
-        'fullscreenOnly' => false,
-        'displayTime' => 0,
-        'top' => 20,
-        'right' => 20
-      ),
       'playlist'  => array(
         array(
           'url'       => $vars['thumbnail'],
@@ -109,13 +95,6 @@ function bg_media_preprocess_bg_media_video(&$vars) {
 
     $vars['flash_video'] = '<div id="' . $player_id . '" class="flowplayer vjs-flash-fallback"></div>';
     flowplayer_add('#' . $player_id, array(
-      'logo'  => array(
-        'url' => 'branding.png',
-        'fullscreenOnly' => false,
-        'displayTime' => 0,
-        'top' => 20,
-        'right' => 20
-      ),
       'playlist'  => array(
         array(
           'url'       => $vars['thumbnail'],
