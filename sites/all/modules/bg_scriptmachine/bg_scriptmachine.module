@@ -25,6 +25,18 @@ function bg_scriptmachine_menu() {
     'access callback'	=> TRUE,
     'type'              => MENU_CALLBACK,
   );
+  $items['scriptmachine'] = array(
+    'title'				=> 'Scriptmachine',
+    'page callback'     => 'bg_scriptmachine',
+    'access callback'	=> TRUE,
+    'type'              => MENU_CALLBACK,
+  );
+  $items['scriptmachine/settings'] = array(
+    'title'				=> 'Scriptmachine',
+    'page callback'     => 'bg_scriptmachine_settings',
+    'access callback'	=> TRUE,
+    'type'              => MENU_CALLBACK,
+  );
   $items['admin/config/scriptmachine'] = array(
     'title'             => 'Scriptmachine Settings',
     'page callback'     => 'drupal_get_form',
@@ -39,13 +51,67 @@ function bg_scriptmachine_menu() {
 function bg_scriptmachine_admin_settings() {
   $form = array();
 
-  $form['bg_scriptmachine_url'] = array(
+  $form['bg_scriptmachine_server'] = array(
     '#type' => 'textfield',
-    '#title' => 'Scriptmachine URL',
-    '#default_value' => variable_get('bg_scriptmachine_url',''),
+    '#title' => 'Scriptmachine Server',
+    '#default_value' => variable_get('bg_scriptmachine_server','http://beeldgeluid.localhost/api/scriptmachine/'),
+  );
+  $form['bg_scriptmachine_urlStore'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Scriptmachine urlStore',
+    '#default_value' => variable_get('bg_scriptmachine_urlStore','http://beeldgeluid.localhost/api/scriptmachine/store'),
+  );
+  $form['bg_scriptmachine_urlLoad'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Scriptmachine urlLoad',
+    '#default_value' => variable_get('bg_scriptmachine_urlLoad','http://beeldgeluid.localhost/api/scriptmachine/scripts'),
+  );
+  $form['bg_scriptmachine_urlCheckLogin'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Scriptmachine urlCheckLogin',
+    '#default_value' => variable_get('bg_scriptmachine_urlCheckLogin','http://beeldgeluid.localhost/api/scriptmachine/check_login'),
+  );
+  $form['bg_scriptmachine_urlSendToFriend'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Scriptmachine urlSendToFriend',
+    '#default_value' => variable_get('bg_scriptmachine_urlSendToFriend','http://beeldgeluid.localhost/api/scriptmachine/notify'),
   );
 
   return system_settings_form($form);
+}
+
+function bg_scriptmachine_settings() {
+  $dir = base_path() . drupal_get_path('module', 'bg_scriptmachine');
+
+  $server = variable_get('bg_scriptmachine_server','http://beeldgeluid.localhost/api/scriptmachine/');
+  $urlStore = variable_get('bg_scriptmachine_urlStore','http://beeldgeluid.localhost/api/scriptmachine/store');
+  $urlLoad = variable_get('bg_scriptmachine_urlLoad','http://beeldgeluid.localhost/api/scriptmachine/scripts');
+  $urlCheckLogin = variable_get('bg_scriptmachine_urlCheckLogin','http://beeldgeluid.localhost/api/scriptmachine/check_login');
+  $urlSendToFriend = variable_get('bg_scriptmachine_urlSendToFriend','http://beeldgeluid.localhost/api/scriptmachine/notify');
+
+  echo <<<SETTINGS
+&server=$server&
+&urlStore=$urlStore&
+&urlLoad=$urlLoad&
+&urlCheckLogin=$urlCheckLogin&
+&urlSendToFriend=$urlSendToFriend&
+
+&___VOOR_REMOTE___&
+&swfRoot=$dir/flash/_swf/scriptmachine/&
+&libraryRoot=$dir/flash/_swf/library/&
+
+SETTINGS;
+  exit;
+}
+
+function bg_scriptmachine() {
+  // Creates a new object wrapping the given file (path)
+  $swf = new SWFObject(base_path() . drupal_get_path('module', 'bg_scriptmachine') . '/flash/scriptmachine_media.swf');
+  $swf->height(520)
+      ->width(970);
+
+  // Theme the object and return that to the client.
+  return theme('swfembed_embed', array('swf' => $swf));
 }
 
 /**
@@ -54,6 +120,8 @@ function bg_scriptmachine_admin_settings() {
  * @param String $action
  */
 function bg_scriptmachine_api($action) {
+  global $user;
+
   if (user_access(PERMISSION_ACCESS_SCRIPTMACHINE_API)) {
     $api_action = '_bg_scriptmachine_api_' . $action;
 
@@ -90,10 +158,11 @@ function bg_scriptmachine_mail($key, &$message, $params) {
 }
 
 function _bg_scriptmachine_api_scripts() {
+  global $user;
   $xml_response = new DOMDocument('1.0', 'UTF-8');
-  $uid = $_GET['user'];
+  $uid = $user->uid;
 
-  if (!is_numeric($uid)) {
+  if ($uid <= 0) {
     throw new Exception('Missing or invalid userid argument', 4);
   }
   else {
@@ -112,9 +181,10 @@ function _bg_scriptmachine_api_scripts() {
 }
 
 function _bg_scriptmachine_api_store() {
+  global $user;
   $document = new DOMDocument('1.0', 'UTF-8');
   $xml_response = _bg_scriptmachine_create_ok_document();
-  $uid = $_GET['user'];
+  $uid = $user->uid;
 
   if (!is_numeric($uid)) {
     throw new Exception('Missing or invalid userid argument', 4);
@@ -158,11 +228,12 @@ function _bg_scriptmachine_api_store() {
 }
 
 function _bg_scriptmachine_api_notify() {
+  global $user;
   global $language;
   $xml_response = _bg_scriptmachine_create_ok_document();
   $params = array();
 
-  $params['uid'] = $_POST['uID'];
+  $params['uid'] = $user->uid;
   $params['sid'] = $_POST['sID'];
 
   $params['from_name'] = $_POST['namefrom'];
@@ -186,6 +257,12 @@ function _bg_scriptmachine_api_notify() {
     $params['script_url'] = url(variable_get('bg_scriptmachine_url', ''), array('absolute' => TRUE, 'query' => array('uID' => $params['uid'], 'sID' => $params['sid'])));
     drupal_mail('bg_scriptmachine', 'notify', $params['to_email'], $language, $params);
   }
+
+  return $xml_response;
+}
+
+function _bg_scriptmachine_api_check_login() {
+  $xml_response = _bg_scriptmachine_create_ok_document();
 
   return $xml_response;
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<data>
+	<row title="Nieuws" sub1="voor kinderen" sub2="voor jongeren" sub3="voor volwassenen" maxscenes="10"/>
+	<row title="Soap" sub1="emotionele soap" sub2="grappige soap" sub3="spannende soap" maxscenes="12"/>
+	<row title="Reclame" sub1="informatieve reclame" sub2="sfeervolle reclame" sub3="grappige reclame" maxscenes="16"/>
+</data>

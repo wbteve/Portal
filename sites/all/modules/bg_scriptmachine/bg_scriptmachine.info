@@ -2,5 +2,8 @@ name = Beeld en Geluid Scriptmachine
 description = The Script Machine is a Flash application with Drupal as a backend. Users can use the tool to create short movies.
 package = "Beeld en Geluid"
 core = 7.x
+
+dependencies[] = bg_custom
 dependencies[] = htmlmail
 dependencies[] = mailsystem
+dependencies[] = swfobject
