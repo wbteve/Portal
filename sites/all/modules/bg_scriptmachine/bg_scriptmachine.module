@@ -105,10 +105,20 @@ SETTINGS;
 }
 
 function bg_scriptmachine() {
-  // Creates a new object wrapping the given file (path)
-  $swf = new SWFObject(base_path() . drupal_get_path('module', 'bg_scriptmachine') . '/flash/scriptmachine_media.swf');
-  $swf->height(520)
-      ->width(970);
+  if (isset($_GET['uID']) && is_numeric($_GET['uID']) && isset($_GET['sID']) && is_numeric($_GET['sID'])) {
+    // Creates a new object wrapping the given file (path)
+    $swf = new SWFObject(base_path() . drupal_get_path('module', 'bg_scriptmachine') . '/flash/ScriptMachinePlayer.swf');
+    $swf->height(370)
+        ->width(410)
+        ->flashVar('uID', $_GET['uID'])
+        ->flashVar('sID', $_GET['sID']);
+  }
+  else {
+    // Creates a new object wrapping the given file (path)
+    $swf = new SWFObject(base_path() . drupal_get_path('module', 'bg_scriptmachine') . '/flash/scriptmachine_media.swf');
+    $swf->height(520)
+        ->width(970);
+  }
 
   // Theme the object and return that to the client.
   return theme('swfembed_embed', array('swf' => $swf));
@@ -121,10 +131,9 @@ function bg_scriptmachine() {
  */
 function bg_scriptmachine_api($action) {
   global $user;
+  $api_action = '_bg_scriptmachine_api_' . $action;
 
-  if (user_access(PERMISSION_ACCESS_SCRIPTMACHINE_API)) {
-    $api_action = '_bg_scriptmachine_api_' . $action;
-
+  if (user_access(PERMISSION_ACCESS_SCRIPTMACHINE_API) || $api_action == '_bg_scriptmachine_api_scripts') {
     if (function_exists($api_action)) {
       try {
         $xml_response = $api_action();
@@ -161,6 +170,10 @@ function _bg_scriptmachine_api_scripts() {
   global $user;
   $xml_response = new DOMDocument('1.0', 'UTF-8');
   $uid = $user->uid;
+
+  if(isset($_GET['user']) && is_numeric($_GET['user']) && $_GET['user'] != $uid) {
+    $uid = $_GET['user'];
+  }
 
   if ($uid <= 0) {
     throw new Exception('Missing or invalid userid argument', 4);
@@ -254,7 +267,7 @@ function _bg_scriptmachine_api_notify() {
     throw new Exception('Ontvanger adres ontbreekt.');
   }
   else {
-    $params['script_url'] = url(variable_get('bg_scriptmachine_url', ''), array('absolute' => TRUE, 'query' => array('uID' => $params['uid'], 'sID' => $params['sid'])));
+    $params['script_url'] = url(variable_get('bg_scriptmachine_url', '/scriptmachine'), array('absolute' => TRUE, 'query' => array('uID' => $params['uid'], 'sID' => $params['sid'])));
     drupal_mail('bg_scriptmachine', 'notify', $params['to_email'], $language, $params);
   }
 
