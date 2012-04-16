@@ -6,4 +6,4 @@ core = 7.x
 dependencies[] = bg_custom
 dependencies[] = htmlmail
 dependencies[] = mailsystem
-dependencies[] = swfobject
+dependencies[] = swfembed
