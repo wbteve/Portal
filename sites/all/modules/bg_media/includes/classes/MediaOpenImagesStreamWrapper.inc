@@ -37,7 +37,21 @@ class MediaOpenImagesStreamWrapper extends BGMediaStreamWrapper {
     }
 
     // Set identifier
-    $this->identifier = str_replace('openimages://', '', $this->uri);
+    $this->identifier = $this->translateIdentifier(str_replace('openimages://', '', $this->uri));
+  }
+
+  function translateIdentifier($identifier) {
+    $pos = strrpos($identifier, '.');
+    if ($pos !== FALSE) {
+      $identifier = substr_replace($identifier, ':', $pos, strlen('.'));
+    }
+
+    $pos = strpos($identifier, '.');
+    if ($pos !== FALSE) {
+      $identifier = substr_replace($identifier, ':', $pos, strlen('.'));
+    }
+
+    return $identifier;
   }
 
   /**

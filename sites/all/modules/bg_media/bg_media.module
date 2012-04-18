@@ -20,7 +20,7 @@ else {
 }
 
 function bg_media_node_view($node, $view_mode, $langcode) {
-  if(in_array($node->type, array(CONTENT_TYPE_DOSSIER, CONTENT_TYPE_FACEBOOK))) {
+  if(in_array($node->type, array(CONTENT_TYPE_MEDIA, CONTENT_TYPE_DOSSIER, CONTENT_TYPE_FACEBOOK))) {
     drupal_add_js(array('bgMedia' => array('initOnce' => $node->type == CONTENT_TYPE_FACEBOOK)), 'setting');
     drupal_add_js(drupal_get_path('module', 'bg_media') . '/includes/js/bg_media.js');
   }
