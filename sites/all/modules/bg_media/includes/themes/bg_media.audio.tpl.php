@@ -7,4 +7,7 @@
    * </audio>
    */
 ?>
-<?php echo $flash_audio; ?>
+<?php echo $cover_image; ?>
+<div class="bg_media_audio_player">
+  <?php echo $flash_audio; ?>
+</div>

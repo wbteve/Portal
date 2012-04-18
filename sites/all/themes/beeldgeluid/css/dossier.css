@@ -216,6 +216,10 @@
   float: left;
 }
 
+.node-media .field-name-field-media-file img    {
+  display: block;
+}
+
 .node-media .group-verbreding {
   background: #E00034;
   width: 300px;
@@ -239,9 +243,17 @@
   height: 280px;
 }
 
+.bg_media_audio_player .flash-media-player {
+  height: 30px;
+}
+
 body.page-node-embed .flash-media-player {
   width: 480px;
   height: 320px;
+}
+
+body.page-node-embed .bg_media_audio_player .flash-media-player {
+  height: 30px;
 }
 
 #main .dossier-element .field-type-media .field-item  {

@@ -123,38 +123,77 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
 
   $player_id = drupal_html_id(BG_MEDIA_FLASH_PLAYER_ID);
 
-  $icon_path    = media_variable_get('icon_base_directory') . '/' . media_variable_get('icon_set');
   $wrapper      = file_stream_wrapper_get_instance_by_uri($vars['file']->uri);
-  if ($wrapper instanceof BGMediaStreamWrapper) {
-    $poster_path =  file_create_url($wrapper->getLocalThumbnailPath());
-  }
-  else {
-    $poster_path  = base_path() . file_icon_path((object)$vars['file'], $icon_path);
-  }
-  $vars['url'] = base_path() . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename;
-  $vars['mimetype'] = $vars['file']->filemime;
 
   $vars['flash_audio'] = '<div id="' . $player_id . '" class="flowplayer ' . BG_MEDIA_FLASH_PLAYER_ID . '"></div>';
-  flowplayer_add('#' . $player_id, array(
-    'playlist'  => array(
-      array(
-        'url'       => $poster_path,
+
+  if (arg(2) == 'embed') {
+    $cover_image_preset = 'media-audio-cover-embed';
+  }
+  else {
+    $cover_image_preset = 'media-audio-cover';
+  }
+
+  // Theming of Prolocation items
+  if($wrapper instanceof MediaBVDStreamWrapper || $wrapper instanceof MediaProlocationStreamWrapper) {
+    $vars['cover_image'] = theme('image_style', array('style_name' => $cover_image_preset, 'path' => $wrapper->getLocalThumbnailPath()));
+
+    flowplayer_add('#' . $player_id, array(
+      'playlist'  => array(
+        array(
+           // Replace single quote in URL for IE compatibility
+          'url'         => str_replace("'", '%2527', $wrapper->getExternalPath()),
+          'provider'    => 'rtmp',
+          'autoPlay'    => false,
+          'onStart'	    => 'Drupal.BGMediaPlayerPlayHandler',
+          'onResume'    => 'Drupal.BGMediaPlayerPlayHandler',
+          'onStop'	    => 'Drupal.BGMediaPlayerStopHandler',
+          'onPause'     => 'Drupal.BGMediaPlayerStopHandler',
+        ),
       ),
-      array(
-        'url'       => $vars['url'],
-        'autoPlay'  => false,
-        'onStart'	=> 'Drupal.BGMediaPlayerPlayHandler',
-        'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
-        'onStop'	=> 'Drupal.BGMediaPlayerStopHandler',
-        'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
-      ),media_variable_get('icon_set')
-    ),
-    'plugins'   => array(
-      'audio'  => array(
-        'url'               => 'flowplayer.audio.swf',
-      )
-    ),
-  ));
+      'play'      => NULL,
+      'plugins'   => array(
+        'rtmp'  => array(
+          'url'               => 'flowplayer.rtmp.swf',
+          'netConnectionUrl'  => $wrapper->getBaseUrl(),
+        ),
+        'controls'  => array(
+          'height'     => 30,
+          'autoHide'   => FALSE,
+          'fullscreen' => FALSE,
+        ),
+      ),
+    ));
+  }
+  else {
+    $icon_path = str_replace('sites/default/files/', '', file_icon_path((object)$vars['file'], 'sites/default/files'));
+
+    $vars['cover_image'] = theme('image_style', array('style_name' => $cover_image_preset, 'path' => $icon_path));
+
+    flowplayer_add('#' . $player_id, array(
+      'playlist'  => array(
+        array(
+          'url'       => base_path() . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename,
+          'autoPlay'  => false,
+          'onStart'	=> 'Drupal.BGMediaPlayerPlayHandler',
+          'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
+          'onStop'	=> 'Drupal.BGMediaPlayerStopHandler',
+          'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
+        ),media_variable_get('icon_set')
+      ),
+      'play'      => NULL,
+      'plugins'   => array(
+        'audio'  => array(
+          'url'               => 'flowplayer.audio.swf',
+        ),
+        'controls'  => array(
+          'height'     => 30,
+          'autoHide'   => FALSE,
+          'fullscreen' => FALSE,
+        ),
+      ),
+    ));
+  }
 }
 
 /**

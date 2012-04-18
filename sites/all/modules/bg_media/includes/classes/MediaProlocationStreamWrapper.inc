@@ -25,7 +25,13 @@ class MediaProlocationStreamWrapper extends BGMediaStreamWrapper {
   }
 
   public function getExternalPath() {
-    return str_replace('prolocation://', 'mp4:', $this->uri);
+    $extension = pathinfo($this->uri, PATHINFO_EXTENSION);
+    if ($extension == 'mp3') {
+      return str_replace('prolocation://', 'mp3:', $this->uri);
+    }
+    else {
+      return str_replace('prolocation://', 'mp4:', $this->uri);
+    }
   }
 
   public function getLocalThumbnailPath() {
