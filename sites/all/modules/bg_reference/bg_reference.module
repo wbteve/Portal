@@ -179,13 +179,10 @@ function theme_bg_reference($variables) {
       if(strpos($element['#data']['content'], '[[{"type":"media"') !== FALSE) {
         $classes[] = 'dossier-element-media';
       }
-      //Check markup filters out the <script> tags, for #5399 this is not wanted, TODO discuss with mark or robbert. Martijn      
-      if (strpos($element['#data']['content'], '<script') !== FALSE ){
-        $content = '<div class="dossier-element-text-inner">' . $element['#data']['content'] . '</div>';
-      }
-      else {
-        $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], 'dossier_text') . '</div>';
-      }
+
+      // Filter content and wrap in a div.
+      $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], $element['#data']['text_format']) . '</div>';
+      
       break;
   }
 
@@ -299,6 +296,48 @@ function bg_reference_field_is_empty($item, $field) {
   return empty($item['content']);
 }
 
+/**
+ * Implement hook_field_presave().
+ */
+function bg_reference_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  // Store the text format together with the text content as a serialized array.
+  foreach ($items as $delta => $item) {
+    if ($item['type'] == CONTENT_TYPE_TEXT) {
+      $content_array = array(
+        'text' => $item['content'],
+        'text_format' => $item['wrapper']['ref_'. CONTENT_TYPE_TEXT]['format'],
+      );
+      $items[$delta]['content'] = serialize($content_array);
+    }
+  }
+}
+
+/**
+ * Implement hook_field_load().
+ */
+function bg_reference_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => $item) {
+      // Unpack serialized arrays of text items to extract the text format.
+      // For backwards compatibility, set the default text format if the content is not a serialized array yet.
+      if ($item['type'] == CONTENT_TYPE_TEXT && ($content_array = @unserialize($item['content'])) !== false) {
+        $items[$id][$delta]['content'] = $content_array['text'];
+        $items[$id][$delta]['text_format'] = $content_array['text_format'];
+      }
+      else {
+        $items[$id][$delta]['text_format'] = 'full_html';
+      }
+    }
+  }
+}
+
+/**
+ * Implement hook_field_prepare_view().
+ */
+/*function bg_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
+  dpm(get_defined_vars());
+}*/
+
 /***********************************************************************
  *  Field Type API: Formatter
  **********************************************************************/
@@ -380,17 +419,25 @@ function bg_reference_field_widget_info() {
 function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
   $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
   $module_path = drupal_get_path('module', 'bg_reference');
-
-  // Get type and value from form values
+  
+  $text_format = NULL;
+  // Get type value from form values
   if(isset($form_state['values']) && isset($form_state['values']['field_referenced_content'][$langcode][$delta])) {
     $type   = $form_state['values']['field_referenced_content'][$langcode][$delta]['type'];
     $value  = $form_state['values']['field_referenced_content'][$langcode][$delta]['content'];
+    if ($type = CONTENT_TYPE_TEXT) {
+      $text_format = $form_state['values']['field_referenced_content'][$langcode][$delta]['wrapper']['ref_'. CONTENT_TYPE_TEXT]['format'];
+    }
   }
   // Get type and value from stored data
   else if(isset($items[$delta])) {
     $type   = $items[$delta]['type'];
     $value  = $items[$delta]['content'];
+    if ($type = CONTENT_TYPE_TEXT) {
+      $text_format = $items[$delta]['text_format'];
+    }
   }
+
   // Set defaults
   else {
     $type   = CONTENT_TYPE_TEXT;
@@ -480,7 +527,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
     ),
   );
 
-  $element['wrapper'] = array_merge($element['wrapper'], _bg_reference_get_form($type, $value));
+  $element['wrapper'] = array_merge($element['wrapper'], _bg_reference_get_form($type, $value, $text_format));
 
   asort($element['type']['#options']);
 
@@ -492,7 +539,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
  * @param $type
  * @param $value
  */
-function _bg_reference_get_form($type, $value) {
+function _bg_reference_get_form($type, $value, $text_format = NULL) {
   $element = array();
   switch($type) {
     case CONTENT_TYPE_BANNER:
@@ -545,22 +592,11 @@ function _bg_reference_get_form($type, $value) {
       break;
 
     case CONTENT_TYPE_TEXT:
-      $format = 'full_html';
-      //TODO discuss with marc or robbert. martijn
-      if (strpos($value, '<script') !== FALSE) {
-        $format = 'full_html_script';
-      }
-      elseif (strpos($value, '<iframe') !== FALSE) {
-        $format = 'full_html_script';
-      }
-      elseif (strpos($value, '<object') !== FALSE) {
-        $format = 'full_html_script';
-      }
       $element['ref_' . CONTENT_TYPE_TEXT] = array(
         '#type'               => 'text_format',
         '#title'              => t('Text'),
         '#attributes'         => array('class' => array('bg_reference_text')),
-        '#format'             => $format,
+        '#format'             => $text_format,
         '#default_value'      => $value,
       );
       break;
