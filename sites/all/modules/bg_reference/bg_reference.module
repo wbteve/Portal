@@ -304,7 +304,7 @@ function bg_reference_field_presave($entity_type, $entity, $field, $instance, $l
   foreach ($items as $delta => $item) {
     if ($item['type'] == CONTENT_TYPE_TEXT) {
       $content_array = array(
-        'text' => $item['content'],
+        'text' => $item['wrapper']['ref_'. CONTENT_TYPE_TEXT]['value'],
         'text_format' => $item['wrapper']['ref_'. CONTENT_TYPE_TEXT]['format'],
       );
       $items[$delta]['content'] = serialize($content_array);
