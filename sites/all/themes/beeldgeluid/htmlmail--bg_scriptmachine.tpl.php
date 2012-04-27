@@ -131,7 +131,7 @@
     --></style>
     <div style="position: relative; margin: 0 auto; width: 600px; background: #E7E7E7; color: #494949; text-align: left;">
 
-      <h1 style="margin: 0;"><img style="display: block;" src="{4}boven.jpg" alt="Beeld en Geluid" width="600" height="75"></h1>
+      <h1 style="margin: 0;"><img style="display: block;" src="<?php print $template_url; ?>/images/mail-header.jpg" alt="Beeld en Geluid" width="600" height="75"></h1>
 
       <div style="line-height: 1.5;">
 
@@ -157,7 +157,7 @@
   		</p>
         <p style="margin: 1em 60px 1em 28px;">
         <a style="color: #0080CE; font-weight: bold; text-decoration: none;" href="http://www.beeldengeluid.nl/">
-          Ga naar de Beeld en Geluid website <img style="border: none;" src="{4}bullet-blue.gif" alt="" width="19" height="10"></a>
+          Ga naar de Beeld en Geluid website <img style="border: none;" src="<?php print $template_url; ?>/images/bullet-blue.gif" alt="" width="19" height="10"></a>
         </p>
         <p style="margin: 1em 60px 1em 28px;">Tot ziens,<br>
           Beeld en Geluid.
