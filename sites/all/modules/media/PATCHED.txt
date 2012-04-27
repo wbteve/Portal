@@ -1,0 +1,12 @@
+media/includes/media.theme.inc has been altered around line 322:
+
+-  $icon = file_icon_path((object)$file, $icon_dir);
++  $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
++  if ($wrapper instanceof BGMediaStreamWrapper) {
++    $icon =  $wrapper->getLocalThumbnailPath();
++  }
++  else {
++      $icon = file_icon_path((object)$file, $icon_dir);
++  }
+
+This was done in commit #21059 in order to fix melding #5339.
