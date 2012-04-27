@@ -4,7 +4,7 @@
  * Implements hook_menu.
  */
 function bg_sitemap_form_alter(&$form, &$form_state, $form_id) {
-  if($form_id == 'user_profile_form' && $_SESSION['serviceconnect']){
+  if($form_id == 'user_profile_form' && isset($_SESSION['serviceconnect']) && $_SESSION['serviceconnect'] == true){
     // Require e-mail if it wasn't updated yet
     if(strpos($form['account']['mail']['#default_value'],'@nvt.nl') !== false){
       $form['account']['mail']['#default_value'] = '';
