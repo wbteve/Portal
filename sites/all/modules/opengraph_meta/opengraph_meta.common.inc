@@ -562,13 +562,15 @@ class OpenGraphMetaDrupalLayer {
       else if (!empty($fields['fid']) && is_numeric($fields['fid'])) {
         $file = file_load($fields['fid']);
         $preview = media_get_thumbnail_preview($file);
-        $url = image_style_url('thumbnail', $preview['#path']);
-
-        array_push($resultarray, array(
-          'title' => '',
-          'alt' => '',
-          'url' => $url,
-        ));
+        if (isset($preview['#path'])) {
+          $url = image_style_url('thumbnail', $preview['#path']);
+  
+          array_push($resultarray, array(
+            'title' => '',
+            'alt' => '',
+            'url' => $url,
+          ));
+        }
       }
       else {
         foreach ($fields as $cv) {
