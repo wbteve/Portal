@@ -419,13 +419,13 @@ function bg_reference_field_widget_info() {
 function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
   $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
   $module_path = drupal_get_path('module', 'bg_reference');
-  
+
   $text_format = NULL;
   // Get type value from form values
   if(isset($form_state['values']) && isset($form_state['values']['field_referenced_content'][$langcode][$delta])) {
     $type   = $form_state['values']['field_referenced_content'][$langcode][$delta]['type'];
     $value  = $form_state['values']['field_referenced_content'][$langcode][$delta]['content'];
-    if ($type = CONTENT_TYPE_TEXT) {
+    if ($type == CONTENT_TYPE_TEXT) {
       $text_format = $form_state['values']['field_referenced_content'][$langcode][$delta]['wrapper']['ref_'. CONTENT_TYPE_TEXT]['format'];
     }
   }
@@ -433,17 +433,16 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
   else if(isset($items[$delta])) {
     $type   = $items[$delta]['type'];
     $value  = $items[$delta]['content'];
-    if ($type = CONTENT_TYPE_TEXT) {
+    if ($type == CONTENT_TYPE_TEXT) {
       $text_format = $items[$delta]['text_format'];
     }
   }
-
   // Set defaults
   else {
     $type   = CONTENT_TYPE_TEXT;
     $value  = '';
   }
-
+       
   $ajax_settings = array(
     'event'     => 'change',
     'method'    => 'html',
@@ -530,7 +529,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
   $element['wrapper'] = array_merge($element['wrapper'], _bg_reference_get_form($type, $value, $text_format));
 
   asort($element['type']['#options']);
-
+    
   return $element;
 }
 
