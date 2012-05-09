@@ -68,6 +68,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '18',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '6',
+        ),
         'full' => array(
           'label' => 'inline',
           'module' => 'taxonomy',
@@ -86,12 +92,12 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
       'field_name' => 'field_media_creators',
-      'label' => 'Creators',
+      'label' => 'Makers',
       'required' => 0,
       'settings' => array(
         'user_register_form' => FALSE,
@@ -142,30 +148,24 @@ function bg_media_feature_field_default_fields() {
       'display' => array(
         'default' => array(
           'label' => 'above',
-          'module' => 'date',
+          'module' => 'bg_media',
           'settings' => array(
-            'format_type' => 'long',
-            'fromto' => 'both',
-            'multiple_from' => '',
-            'multiple_number' => '',
-            'multiple_to' => '',
-            'show_repeat_rule' => 'show',
+            'format_type_day' => 'short',
+            'format_type_month' => 'month_year',
+            'format_type_year' => 'year',
           ),
-          'type' => 'date_default',
+          'type' => 'bg_media_date',
           'weight' => '2',
         ),
         'dossier' => array(
           'label' => 'above',
-          'module' => 'date',
+          'module' => 'bg_media',
           'settings' => array(
-            'format_type' => 'hidden',
-            'fromto' => 'both',
-            'multiple_from' => '',
-            'multiple_number' => '',
-            'multiple_to' => '',
-            'show_repeat_rule' => 'show',
+            'format_type_day' => 'short',
+            'format_type_month' => 'month_year',
+            'format_type_year' => 'year',
           ),
-          'type' => 'date_default',
+          'type' => 'bg_media_date',
           'weight' => '10',
         ),
         'embed' => array(
@@ -174,18 +174,21 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '1',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '20',
+        ),
         'full' => array(
           'label' => 'inline',
-          'module' => 'date',
+          'module' => 'bg_media',
           'settings' => array(
-            'format_type' => 'long',
-            'fromto' => 'both',
-            'multiple_from' => '',
-            'multiple_number' => '',
-            'multiple_to' => '',
-            'show_repeat_rule' => 'show',
+            'format_type_day' => 'short',
+            'format_type_month' => 'month_year',
+            'format_type_year' => 'year',
           ),
-          'type' => 'date_default',
+          'type' => 'bg_media_date',
           'weight' => '7',
         ),
         'search_result' => array(
@@ -204,17 +207,14 @@ function bg_media_feature_field_default_fields() {
         ),
         'teaser' => array(
           'label' => 'above',
-          'module' => 'date',
+          'module' => 'bg_media',
           'settings' => array(
-            'format_type' => 'hidden',
-            'fromto' => 'both',
-            'multiple_from' => '',
-            'multiple_number' => '',
-            'multiple_to' => '',
-            'show_repeat_rule' => 'show',
+            'format_type_day' => 'short',
+            'format_type_month' => 'month_year',
+            'format_type_year' => 'year',
           ),
-          'type' => 'date_default',
-          'weight' => 0,
+          'type' => 'bg_media_date',
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -242,7 +242,94 @@ function bg_media_feature_field_default_fields() {
           'year_range' => '-3:+3',
         ),
         'type' => 'date_popup',
-        'weight' => '8',
+        'weight' => '3',
+      ),
+    ),
+  );
+
+  // Exported field: 'node-media-field_media_date_accuracy'
+  $fields['node-media-field_media_date_accuracy'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_media_date_accuracy',
+      'foreign keys' => array(),
+      'indexes' => array(
+        'value' => array(
+          0 => 'value',
+        ),
+      ),
+      'module' => 'list',
+      'settings' => array(
+        'allowed_values' => array(
+          'day' => 'Dag',
+          'month' => 'Maand',
+          'year' => 'Jaar',
+        ),
+        'allowed_values_function' => '',
+      ),
+      'translatable' => '0',
+      'type' => 'list_text',
+    ),
+    'field_instance' => array(
+      'bundle' => 'media',
+      'default_value' => NULL,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'list',
+          'settings' => array(),
+          'type' => 'list_default',
+          'weight' => '14',
+        ),
+        'dossier' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '0',
+        ),
+        'embed' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+        'full' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '0',
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '0',
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_media_date_accuracy',
+      'label' => 'Datum nauwkeurigheid',
+      'required' => 0,
+      'settings' => array(
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'options',
+        'settings' => array(),
+        'type' => 'options_select',
+        'weight' => '4',
       ),
     ),
   );
@@ -300,6 +387,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '12',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '16',
+        ),
         'full' => array(
           'label' => 'hidden',
           'module' => 'text',
@@ -318,12 +411,12 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
       'field_name' => 'field_media_description',
-      'label' => 'Description',
+      'label' => 'Beschrijving',
       'required' => 0,
       'settings' => array(
         'text_processing' => '0',
@@ -395,6 +488,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '15',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '19',
+        ),
         'full' => array(
           'label' => 'inline',
           'module' => 'text',
@@ -413,12 +512,12 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
       'field_name' => 'field_media_episode',
-      'label' => 'Episode',
+      'label' => 'Aflevering',
       'required' => 0,
       'settings' => array(
         'text_processing' => '0',
@@ -483,6 +582,13 @@ function bg_media_feature_field_default_fields() {
           'type' => 'bg_media',
           'weight' => '0',
         ),
+        'facebook' => array(
+          'label' => 'hidden',
+          'module' => 'bg_media',
+          'settings' => array(),
+          'type' => 'bg_media_facebook',
+          'weight' => '0',
+        ),
         'full' => array(
           'label' => 'hidden',
           'module' => 'bg_media',
@@ -501,7 +607,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -587,6 +693,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '14',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '13',
+        ),
         'full' => array(
           'label' => 'inline',
           'module' => 'bg_media',
@@ -610,12 +722,12 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
       'field_name' => 'field_media_length',
-      'label' => 'Length',
+      'label' => 'Duur',
       'required' => 0,
       'settings' => array(
         'max' => '',
@@ -688,6 +800,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '13',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '15',
+        ),
         'full' => array(
           'label' => 'inline',
           'module' => 'text',
@@ -706,12 +824,12 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
       'field_name' => 'field_media_license',
-      'label' => 'License',
+      'label' => 'Licentie',
       'required' => 0,
       'settings' => array(
         'text_processing' => '0',
@@ -724,7 +842,7 @@ function bg_media_feature_field_default_fields() {
           'size' => '60',
         ),
         'type' => 'text_textfield',
-        'weight' => '10',
+        'weight' => '5',
       ),
     ),
   );
@@ -788,6 +906,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '16',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '12',
+        ),
         'full' => array(
           'label' => 'above',
           'module' => 'taxonomy',
@@ -806,12 +930,12 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
       'field_name' => 'field_media_people',
-      'label' => 'People',
+      'label' => 'Personen',
       'required' => 0,
       'settings' => array(
         'user_register_form' => FALSE,
@@ -888,6 +1012,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '9',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '14',
+        ),
         'full' => array(
           'label' => 'inline',
           'module' => 'taxonomy',
@@ -906,12 +1036,12 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
       'field_name' => 'field_media_source',
-      'label' => 'Source',
+      'label' => 'Bron',
       'required' => 1,
       'settings' => array(
         'user_register_form' => FALSE,
@@ -980,6 +1110,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '10',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '17',
+        ),
         'full' => array(
           'label' => 'inline',
           'module' => 'link',
@@ -998,12 +1134,12 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
       'field_name' => 'field_media_source_url',
-      'label' => 'Source URL',
+      'label' => 'Link',
       'required' => 0,
       'settings' => array(
         'attributes' => array(
@@ -1012,7 +1148,7 @@ function bg_media_feature_field_default_fields() {
           'target' => '_blank',
         ),
         'display' => array(
-          'url_cutoff' => '80',
+          'url_cutoff' => '50',
         ),
         'enable_tokens' => 1,
         'title' => 'none',
@@ -1089,6 +1225,12 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '11',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '18',
+        ),
         'full' => array(
           'label' => 'above',
           'module' => 'taxonomy',
@@ -1107,7 +1249,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -1174,7 +1316,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'embed' => array(
           'label' => 'above',
@@ -1182,17 +1324,23 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '6',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '9',
+        ),
         'full' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -1259,7 +1407,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'embed' => array(
           'label' => 'above',
@@ -1267,17 +1415,23 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '5',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '10',
+        ),
         'full' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -1344,7 +1498,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'embed' => array(
           'label' => 'above',
@@ -1352,17 +1506,23 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '2',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '8',
+        ),
         'full' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -1430,7 +1590,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'embed' => array(
           'label' => 'above',
@@ -1438,17 +1598,23 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '4',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '11',
+        ),
         'full' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -1483,8 +1649,8 @@ function bg_media_feature_field_default_fields() {
       'indexes' => array(),
       'module' => 'metatags_quick',
       'settings' => array(
-        0 => 'meta_name',
         'meta_name' => 'canonical',
+        0 => 'meta_name',
       ),
       'translatable' => '0',
       'type' => 'metatags_quick',
@@ -1506,7 +1672,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'embed' => array(
           'label' => 'above',
@@ -1514,17 +1680,23 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '7',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '4',
+        ),
         'full' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -1556,8 +1728,8 @@ function bg_media_feature_field_default_fields() {
       'indexes' => array(),
       'module' => 'metatags_quick',
       'settings' => array(
-        0 => 'meta_name',
         'meta_name' => 'description',
+        0 => 'meta_name',
       ),
       'translatable' => '0',
       'type' => 'metatags_quick',
@@ -1579,7 +1751,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'embed' => array(
           'label' => 'above',
@@ -1587,17 +1759,23 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '3',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '7',
+        ),
         'full' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -1629,8 +1807,8 @@ function bg_media_feature_field_default_fields() {
       'indexes' => array(),
       'module' => 'metatags_quick',
       'settings' => array(
-        0 => 'meta_name',
         'meta_name' => 'keywords',
+        0 => 'meta_name',
       ),
       'translatable' => '0',
       'type' => 'metatags_quick',
@@ -1652,7 +1830,7 @@ function bg_media_feature_field_default_fields() {
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'embed' => array(
           'label' => 'above',
@@ -1660,17 +1838,23 @@ function bg_media_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => '8',
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => '5',
+        ),
         'full' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'node',
@@ -1692,25 +1876,27 @@ function bg_media_feature_field_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Aflevering');
+  t('Beschrijving');
   t('Body code');
+  t('Bron');
   t('Canonical URL');
-  t('Creators');
   t('Datum');
+  t('Datum nauwkeurigheid');
   t('De inhoud van dit veld wordt als <code>&lt;h1&gt;</code> tag aan de pagina toegevoegd.');
   t('De inhoud van dit veld wordt vlak voor <code>&lt;/body&gt;</code> aan de pagina toegevoegd.');
   t('De inhoud van dit veld wordt vlak voor <code>&lt;/head&gt;</code> aan de pagina toegevoegd.<br />Pas op! De inhoud van dit veld wordt direct in de html geplaatst. Verkeerd gebruik kan fouten veroorzaken.');
   t('Description');
-  t('Episode');
+  t('Duur');
   t('File');
   t('Head code');
-  t('Length');
   t('Length of media asset in seconds.');
-  t('License');
-  t('People');
+  t('Licentie');
+  t('Link');
+  t('Makers');
+  t('Personen');
   t('SEO H1');
   t('SEO content');
-  t('Source');
-  t('Source URL');
   t('Tags');
   t('Trefwoorden');
 
