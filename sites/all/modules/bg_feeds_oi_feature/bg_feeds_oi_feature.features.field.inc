@@ -57,6 +57,12 @@ function bg_feeds_oi_feature_field_default_fields() {
           'type' => 'hidden',
           'weight' => 0,
         ),
+        'facebook' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
         'teaser' => array(
           'label' => 'hidden',
           'module' => 'text',
