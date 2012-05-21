@@ -108,7 +108,8 @@ function bg_scriptmachine() {
   if (isset($_GET['uID']) && is_numeric($_GET['uID']) && isset($_GET['sID']) && is_numeric($_GET['sID'])) {
     // Creates a new object wrapping the given file (path)
     $swf = new SWFObject(base_path() . drupal_get_path('module', 'bg_scriptmachine') . '/flash/ScriptMachinePlayer.swf');
-    $swf->height(370)
+    $swf->param('wmode', 'transparent')
+        ->height(370)
         ->width(410)
         ->flashVar('uID', $_GET['uID'])
         ->flashVar('sID', $_GET['sID']);
@@ -116,7 +117,8 @@ function bg_scriptmachine() {
   else {
     // Creates a new object wrapping the given file (path)
     $swf = new SWFObject(base_path() . drupal_get_path('module', 'bg_scriptmachine') . '/flash/scriptmachine_media.swf');
-    $swf->height(520)
+    $swf->param('wmode', 'transparent')
+        ->height(520)
         ->width(970);
   }
 
