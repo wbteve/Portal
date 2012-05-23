@@ -182,7 +182,7 @@ function theme_bg_reference($variables) {
       }
 
       // Filter content and wrap in a div.
-      //$content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], $element['#data']['text_format']) . '</div>';
+      $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], $element['#data']['text_format']) . '</div>';
 
       break;
     case CONTENT_TYPE_VIEW:
@@ -384,8 +384,6 @@ function bg_reference_field_formatter_info() {
 function bg_reference_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
   $element = array();
   $height = 0;
-  print $display;
-  die();
   switch($display['type']) {
     case 'bg_reference_facebook':
     case 'bg_reference_default':
