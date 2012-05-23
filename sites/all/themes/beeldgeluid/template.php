@@ -238,6 +238,20 @@ function beeldgeluid_preprocess_node(&$variables, $hook) {
   if ($variables['node']->type == 'blog' && $variables['view_mode'] == 'full' && isset($variables['content']['links']['comment'])) {
     unset($variables['content']['links']['comment']);
   }
+  if ($variables['node']->type == 'article') {
+    //Construct the view
+    $view_array = explode('-', $variables['node']->field_artikel_view['und'][0]['value']);
+    //Load the view
+    $view = views_get_view($view_array[0]);
+    if ($view) {
+      //Only execute if we have a view
+      $view_result = $view->execute_display($view_array[1]);
+      $variables['content']['field_artikel_view'][0]['#markup'] = $view_result['content'];
+    }
+    else {
+      $variables['content']['field_artikel_view'][0]['#markup'] = '';
+    }
+  }
 }
 
 function beeldgeluid_preprocess_node_media(&$variables) {

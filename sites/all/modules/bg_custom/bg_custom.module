@@ -15,6 +15,25 @@ function bg_custom_form_alter(&$form, &$form_state, $form_id) {
     $adapter = facetapi_adapter_load('apachesolr@solr');
     $form['search_block_form']['#default_value'] = $adapter->getSearchKeys();
   }
+  elseif ($form_id == 'article_node_form') {
+    $result = db_query("SELECT delta FROM {block} WHERE module = 'views' AND theme = 'beeldgeluid'");
+    foreach ($result as $block ){
+      $options[$block->delta] = $block->delta;
+    }
+    $form['field_article_view'] = array(
+      '#title' => t('View under content'),
+      '#type' => 'select',
+      '#options' => $options,
+      '#default_value' => $form['field_artikel_view']['und'][0]['value']['#default_value'],
+      '#weight' => 5
+    );
+    $form['#submit'][] = 'bg_custom_article_form_submit';
+    drupal_add_css('#edit-field-artikel-view { display:none; }', array('type' => 'inline'));
+  }
+}
+
+function bg_custom_article_form_submit($form, &$form_state) {
+  $form_state['values']['field_artikel_view']['und'][0]['value'] = $form_state['values']['field_article_view'];
 }
 
 function bg_custom_form_comment_form_alter(&$form, &$form_state, &$form_id) {

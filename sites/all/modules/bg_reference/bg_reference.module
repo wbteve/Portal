@@ -6,6 +6,7 @@ define('CONTENT_TYPE_BANNER', 'banner');
 define('CONTENT_TYPE_EVENT', 'agenda');
 define('CONTENT_TYPE_DOSSIER', 'dossier');
 define('CONTENT_TYPE_FACEBOOK', 'facebook_page');
+define('CONTENT_TYPE_VIEW' , 'view');
 
 define('UNIT_SIZE_WIDTH', 120);
 define('UNIT_SIZE_HEIGHT', 80);
@@ -181,8 +182,24 @@ function theme_bg_reference($variables) {
       }
 
       // Filter content and wrap in a div.
-      $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], $element['#data']['text_format']) . '</div>';
-      
+      //$content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], $element['#data']['text_format']) . '</div>';
+
+      break;
+    case CONTENT_TYPE_VIEW:
+      // Add class when color is white or yellow so text turns black for contrast
+      if(in_array($element['#data']['color_back'], array('#ffffff', '#fce300'))) {
+        $classes[] = 'dossier-element-black';
+      }
+      //Construct the view
+      $view_array = explode('-', $element['#data']['content']);
+      //Load the view
+      $view = views_get_view($view_array[0]);
+      if ($view) {
+        //Only execute if we have a view
+        $view_result = $view->execute_display($view_array[1]);
+      }
+      // Filter content and wrap in a div.
+      $content = '<div class="dossier-element-view-inner">' . $view_result['content'] . '</div>';
       break;
   }
 
@@ -309,6 +326,9 @@ function bg_reference_field_presave($entity_type, $entity, $field, $instance, $l
       );
       $items[$delta]['content'] = serialize($content_array);
     }
+    else if ($item['type'] == CONTENT_TYPE_VIEW) {
+      $items[$delta]['content'] = $item['wrapper']['ref_' . CONTENT_TYPE_VIEW];
+    }
   }
 }
 
@@ -364,7 +384,8 @@ function bg_reference_field_formatter_info() {
 function bg_reference_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
   $element = array();
   $height = 0;
-
+  print $display;
+  die();
   switch($display['type']) {
     case 'bg_reference_facebook':
     case 'bg_reference_default':
@@ -442,7 +463,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
     $type   = CONTENT_TYPE_TEXT;
     $value  = '';
   }
-       
+
   $ajax_settings = array(
     'event'     => 'change',
     'method'    => 'html',
@@ -472,6 +493,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
         CONTENT_TYPE_SEARCH_RESULT  => t('Search result'),
         CONTENT_TYPE_BANNER         => t('Banner'),
         CONTENT_TYPE_EVENT          => t('Event'),
+        CONTENT_TYPE_VIEW           => t('Views block')
       ),
       '#default_value' => $type,
     ),
@@ -529,7 +551,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
   $element['wrapper'] = array_merge($element['wrapper'], _bg_reference_get_form($type, $value, $text_format));
 
   asort($element['type']['#options']);
-    
+
   return $element;
 }
 
@@ -596,6 +618,20 @@ function _bg_reference_get_form($type, $value, $text_format = NULL) {
         '#title'              => t('Text'),
         '#attributes'         => array('class' => array('bg_reference_text')),
         '#format'             => $text_format,
+        '#default_value'      => $value,
+      );
+      break;
+    case CONTENT_TYPE_VIEW:
+      //Get all the views that have block from this template
+      $result = db_query("SELECT delta FROM {block} WHERE module = 'views' AND theme = 'beeldgeluid'");
+      foreach ($result as $block ){
+        $options[$block->delta] = $block->delta;
+      }
+      $element['ref_' . CONTENT_TYPE_VIEW] = array(
+        '#type'               => 'select',
+        '#title'              => t('Views block'),
+        '#attributes'         => array('class' => array('bg_reference_' . CONTENT_TYPE_VIEW)),
+        '#options'            => $options,
         '#default_value'      => $value,
       );
       break;
