@@ -105,7 +105,7 @@ SETTINGS;
 }
 
 function bg_scriptmachine() {
-  if (isset($_GET['uID']) && is_numeric($_GET['uID']) && isset($_GET['sID']) && is_numeric($_GET['sID'])) {
+  if (isset($_GET['uID']) && is_numeric($_GET['uID']) && isset($_GET['sID']) && !empty($_GET['sID'])) {
     // Creates a new object wrapping the given file (path)
     $swf = new SWFObject(base_path() . drupal_get_path('module', 'bg_scriptmachine') . '/flash/ScriptMachinePlayer.swf');
     $swf->param('wmode', 'transparent')
