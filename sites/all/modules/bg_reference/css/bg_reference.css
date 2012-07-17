@@ -1,7 +1,11 @@
 .item-list ul.xml-feed-items {
   list-style-type: none;
-  padding: 0 0 0 1em;
   font-weight: bold;
+  padding: 0;
+}
+
+.item-list ul.xml-feed-items > li {
+  padding-left: 1em;
 }
 
 .item-list ul.xml-feed-items li ul li {
@@ -10,7 +14,7 @@
 
 ul.xml-feed-items li ul{
   list-style-type: none;
-  padding: 0 0 0 1em;
+  padding: 0;
 }
 
 ul.xml-feed-items li ul li ul li:first-child {
@@ -19,7 +23,7 @@ ul.xml-feed-items li ul li ul li:first-child {
 
 ul.xml-feed-items li ul li ul li {
   text-decoration: none;
-  padding: 0.5em 1em 0.5em 1em;
+  padding: 0.5em 1em;
 }
 
 ul.xml-feed-items li ul li {
@@ -29,11 +33,15 @@ ul.xml-feed-items li ul li {
 ul.xml-feed-items li ul li ul {
   display: none;
   list-style-type: none;
-  padding: 0 0 0 0em;
-  position: absolute;
-  top: -1;
+  padding: 0;
+  position: fixed;
+  left: 50px;
   z-index: 9;
   background: #4A4A4A;
   border: solid 1px #FFF;
-  width: 200%;
+  width: 400px;
+}
+
+.dossier-element-xml_feed_import {
+  list-style-type: none;
 }
