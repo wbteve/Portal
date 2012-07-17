@@ -7,6 +7,8 @@ define('CONTENT_TYPE_EVENT', 'agenda');
 define('CONTENT_TYPE_DOSSIER', 'dossier');
 define('CONTENT_TYPE_FACEBOOK', 'facebook_page');
 define('CONTENT_TYPE_VIEW' , 'view');
+define('CONTENT_TYPE_EMBEDDED_VIDEO', 'embedded_video');
+define('CONTENT_TYPE_XML_FEED_IMPORT', 'xml_feed_import');
 
 define('UNIT_SIZE_WIDTH', 120);
 define('UNIT_SIZE_HEIGHT', 80);
@@ -58,6 +60,10 @@ function bg_reference_theme() {
 }
 
 function theme_bg_reference($variables) {
+
+  drupal_add_css(drupal_get_path('module', 'bg_reference') . '/css/bg_reference.css');
+  drupal_add_js(drupal_get_path('module', 'bg_reference') . '/js/bg_reference_page.js');
+
   static $main_player_rendered, $row;
   extract($variables);
 
@@ -72,6 +78,12 @@ function theme_bg_reference($variables) {
     'dossier-element-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
     'dossier-element-' . $element['#data']['type'] . '-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
   );
+
+  // Set style information based on unit height, width.
+  $left_position   = $element['#data']['pos_x'] * UNIT_SIZE_WIDTH;
+  $top_position    = $element['#data']['pos_y'] * UNIT_SIZE_HEIGHT;
+  $width           = $element['#data']['width'] * UNIT_SIZE_WIDTH;
+  $height          = $element['#data']['height'] * UNIT_SIZE_HEIGHT;
 
   $content = '';
   switch($element['#data']['type']) {
@@ -201,19 +213,53 @@ function theme_bg_reference($variables) {
       // Filter content and wrap in a div.
       $content = '<div class="dossier-element-view-inner">' . $view_result['content'] . '</div>';
       break;
+
+    case CONTENT_TYPE_EMBEDDED_VIDEO:
+      // Filter content and wrap in a div.
+      $content = '<div class="dossier-element-embedded-video-inner">' . check_markup($element['#data']['content'], $element['#data']['text_format']) . '</div>';
+      break;
+    case CONTENT_TYPE_XML_FEED_IMPORT:
+      $data = unserialize($element['#data']['content']);
+      $listitems = array();
+      $listitems = bg_reference_create_render_array($data['content'], $listitems, $element);
+      $variables = array(
+        'items' => $listitems,
+        'title' => NULL,
+        'type' => 'ul',
+        'attributes' => array(
+          'style' => 'overflow:auto;height:' . $height . 'px;width:' . $width . 'px;',
+          'class' => 'xml-feed-items',
+        ),
+      );
+      $content = theme_item_list($variables);
+      break;
   }
 
   // Set style
-  $left_position   = $element['#data']['pos_x'] * UNIT_SIZE_WIDTH;
-  $top_position    = $element['#data']['pos_y'] * UNIT_SIZE_HEIGHT;
-  $width           = $element['#data']['width'] * UNIT_SIZE_WIDTH;
-  $height          = $element['#data']['height'] * UNIT_SIZE_HEIGHT;
   $background_color = $element['#data']['type'] == CONTENT_TYPE_MEDIA ? 'transparent' : $element['#data']['color_back'];
   $style           = "position: absolute; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px; background-color: {$background_color};";
 
   $row++;
 
   return '<div class="' . implode(' ', $classes) . '" style="' . $style . '">' . $content . '</div>';
+}
+
+/**
+ * Create render array from associative array
+ */
+function bg_reference_create_render_array($data, $renderarray) {
+
+  foreach($data as $key => $value) {
+    if(is_array($value)) {
+      $renderarray[$key]['data'] = $key;
+      $renderarray[$key]['children'] = array();
+      $renderarray[$key]['children'] = bg_reference_create_render_array($value, $renderarray[$key]['children']);
+    }
+    else {
+      $renderarray[$key]['data'] = $value;
+    }
+  }
+  return $renderarray;
 }
 
 /**
@@ -306,11 +352,69 @@ function bg_reference_field_validate($obj_type, $object, $field, $instance, $lan
 }
 
 /**
- * Implement hoo_field_is_empty().
+ * Implement hook_field_is_empty().
  */
 function bg_reference_field_is_empty($item, $field) {
+  $empty = (empty($item['content']) && empty($item['wrapper']['ref_' . CONTENT_TYPE_XML_FEED_IMPORT]))? TRUE : FALSE;
   // Field is empty when content is empty
-  return empty($item['content']);
+  return $empty;
+}
+
+/**
+ * Implement hook_field_presave().
+ */
+function bg_reference_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  // Store the text format together with the text content as a serialized array.
+  foreach ($items as $delta => $item) {
+    if($item['type'] == CONTENT_TYPE_XML_FEED_IMPORT) {
+      // Load the file via file.fid.
+      $file = file_load($item['wrapper']['ref_' . CONTENT_TYPE_XML_FEED_IMPORT]);
+      if($file->status !== FILE_STATUS_PERMANENT) {
+        // Change status to permanent.
+        $file->status = FILE_STATUS_PERMANENT;
+        // Save.
+        file_save($file);
+        file_usage_add($file, 'bg_reference', $entity_type, $entity->nid);
+      }
+      $content_array = array(
+        'file_id' => $file->fid,
+        'content' => bg_reference_parse_xml($file),
+      );
+      $items[$delta]['content'] = serialize($content_array);
+    }
+    elseif ($item['type'] == CONTENT_TYPE_TEXT || $item['type'] == CONTENT_TYPE_EMBEDDED_VIDEO) {
+      $content_array = array(
+        'text' => $item['wrapper']['ref_'. $item['type']]['value'],
+        'text_format' => $item['wrapper']['ref_'. $item['type']]['format'],
+      );
+      $items[$delta]['content'] = serialize($content_array);
+    }
+    else if ($item['type'] == CONTENT_TYPE_VIEW) {
+      $items[$delta]['content'] = $item['wrapper']['ref_' . CONTENT_TYPE_VIEW];
+    }
+  }
+}
+
+/**
+ * Implement hook_field_load().
+ */
+function bg_reference_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => $item) {
+      // Unpack serialized arrays of text items to extract the text format.
+      // For backwards compatibility, set the default text format if the content is not a serialized array yet.
+      if(($item['type'] == CONTENT_TYPE_XML_FEED_IMPORT)) {
+        $items[$id][$delta]['content'] = $item['content'];
+      }
+      elseif (($item['type'] == CONTENT_TYPE_TEXT || $item['type'] == CONTENT_TYPE_EMBEDDED_VIDEO) && ($content_array = @unserialize($item['content'])) !== false) {
+        $items[$id][$delta]['content'] = $content_array['text'];
+        $items[$id][$delta]['text_format'] = $content_array['text_format'];
+      }
+      else {
+        $items[$id][$delta]['text_format'] = 'full_html';
+      }
+    }
+  }
 }
 
 /**
@@ -433,15 +537,20 @@ function bg_reference_field_widget_info() {
 }
 
 /**
- * Implement hook_field_widget().
+ * Implement hook_field_widget_form().
  */
 function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
+
   $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
   $module_path = drupal_get_path('module', 'bg_reference');
 
   $text_format = NULL;
   // Get type value from form values
-  if(isset($form_state['values']) && isset($form_state['values']['field_referenced_content'][$langcode][$delta])) {
+  if(isset($form_state['values']['field_referenced_content'][$langcode][$delta]['wrapper']['ref_' . CONTENT_TYPE_XML_FEED_IMPORT])) {
+    $type = CONTENT_TYPE_XML_FEED_IMPORT;
+    $value = $form_state['values']['field_referenced_content'][$langcode][$delta]['wrapper']['ref_' . CONTENT_TYPE_XML_FEED_IMPORT];
+  }
+  elseif(isset($form_state['values']) && isset($form_state['values']['field_referenced_content'][$langcode][$delta])) {
     $type   = $form_state['values']['field_referenced_content'][$langcode][$delta]['type'];
     $value  = $form_state['values']['field_referenced_content'][$langcode][$delta]['content'];
     if ($type == CONTENT_TYPE_TEXT) {
@@ -449,7 +558,7 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
     }
   }
   // Get type and value from stored data
-  else if(isset($items[$delta])) {
+  elseif(isset($items[$delta])) {
     $type   = $items[$delta]['type'];
     $value  = $items[$delta]['content'];
     if ($type == CONTENT_TYPE_TEXT) {
@@ -491,7 +600,9 @@ function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance,
         CONTENT_TYPE_SEARCH_RESULT  => t('Search result'),
         CONTENT_TYPE_BANNER         => t('Banner'),
         CONTENT_TYPE_EVENT          => t('Event'),
-        CONTENT_TYPE_VIEW           => t('Views block')
+        CONTENT_TYPE_VIEW           => t('Views block'),
+        CONTENT_TYPE_EMBEDDED_VIDEO => t('Embedded video'),
+        CONTENT_TYPE_XML_FEED_IMPORT  => t('XML feed import'),
       ),
       '#default_value' => $type,
     ),
@@ -633,6 +744,45 @@ function _bg_reference_get_form($type, $value, $text_format = NULL) {
         '#default_value'      => $value,
       );
       break;
+    case CONTENT_TYPE_EMBEDDED_VIDEO:
+      $text_format = (empty($text_format)) ? 'full_html_with_script' : $text_format;
+      $element['ref_' . CONTENT_TYPE_EMBEDDED_VIDEO] = array(
+        '#type' => 'text_format',
+        '#title' => t('Embedded video'),
+        '#attributes' => array('class' => array('bg_reference_' . CONTENT_TYPE_EMBEDDED_VIDEO)),
+        '#format' => $text_format,
+        '#default_value' => $value,
+      );
+      break;
+  case CONTENT_TYPE_XML_FEED_IMPORT:
+    $data = unserialize($value);
+    $file_id = $data['file_id'];
+    $element['ref_' . CONTENT_TYPE_XML_FEED_IMPORT] = array(
+      '#title' => t('XML file'),
+      '#type' => 'managed_file',
+      '#description' => t('Upload an XML file with the 2nd screen content.'),
+      '#progress_indicator' => 'bar',
+      '#progress_message' => t('Your file is being uploaded, please wait.'),
+      '#default_value' => (!empty($file_id))? $file_id : 0,
+      '#upload_location' => 'public://dossier_files/',
+      '#upload_validators' => array(
+        'file_validate_extensions' => array('xml'),
+      ),
+    );
+    break;
+    // case CONTENT_TYPE_XML_FEED_IMPORT:
+    // $element['ref_' . CONTENT_TYPE_XML_FEED_IMPORT] = array(
+    //   '#title' => t('XML file'),
+    //   '#type' => 'managed_file',
+    //   '#description' => t('Upload an XML file with the 2nd screen content.'),
+    //   '#progress_indicator' => 'bar',
+    //   '#progress_message' => t('Your file is being uploaded, please wait.'),
+    //   '#default_value' => (!empty($value))? $value : 0,
+    //   '#upload_location' => 'public://dossier_files/',
+    //   '#upload_validators' => array(
+    //     'file_validate_extensions' => array('xml'),
+    //   ),
+    //   break;
   }
 
   return $element;
@@ -722,6 +872,40 @@ function _bg_reference_get_element($dossier_node, $delta = NULL) {
   else {
     return $dossier_node->field_referenced_content[$dossier_node->language][$delta];
   }
+}
+
+/**
+ * Parse the uploaded XML file and return an associative array.
+ */
+function bg_reference_parse_xml($file) {
+  // Use the SimpleXML parser library to parse Excel generated XML.
+  $excel = new SimpleExcel('xml');
+  $excel->parser->loadFile($file->uri);
+  // Return the table section of the XML as an array.
+  $table = $excel->parser->getField();
+
+  // Create the output array for storing the associative data.
+  $output = array();
+
+  // Loop trough the table rows.
+  foreach($table['table_contents'] as $rownumber => $row) {
+    // Skip row number 1, this only contains the column headers.
+    if($row['row_num'] == 1) {
+      continue;
+    }
+    // Read our fields from the $row variable.
+    $fragment = $row['row_contents'][0]['value'];
+    $title = $row['row_contents'][1]['value'];
+    $pushmessage = $row['row_contents'][2]['value'];
+    $fullmessage = $row['row_contents'][3]['value'];
+
+    // Fill our associative array with data.
+    $output[$fragment][$title]['pushmessage'] = $pushmessage;
+    $output[$fragment][$title]['fullmessage'] = $fullmessage;
+  }
+
+  // Return the associative array.
+  return $output;
 }
 
 /**************************************************************************

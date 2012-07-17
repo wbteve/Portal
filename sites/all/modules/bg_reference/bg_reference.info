@@ -2,5 +2,14 @@ name = Referenced Content
 description = Provides support for all kinds of referenced content. Primarily intended for use in the files content type.
 package = "Beeld en Geluid"
 core = 7.x
+
 files[] = bg_reference_field.module
+files[] = includes/SimpleExcel/SimpleExcel.php
+files[] = includes/SimpleExcel/Parser/CSV.php
+files[] = includes/SimpleExcel/Parser/Interface.php
+files[] = includes/SimpleExcel/Parser/XML.php
+files[] = includes/SimpleExcel/Writer/CSV.php
+files[] = includes/SimpleExcel/Writer/Interface.php
+files[] = includes/SimpleExcel/Writer/XML.php
+
 dependencies[] = bg_media

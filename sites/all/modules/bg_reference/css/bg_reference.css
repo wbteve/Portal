@@ -1,0 +1,39 @@
+.item-list ul.xml-feed-items {
+  list-style-type: none;
+  padding: 0 0 0 1em;
+  font-weight: bold;
+}
+
+.item-list ul.xml-feed-items li ul li {
+  cursor: help;
+}
+
+ul.xml-feed-items li ul{
+  list-style-type: none;
+  padding: 0 0 0 1em;
+}
+
+ul.xml-feed-items li ul li ul li:first-child {
+  font-weight: bold;
+}
+
+ul.xml-feed-items li ul li ul li {
+  text-decoration: none;
+  padding: 0.5em 1em 0.5em 1em;
+}
+
+ul.xml-feed-items li ul li {
+  text-decoration: underline;
+}
+
+ul.xml-feed-items li ul li ul {
+  display: none;
+  list-style-type: none;
+  padding: 0 0 0 0em;
+  position: absolute;
+  top: -1;
+  z-index: 9;
+  background: #4A4A4A;
+  border: solid 1px #FFF;
+  width: 200%;
+}
