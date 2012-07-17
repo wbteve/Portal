@@ -3,7 +3,8 @@ description = Provides support for all kinds of referenced content. Primarily in
 package = "Beeld en Geluid"
 core = 7.x
 
-files[] = bg_reference_field.module
+files[] = bg_reference.module
+files[] = js/bg_reference.js
 files[] = includes/SimpleExcel/SimpleExcel.php
 files[] = includes/SimpleExcel/Parser/CSV.php
 files[] = includes/SimpleExcel/Parser/Interface.php
