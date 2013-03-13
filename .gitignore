@@ -31,7 +31,7 @@
 # /sites/default/
 /sites/default/settings.php
 
-# /sites/default/files/
+/sites/default/files/
 /sites/default/files/styles
 /sites/default/files/profile_pictures
 /sites/default/files/pictures
