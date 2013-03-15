@@ -96,7 +96,10 @@ function bg_blocks_profile_menu() {
 }
 
 function bg_blocks_museumprijs() {
-  drupal_add_library('media_browser_plus', 'colorbox', TRUE);
   $output = '<div id="museumprijs"><a href="http://museumprijs.nl/stemmen/detail/4/beeldengeluid"><img src="' . drupal_get_path('module', 'bg_blocks') . '/images/museumprijs.jpg" /></a></div>';
   return $output;
+}
+
+function bg_blocks_init() {
+  drupal_add_library('media_browser_plus', 'colorbox', TRUE);
 }
