@@ -22,7 +22,13 @@ function bg_blocks_block_info() {
     'visibility' => BLOCK_VISIBILITY_LISTED,
     'pages' => 'user/*',
   );
-
+  $blocks['vote_museum_price'] = array(
+    'info' => t('Stemming Museumprijs'),
+    'status' => TRUE,
+    'region' => 'content_bottom',
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+    'pages' => 'node/*',
+  );
   return $blocks;
 }
 
@@ -57,6 +63,10 @@ function bg_blocks_block_view($delta = '') {
       $block['subject'] = '';
       $block['content'] = bg_blocks_profile_menu();
       break;
+    case 'vote_museum_price':
+      $block['subject'] = '';
+      $block['content'] = bg_blocks_museumprijs();
+      break;
   }
   return $block;
 }
@@ -82,5 +92,11 @@ function bg_blocks_profile_menu() {
   $output .= '<div class="profile-menu">';
     $output .= theme('item_list', array('items' => $list_items));
   $output .= '</div>';
+  return $output;
+}
+
+function bg_blocks_museumprijs() {
+  drupal_add_library('media_browser_plus', 'colorbox', TRUE);
+  $output = '<div id="museumprijs"><a href="http://museumprijs.nl/stemmen/detail/4/beeldengeluid"><img src="' . drupal_get_path('module', 'bg_blocks') . '/images/museumprijs.jpg" /></a></div>';
   return $output;
 }
