@@ -159,3 +159,19 @@ function bg_custom_menu_alter(&$items) {
   // Disable the default front page.
   unset($items['node']);
 }
+
+/**
+ * Implements hook_service_links().
+ */
+function bg_custom_service_links() {
+  $links = array();
+
+  $links['google_plus_share'] = array(
+    'name' => 'Google Plus Share',
+    'description' => t('Share on Google+'),
+    'link' => 'https://plus.google.com/share?url=<raw-encoded-url>',
+    'icon' => drupal_get_path('module', 'bg_custom') .'/img/google_plus_share.png',
+  );
+
+  return $links;
+}
