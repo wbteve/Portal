@@ -117,7 +117,7 @@ class PathologicTestCase extends DrupalWebTestCase {
     );
     $this->assertEqual(
       _pathologic('<a href="files:image.jpeg">', $filter),
-      '<a href="' . file_create_url(file_build_uri('image.jpeg'))) . '">',
+      '<a href="' . file_create_url(file_build_uri('image.jpeg')) . '">',
       t('Path Filter compatibility (files:)')
     );
     $this->assertEqual(
