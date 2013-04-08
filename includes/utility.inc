@@ -12,6 +12,10 @@
  *   The variable to export.
  * @param $prefix
  *   A prefix that will be added at the beginning of every lines of the output.
+<<<<<<< HEAD
+=======
+ *
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  * @return
  *   The variable exported in a way compatible to Drupal's coding standards.
  */

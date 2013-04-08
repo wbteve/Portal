@@ -126,7 +126,11 @@ Drupal.tableHeader.prototype.eventhandlerRecalculateStickyHeader = function (eve
         $stickyCell.css('display', 'none');
       }
     }
+<<<<<<< HEAD
     this.stickyTable.css('width', this.originalTable.css('width'));
+=======
+    this.stickyTable.css('width', this.originalTable.outerWidth());
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
   }
 };
 

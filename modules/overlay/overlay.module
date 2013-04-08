@@ -704,7 +704,11 @@ function overlay_overlay_child_initialize() {
 }
 
 /**
+<<<<<<< HEAD
  * Requests that the overlay overlay closes when the page is displayed.
+=======
+ * Requests that the overlay closes when the page is displayed.
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @param $redirect
  *   (optional) The path that should open in the parent window after the

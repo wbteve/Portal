@@ -62,6 +62,7 @@ function hook_language_switch_links_alter(array &$links, $type, $path) {
 }
 
 /**
+<<<<<<< HEAD
  * Allow modules to define their own language types.
  *
  * @return
@@ -72,6 +73,24 @@ function hook_language_switch_links_alter(array &$links, $type, $path) {
  *   - "description": A description of the language type.
  *   - "fixed": An array of language provider identifiers. Defining this key
  *     makes the language type non-configurable.
+=======
+ * Define language types.
+ *
+ * @return
+ *   An associative array of language type definitions. The keys are the
+ *   identifiers, which are also used as names for global variables representing
+ *   the types in the bootstrap phase. The values are associative arrays that
+ *   may contain the following elements:
+ *   - name: The human-readable language type identifier.
+ *   - description: A description of the language type.
+ *   - fixed: A fixed array of language negotiation provider identifiers to use
+ *     to initialize this language. Defining this key makes the language type
+ *     non-configurable, so it will always use the specified providers in the
+ *     given priority order. Omit to make the language type configurable.
+ *
+ * @see hook_language_types_info_alter()
+ * @ingroup language_negotiation
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  */
 function hook_language_types_info() {
   return array(
@@ -90,6 +109,12 @@ function hook_language_types_info() {
  *
  * @param $language_types
  *   Array of language type definitions.
+<<<<<<< HEAD
+=======
+ *
+ * @see hook_language_types_info()
+ * @ingroup language_negotiation
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  */
 function hook_language_types_info_alter(array &$language_types) {
   if (isset($language_types['custom_language_type'])) {
@@ -98,6 +123,7 @@ function hook_language_types_info_alter(array &$language_types) {
 }
 
 /**
+<<<<<<< HEAD
  * Allow modules to define their own language providers.
  *
  * @return
@@ -123,6 +149,37 @@ function hook_language_types_info_alter(array &$language_types) {
  *     configuration page.
  *   - "cache": The value Drupal's page cache should be set to for the current
  *     language provider to be invoked.
+=======
+ * Define language negotiation providers.
+ *
+ * @return
+ *   An associative array of language negotiation provider definitions. The keys
+ *   are provider identifiers, and the values are associative arrays definining
+ *   each provider, with the following elements:
+ *   - types: An array of allowed language types. If a language negotiation
+ *     provider does not specify which language types it should be used with, it
+ *     will be available for all the configurable language types.
+ *   - callbacks: An associative array of functions that will be called to
+ *     perform various tasks. Possible elements are:
+ *     - negotiation: (required) Name of the callback function that determines
+ *       the language value.
+ *     - language_switch: (optional) Name of the callback function that
+ *       determines links for a language switcher block associated with this
+ *       provider. See language_switcher_url() for an example.
+ *     - url_rewrite: (optional) Name of the callback function that provides URL
+ *       rewriting, if needed by this provider.
+ *   - file: The file where callback functions are defined (this file will be
+ *     included before the callbacks are invoked).
+ *   - weight: The default weight of the provider.
+ *   - name: The translated human-readable name for the provider.
+ *   - description: A translated longer description of the provider.
+ *   - config: An internal path pointing to the provider's configuration page.
+ *   - cache: The value Drupal's page cache should be set to for the current
+ *     provider to be invoked.
+ *
+ * @see hook_language_negotiation_info_alter()
+ * @ingroup language_negotiation
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  */
 function hook_language_negotiation_info() {
   return array(
@@ -135,18 +192,33 @@ function hook_language_negotiation_info() {
       'file' => drupal_get_path('module', 'custom') . '/custom.module',
       'weight' => -4,
       'types' => array('custom_language_type'),
+<<<<<<< HEAD
       'name' => t('Custom language provider'),
       'description' => t('This is a custom language provider.'),
+=======
+      'name' => t('Custom language negotiation provider'),
+      'description' => t('This is a custom language negotiation provider.'),
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
       'cache' => 0,
     ),
   );
 }
 
 /**
+<<<<<<< HEAD
  * Perform alterations on language providers.
  *
  * @param $language_providers
  *   Array of language provider definitions.
+=======
+ * Perform alterations on language negoiation providers.
+ *
+ * @param $language_providers
+ *   Array of language negotiation provider definitions.
+ *
+ * @see hook_language_negotiation_info()
+ * @ingroup language_negotiation
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  */
 function hook_language_negotiation_info_alter(array &$language_providers) {
   if (isset($language_providers['custom_language_provider'])) {

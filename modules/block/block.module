@@ -740,7 +740,11 @@ function _block_load_blocks() {
 /**
  * Implements hook_block_list_alter().
  *
+<<<<<<< HEAD
  * Checks the page, user role, and user-specific visibilty settings.
+=======
+ * Checks the page, user role, and user-specific visibility settings.
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  * Removes the block if the visibility conditions are not met.
  */
 function block_block_list_alter(&$blocks) {

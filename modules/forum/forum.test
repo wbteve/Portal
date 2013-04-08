@@ -677,6 +677,10 @@ class ForumIndexTestCase extends DrupalWebTestCase {
       'status' => FALSE,
     );
     $this->drupalPost("node/{$node->nid}/edit", $edit, t('Save'));
+<<<<<<< HEAD
+=======
+    $this->drupalGet("node/{$node->nid}");
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
     $this->assertText(t('Access denied'), 'Unpublished node is no longer accessible.');
 
     // Verify that the node no longer appears on the index.

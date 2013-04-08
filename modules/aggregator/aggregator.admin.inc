@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Admin page callbacks for the aggregator module.
+ * Administration page callbacks for the Aggregator module.
  */
 
 /**
- * Menu callback; displays the aggregator administration page.
+ * Page callback: Displays the Aggregator module administration page.
  */
 function aggregator_admin_overview() {
   return aggregator_view();
@@ -16,7 +16,7 @@ function aggregator_admin_overview() {
  * Displays the aggregator administration page.
  *
  * @return
- *   The page HTML.
+ *   A HTML-formatted string with administration page content.
  */
 function aggregator_view() {
   $result = db_query('SELECT f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.hash, f.etag, f.modified, f.image, f.block, COUNT(i.iid) AS items FROM {aggregator_feed} f LEFT JOIN {aggregator_item} i ON f.fid = i.fid GROUP BY f.fid, f.title, f.url, f.refresh, f.checked, f.link, f.description, f.hash, f.etag, f.modified, f.image, f.block ORDER BY f.title');
@@ -56,8 +56,13 @@ function aggregator_view() {
  * Form constructor for adding and editing feed sources.
  *
  * @param $feed
+<<<<<<< HEAD
  *   If editing a feed, the feed to edit as a PHP stdClass value; if adding a
  *   new feed, NULL.
+=======
+ *   (optional) If editing a feed, the feed to edit as a PHP stdClass value; if
+ *   adding a new feed, NULL. Defaults to NULL.
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @ingroup forms
  * @see aggregator_form_feed_validate()
@@ -163,6 +168,11 @@ function aggregator_form_feed_validate($form, &$form_state) {
 
 /**
  * Form submission handler for aggregator_form_feed().
+<<<<<<< HEAD
+=======
+ *
+ * @see aggregator_form_feed_validate()
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @see aggregator_form_feed_validate()
  * @todo Add delete confirmation dialog.
@@ -398,7 +408,7 @@ function _aggregator_parse_opml($opml) {
 }
 
 /**
- * Menu callback; refreshes a feed, then redirects to the overview page.
+ * Page callback: Refreshes a feed, then redirects to the overview page.
  *
  * @param $feed
  *   An object describing the feed to be refreshed.
@@ -588,6 +598,11 @@ function aggregator_form_category_validate($form, &$form_state) {
 
 /**
  * Form submission handler for aggregator_form_category().
+<<<<<<< HEAD
+=======
+ *
+ * @see aggregator_form_category_validate()
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @see aggregator_form_category_validate()
  * @todo Add delete confirmation dialog.
