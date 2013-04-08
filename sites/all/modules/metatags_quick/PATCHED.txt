@@ -1,2 +1,0 @@
-This module was patched to add support for link tags, specifically <link rel="canonical">.
-See http://drupal.org/node/1229822#comment-4782504.
