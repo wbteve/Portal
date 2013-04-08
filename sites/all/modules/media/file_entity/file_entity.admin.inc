@@ -42,7 +42,8 @@ function file_entity_list_types_page() {
 /**
  * Form callback; presents file display settings for a given view mode.
  */
-function file_entity_file_display_form($form, &$form_state, $file_type, $view_mode) {
+function file_entity_file_display_form($form, &$form_state, $bundle, $view_mode) {
+  $file_type = field_extract_bundle('file', $bundle);
   $form['#file_type'] = $file_type;
   $form['#view_mode'] = $view_mode;
   $form['#tree'] = TRUE;
@@ -113,8 +114,8 @@ function file_entity_file_display_form($form, &$form_state, $file_type, $view_mo
   $i=0;
   foreach ($formatters as $name => $formatter) {
     if (isset($formatter['settings callback']) && ($function = $formatter['settings callback']) && function_exists($function)) {
-      $defaults = isset($formatter['default settings']) ? $formatter['default settings'] : array();
-      $settings = isset($current_displays[$name]['settings']) ? $current_displays[$name]['settings'] : array();
+      $defaults = !empty($formatter['default settings']) ? $formatter['default settings'] : array();
+      $settings = !empty($current_displays[$name]['settings']) ? $current_displays[$name]['settings'] : array();
       $settings += $defaults;
       $settings_form = $function($form, $form_state, $settings, $name, $file_type, $view_mode);
       if (!empty($settings_form)) {

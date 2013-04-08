@@ -1,14 +1,10 @@
 <?php
-/**
- * @file
- *
- * Provide views data and handlers for image.module
- */
 
 /**
- * @defgroup views_image_module image.module handlers
+ * @file
+ * Provide views data and handlers for image.module.
  *
- * @{
+ * @ingroup views_module_handlers
  */
 
 /**
@@ -60,10 +56,17 @@ function image_field_views_data_views_data_alter(&$data, $field) {
       'base' => $entity_info['base table'],
       'base field' => $entity_info['entity keys']['id'],
       'label' => t('!field_name', array('!field_name' => $field['field_name'])),
+      'join_extra' => array(
+        0 => array(
+          'field' => 'entity_type',
+          'value' => $entity_type,
+        ),
+        1 => array(
+          'field' => 'deleted',
+          'value' => 0,
+          'numeric' => TRUE,
+        ),
+      ),
     );
   }
 }
-
-/**
- * @}
- */

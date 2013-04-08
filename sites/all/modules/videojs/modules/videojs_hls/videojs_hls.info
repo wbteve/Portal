@@ -1,0 +1,11 @@
+name = Video.js HTTP Live Streaming
+description = Extends the functionality of Video.js by combining multiple m3u8 files into one file that can be used for bandwidth switching. This module provides no administrative interface. See README.md for more information.
+package = Media
+core = 7.x
+dependencies[] = videojs
+; Information added by drupal.org packaging script on 2012-06-12
+version = "7.x-2.2"
+core = "7.x"
+project = "videojs"
+datestamp = "1339515734"
+

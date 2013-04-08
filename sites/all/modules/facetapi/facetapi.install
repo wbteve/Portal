@@ -158,6 +158,9 @@ function facetapi_update_7001() {
           ->execute();
       }
     }
+    
+    // next code fails... so skip it and see how it goes then.
+    return;
 
     // Hashes the delta and updates.
     $delta = substr(drupal_hash_base64($record->delta), 0, 32);

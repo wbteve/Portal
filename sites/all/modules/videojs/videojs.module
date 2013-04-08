@@ -1,25 +1,24 @@
 <?php
-
 /**
  * @file
  * Provides an HTML5-compatible with Flash-fallback video player.
  *
- * This module provides functionality for loading the videojs library and
+ * This module provides functionality for loading the Video.js library and
  * formatters for CCK FileFields.
  */
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function videojs_menu() {
   $items = array();
 
   $items['admin/config/media/videojs'] = array(
-    'title' => 'VideoJS Settings',
+    'title' => 'Video.js',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('videojs_settings_form'),
     'access arguments' => array('administer site configuration'),
-    'description' => 'Configure the settings for the VideoJS module.',
+    'description' => 'Configure the settings for the Video.js module.',
     'file' => 'includes/videojs.admin.inc',
   );
 
@@ -27,7 +26,7 @@ function videojs_menu() {
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function videojs_theme() {
   return array(
@@ -45,7 +44,7 @@ function videojs_theme() {
 }
 
 /**
- * Implementation of Views' hook_views_api().
+ * Implements hook_views_api().
  */
 function videojs_views_api() {
   return array(
@@ -55,15 +54,15 @@ function videojs_views_api() {
 }
 
 /**
- * Implementation of CCK's hook_field_formatter_info().
+ * Implements hook_field_formatter_info().
  */
 function videojs_field_formatter_info() {
   return array(
     'videojs' => array(
-      'label' => t('VideoJS : HTML5 Video Player'),
-      'field types' => array('file', 'video', 'media'),
+      'label' => t('Video.js : HTML5 Video Player'),
+      'field types' => array('file', 'media', 'link_field'),
       'description' => t('Display a video file as an HTML5-compatible with Flash-fallback video player.'),
-    )
+    ),
   );
 }
 
@@ -71,100 +70,163 @@ function videojs_field_formatter_info() {
  * Implements hook_field_formatter_view().
  */
 function videojs_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
-  $element = array();
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
-  switch ($display['type']) {
-    case 'videojs':
-      $element = array(
-        '#theme' => 'videojs',
-        '#items' => $items,
-        '#player_id' => 'videojs-' . $id . '-' . str_replace('_', '-', $instance['field_name']),
-      );
-      break;
+  if ($display['type'] !== 'videojs') {
+    return array();
   }
-  $element['#attached'] = videojs_add(FALSE);
-  return $element;
+  if (empty($items)) {
+    return array();
+  }
+
+  if ($field['type'] == 'link_field') {
+    $links = $items;
+    $items = array();
+    foreach ($links as $link) {
+      // Allow the user to override the mime type using the title field
+      if (!empty($link['title']) && strncmp('video/', $link['title'], 6) === 0) {
+        $mime = $link['title'];
+      }
+      // Manual override for WebM, because Drupal doesn't detect it.
+      elseif (substr($link['url'], -5) == '.webm') {
+        $mime = 'video/webm';
+      }
+      else {
+        $mime = DrupalLocalStreamWrapper::getMimeType($link['url']);
+
+        // If the mime type is application/octet-stream, default to MP4.
+        // This happens for instance for links without extensions.
+        if ($mime == 'application/octet-stream') {
+          $mime = 'video/mp4';
+        }
+      }
+
+      $items[] = array(
+        'uri' => url($link['url'], $link),
+        'filemime' => $mime,
+      );
+    }
+  }
+
+  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  return array(
+    array(
+      '#theme' => 'videojs',
+      '#items' => $items,
+      '#player_id' => 'videojs-' . $id . '-' . str_replace('_', '-', $instance['field_name']),
+      '#attached' => videojs_add(FALSE),
+    ),
+  );
 }
 
 /**
- * Add the videojs library to the page.
+ * Add the Video.js library to the page.
  *
  * @param $add
  *   By default this function will add videojs to the page JavaScript array
- *   directly. If wanting to store the videojs file as an #attached property,
+ *   directly. If wanting to store the Video.js file as an #attached property,
  *   set this to FALSE and videojs_add() will only return the needed array
  *   suitable for use as an #attached property.
  */
 function videojs_add($add = TRUE) {
   static $added = FALSE;
+  if (!isset($added)) {
+    $added = &drupal_static(__FUNCTION__);
+  }
 
   $directory = variable_get('videojs_directory', 'sites/all/libraries/video-js');
-  $return = FALSE;
-  if (file_exists($directory . '/video.js')) {
-    $filepath = $directory . '/video.js';
-    $filepath_css = $directory . '/video-js.css';
+
+  if (!file_exists($directory . '/video.min.js')) {
+    return FALSE;
   }
 
-  if (isset($filepath)) {
-    $videojs_js = drupal_get_path('module', 'videojs') . '/theme/videojs.js';
-    $videojs_css = drupal_get_path('module', 'videojs') . '/theme/videojs.css';
-    $settings = array('videojs' => array(
-        'autoPlay' => (int) variable_get('videojs_autoplay', ''),
-        ));
-    if ($add) {
-      drupal_add_js($filepath);
-      drupal_add_css($filepath_css);
-      drupal_add_js($videojs_js);
-      drupal_add_css($videojs_css);
-      if (!$added) {
-        drupal_add_js($settings, array('type' => 'setting'));
-        $added = TRUE;
-      }
-    }
-    $return = array(
-      'js' => array(
-        array('data' => $filepath),
-        array('data' => $videojs_js),
-        array('data' => $settings, 'type' => 'setting'),
-      ),
-      'css' => array(
-        array('data' => $filepath_css),
-        array('data' => $videojs_css),
-        array('data' => $directory . '/skins/hu.css'),
-        array('data' => $directory . '/skins/tube.css'),
-        array('data' => $directory . '/skins/vim.css'),
-      ),
-    );
+  $libjs = $directory . '/video.min.js';
+  $libcss = $directory . '/video-js.min.css';
+
+  if ($add && !$added) {
+    drupal_add_js($libjs, array('group' => JS_LIBRARY));
+    drupal_add_css($libcss);
+    $added = TRUE;
   }
 
-  return $return;
+  return array(
+    'js' => array(
+      $libjs => array('group' => JS_LIBRARY),
+    ),
+    'css' => array($libcss),
+  );
 }
 
 /**
- * Return the version of video JS installed.
+ * Return the version of Video.js installed.
  *
  * @param $directory
- *   The directory to check for a videojs installation.
+ *   The directory to check for a Video.js installation.
  */
 function videojs_get_version($directory = NULL) {
-  $version = 0;
+  $version = NULL;
 
   if (!isset($directory)) {
     $directory = variable_get('videojs_directory', 'sites/all/libraries/video-js');
   }
 
-  if (file_exists($directory . '/video.js')) {
-    $contents = file_get_contents($directory . '/video.js');
+  if (!file_exists($directory . '/video.js')) {
+    return NULL;
   }
-  else
-    return FALSE;
+
+  $contents = file_get_contents($directory . '/video.js');
 
   $matches = array();
-  preg_match('/v.?[ ]*([\d.]+)/i', $contents, $matches);
-
-  if (isset($matches[0])) {
-    $version = substr($matches[0], 1);
+  if (preg_match('/(?:v[ ]*|Version )([\d.]+)/i', $contents, $matches)) {
+    $version = $matches[1];
   }
 
   return $version;
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function videojs_libraries_info() {
+  $libraries = array();
+
+  $libraries['video-js'] = array(
+    'name' => 'Video.js',
+    'vendor url' => 'http://videojs.com',
+    'download url' => 'https://github.com/zencoder/video-js/downloads',
+    'version arguments' => array(
+      'file' => 'video.js',
+      'pattern' => '/(?:v[ ]*|Version )([\d.]+)/i',
+      'lines' => 10,
+      'cols' => 50,
+    ),
+    'versions' => array(
+      '2' => array(
+        'files' => array(
+          'js' => array('video.js' => array('group' => JS_LIBRARY)),
+          'css' => array('video-js.css'),
+        ),
+      ),
+      '3' => array(
+        'files' => array(
+          'js' => array('video.min.js' => array('group' => JS_LIBRARY)),
+          'css' => array('video-js.min.css'),
+        ),
+        'variants' => array(
+          'source' => array(
+            'files' => array(
+              'js' => array('video.js' => array('group' => JS_LIBRARY)),
+              'css' => array('video-js.css'),
+            ),
+            'minified' => array(
+              'files' => array(
+                'js' => array('video.min.js' => array('group' => JS_LIBRARY)),
+                'css' => array('video-js.min.css'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  return $libraries;
 }

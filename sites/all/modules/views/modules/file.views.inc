@@ -1,14 +1,10 @@
 <?php
-/**
- * @file
- *
- * Provide views data and handlers for file.module
- */
 
 /**
- * @defgroup views_file_module file.module handlers
+ * @file
+ * Provide views data and handlers for file.module.
  *
- * @{
+ * @ingroup views_module_handlers
  */
 
 /**
@@ -26,6 +22,7 @@ function file_field_views_data($field) {
     $data[$table_name][$field['field_name'] . '_fid']['relationship'] = array(
       'handler' => 'views_handler_relationship',
       'base' => 'file_managed',
+      'entity type' => 'file',
       'base field' => 'fid',
       'label' => t('file from !field_name', array('!field_name' => $field['field_name'])),
     );
@@ -60,10 +57,17 @@ function file_field_views_data_views_data_alter(&$data, $field) {
       'base' => $entity_info['base table'],
       'base field' => $entity_info['entity keys']['id'],
       'label' => t('!field_name', array('!field_name' => $field['field_name'])),
+      'join_extra' => array(
+        0 => array(
+          'field' => 'entity_type',
+          'value' => $entity_type,
+        ),
+        1 => array(
+          'field' => 'deleted',
+          'value' => 0,
+          'numeric' => TRUE,
+        ),
+      ),
     );
   }
 }
-
-/**
- * @}
- */
