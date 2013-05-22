@@ -2,11 +2,16 @@
 
 /**
  * @file
- * Admin page callbacks for the book module.
+ * Administration page callbacks for the Book module.
  */
 
 /**
  * Returns an administrative overview of all books.
+ *
+ * @return string
+ *   A HTML-formatted string with the administrative page content.
+ *
+ * @see book_menu()
  */
 function book_admin_overview() {
   $rows = array();
@@ -53,6 +58,11 @@ function book_admin_settings() {
 
 /**
  * Form validation handler for book_admin_settings().
+<<<<<<< HEAD
+=======
+ *
+ * @see book_admin_settings_submit()
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  */
 function book_admin_settings_validate($form, &$form_state) {
   $child_type = $form_state['values']['book_child_type'];
@@ -149,7 +159,11 @@ function book_admin_edit_submit($form, &$form_state) {
  * @param $node
  *   The node of the top-level page in the book.
  * @param $form
+<<<<<<< HEAD
  *   The form that is being modified.
+=======
+ *   The form that is being modified, passed by reference.
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @see book_admin_edit()
  */
@@ -184,10 +198,17 @@ function _book_admin_table($node, &$form) {
  * @param $tree
  *   A subtree of the book menu hierarchy.
  * @param $form
+<<<<<<< HEAD
  *   The form that is being modified.
  *
  * @return
  *   The form that is being modified.
+=======
+ *   The form that is being modified, passed by reference.
+ *
+ * @return
+ *   The modified form array.
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @see book_admin_edit()
  */

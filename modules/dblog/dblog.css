@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+/**
+ * @file
+ * Admin styles for the Database Logging module.
+ */
+
+>>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
 .form-item-type,
 .form-item-severity {
   float: left; /* LTR */
