@@ -118,11 +118,7 @@ function taxonomy_term_feed($term) {
  * @see taxonomy_menu()
  * @see taxonomy_field_widget_info()
  */
-<<<<<<< HEAD
 function taxonomy_autocomplete($field_name, $tags_typed = '') {
-=======
-function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
   // If the request has a '/' in the search text, then the menu system will have
   // split it into multiple arguments, recover the intended $tags_typed.
   $args = func_get_args();
@@ -142,7 +138,7 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
   $tags_typed = drupal_explode_tags($tags_typed);
   $tag_last = drupal_strtolower(array_pop($tags_typed));
 
-  $term_matches = array();
+  $matches = array();
   if ($tag_last != '') {
 
     // Part of the criteria for the query come from the field's own settings.
@@ -171,6 +167,7 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
 
     $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . ', ' : '';
 
+    $term_matches = array();
     foreach ($tags_return as $tid => $name) {
       $n = $name;
       // Term names containing commas or quotes must be wrapped in quotes.

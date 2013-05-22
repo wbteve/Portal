@@ -914,10 +914,6 @@ function node_update_7012() {
  * Change {node}.vid default value from 0 to NULL to avoid deadlock issues on MySQL.
  */
 function node_update_7013() {
-<<<<<<< HEAD
-=======
-  db_drop_unique_key('node', 'vid');
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
   db_change_field('node', 'vid', 'vid', array(
     'description' => 'The current {node_revision}.vid version identifier.',
     'type' => 'int',
@@ -925,10 +921,6 @@ function node_update_7013() {
     'not null' => FALSE,
     'default' => NULL,
   ));
-<<<<<<< HEAD
-=======
-  db_add_unique_key('node', 'vid', array('vid'));
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
 }
 
 /**

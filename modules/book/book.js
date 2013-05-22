@@ -2,10 +2,7 @@
  * @file
  * Javascript behaviors for the Book module.
  */
-<<<<<<< HEAD
 
-=======
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
 
 (function ($) {
 

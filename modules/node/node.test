@@ -149,9 +149,6 @@ class NodeLoadHooksTestCase extends DrupalWebTestCase {
   }
 }
 
-/**
- * Tests the node revision functionality.
- */
 class NodeRevisionsTestCase extends DrupalWebTestCase {
   protected $nodes;
   protected $logs;
@@ -201,7 +198,7 @@ class NodeRevisionsTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Checks node revision related operations.
+   * Check node revision related operations.
    */
   function testRevisions() {
     $nodes = $this->nodes;
@@ -285,9 +282,6 @@ class NodeRevisionsTestCase extends DrupalWebTestCase {
   }
 }
 
-/**
- * Tests the node edit functionality.
- */
 class PageEditTestCase extends DrupalWebTestCase {
   protected $web_user;
   protected $admin_user;
@@ -308,7 +302,7 @@ class PageEditTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Checks node edit functionality.
+   * Check node edit functionality.
    */
   function testPageEdit() {
     $this->drupalLogin($this->web_user);
@@ -375,7 +369,7 @@ class PageEditTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests changing a node's "authored by" field.
+   * Check changing node authored by fields.
    */
   function testPageAuthoredBy() {
     $this->drupalLogin($this->admin_user);
@@ -420,9 +414,6 @@ class PageEditTestCase extends DrupalWebTestCase {
   }
 }
 
-/**
- * Tests the node entity preview functionality.
- */
 class PagePreviewTestCase extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
@@ -440,7 +431,7 @@ class PagePreviewTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Checks the node preview functionality.
+   * Check the node preview functionality.
    */
   function testPagePreview() {
     $langcode = LANGUAGE_NONE;
@@ -464,7 +455,7 @@ class PagePreviewTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Checks the node preview functionality, when using revisions.
+   * Check the node preview functionality, when using revisions.
    */
   function testPagePreviewWithRevisions() {
     $langcode = LANGUAGE_NONE;
@@ -494,9 +485,6 @@ class PagePreviewTestCase extends DrupalWebTestCase {
   }
 }
 
-/**
- * Tests creating and saving a node.
- */
 class NodeCreationTestCase extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
@@ -515,7 +503,7 @@ class NodeCreationTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Creates a "Basic page" node and verifies its consistency in the database.
+   * Create a "Basic page" node and verify its consistency in the database.
    */
   function testNodeCreation() {
     // Create a node.
@@ -534,7 +522,7 @@ class NodeCreationTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Verifies that a transaction rolls back the failed creation.
+   * Create a page node and verify that a transaction rolls back the failed creation
    */
   function testFailedPageCreation() {
     // Create a node.
@@ -573,30 +561,8 @@ class NodeCreationTestCase extends DrupalWebTestCase {
     $records = db_query("SELECT wid FROM {watchdog} WHERE variables LIKE '%Test exception for rollback.%'")->fetchAll();
     $this->assertTrue(count($records) > 0, t('Rollback explanatory error logged to watchdog.'));
   }
-
-  /**
-   * Create an unpublished node and confirm correct redirect behavior.
-   */
-  function testUnpublishedNodeCreation() {
-    // Set "Basic page" content type to be unpublished by default.
-    variable_set('node_options_page', array());
-    // Set the front page to the default "node" page.
-    variable_set('site_frontpage', 'node');
-
-    // Create a node.
-    $edit = array();
-    $edit["title"] = $this->randomName(8);
-    $edit["body[" . LANGUAGE_NONE . "][0][value]"] = $this->randomName(16);
-    $this->drupalPost('node/add/page', $edit, t('Save'));
-
-    // Check that the user was redirected to the home page.
-    $this->assertText(t('Welcome to Drupal'), t('The user is redirected to the home page.'));
-  }
 }
 
-/**
- * Tests the functionality of node entity edit permissions.
- */
 class PageViewTestCase extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
@@ -607,7 +573,7 @@ class PageViewTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests an anonymous and unpermissioned user attempting to edit the node.
+   * Creates a node and then an anonymous and unpermissioned user attempt to edit the node.
    */
   function testPageView() {
     // Create a node to view.
@@ -636,9 +602,6 @@ class PageViewTestCase extends DrupalWebTestCase {
   }
 }
 
-/**
- * Tests the summary length functionality.
- */
 class SummaryLengthTestCase extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
@@ -649,7 +612,7 @@ class SummaryLengthTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests the node summary length functionality.
+   * Creates a node and then an anonymous and unpermissioned user attempt to edit the node.
    */
   function testSummaryLength() {
     // Create a node to view.
@@ -681,9 +644,6 @@ class SummaryLengthTestCase extends DrupalWebTestCase {
   }
 }
 
-/**
- * Tests XSS functionality with a node entity.
- */
 class NodeTitleXSSTestCase extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
@@ -693,9 +653,6 @@ class NodeTitleXSSTestCase extends DrupalWebTestCase {
     );
   }
 
-  /**
-   * Tests XSS functionality with a node entity.
-   */
   function testNodeTitleXSS() {
     // Prepare a user to do the stuff.
     $web_user = $this->drupalCreateUser(array('create page content', 'edit any page content'));
@@ -721,9 +678,6 @@ class NodeTitleXSSTestCase extends DrupalWebTestCase {
   }
 }
 
-/**
- * Tests the availability of the syndicate block.
- */
 class NodeBlockTestCase extends DrupalWebTestCase {
   public static function getInfo() {
     return array(
@@ -755,7 +709,7 @@ class NodeBlockTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Checks that the post information displays when enabled for a content type.
+ * Check that the post information displays when enabled for a content type.
  */
 class NodePostSettingsTestCase extends DrupalWebTestCase {
   public static function getInfo() {
@@ -774,7 +728,7 @@ class NodePostSettingsTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Confirms "Basic page" content type and post information is on a new node.
+   * Set "Basic page" content type to display post information and confirm its presence on a new node.
    */
   function testPagePostInfo() {
 
@@ -797,7 +751,7 @@ class NodePostSettingsTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Confirms absence of post information on a new node.
+   * Set "Basic page" content type to not display post information and confirm its absence on a new node.
    */
   function testPageNotPostInfo() {
 
@@ -820,7 +774,7 @@ class NodePostSettingsTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Ensures that data added to nodes by other modules appears in RSS feeds.
+ * Ensure that data added to nodes by other modules appears in RSS feeds.
  *
  * Create a node, enable the node_test module to ensure that extra data is
  * added to the node->content array, then verify that the data appears on the
@@ -847,7 +801,8 @@ class NodeRSSContentTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Ensures that a new node includes the custom data when added to an RSS feed.
+   * Create a new node and ensure that it includes the custom data when added
+   * to an RSS feed.
    */
   function testNodeRSSContent() {
     // Create a node.
@@ -886,11 +841,9 @@ class NodeRSSContentTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Tests basic node_access functionality.
- *
- * Note that hook_node_access_records() is covered in another test class.
- *
+ * Test case to verify basic node_access functionality.
  * @todo Cover hook_node_access in a separate test class.
+ * hook_node_access_records is covered in another test class.
  */
 class NodeAccessTestCase extends DrupalWebTestCase {
   public static function getInfo() {
@@ -902,7 +855,7 @@ class NodeAccessTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Asserts node_access() correctly grants or denies access.
+   * Asserts node_access correctly grants or denies access.
    */
   function assertNodeAccess($ops, $node, $account) {
     foreach ($ops as $op => $result) {
@@ -957,7 +910,7 @@ class NodeAccessTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Tests hook_node_access_records() functionality.
+ * Test case to verify hook_node_access_records functionality.
  */
 class NodeAccessRecordsTestCase extends DrupalWebTestCase {
   public static function getInfo() {
@@ -976,7 +929,7 @@ class NodeAccessRecordsTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Creates a node and tests the creation of node access rules.
+   * Create a node and test the creation of node access rules.
    */
   function testNodeAccessRecords() {
     // Create an article node.
@@ -1052,6 +1005,9 @@ class NodeAccessBaseTableTestCase extends DrupalWebTestCase {
     );
   }
 
+  /**
+   * Enable modules and create user with specific permissions.
+   */
   public function setUp() {
     parent::setUp('node_access_test');
     node_access_rebuild();
@@ -1059,7 +1015,7 @@ class NodeAccessBaseTableTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests the "private" node access functionality.
+   * Test the "private" node access.
    *
    * - Create 2 users with "access content" and "create article" permissions.
    * - Each user creates one private and one not private article.
@@ -1196,7 +1152,7 @@ class NodeAccessBaseTableTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Tests node save related functionality, including import-save.
+ * Test case to check node save related functionality, including import-save
  */
 class NodeSaveTestCase extends DrupalWebTestCase {
 
@@ -1217,8 +1173,7 @@ class NodeSaveTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Checks whether custom node IDs are saved properly during an import operation.
-   *
+   * Import test, to check if custom node ids are saved properly.
    * Workflow:
    *  - first create a piece of content
    *  - save the content
@@ -1252,7 +1207,8 @@ class NodeSaveTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Verifies accuracy of the "created" and "changed" timestamp functionality.
+   * Check that the "created" and "changed" timestamps are set correctly when
+   * saving a new node or updating an existing node.
    */
   function testTimestamps() {
     // Use the default timestamps.
@@ -1351,7 +1307,7 @@ class NodeTypeTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Ensures that node type functions (node_type_get_*) work correctly.
+   * Ensure that node type functions (node_type_get_*) work correctly.
    *
    * Load available node types and validate the returned data.
    */
@@ -1370,7 +1326,7 @@ class NodeTypeTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests creating a content type programmatically and via a form.
+   * Test creating a content type programmatically and via a form.
    */
   function testNodeTypeCreation() {
     // Create a content type programmaticaly.
@@ -1400,7 +1356,7 @@ class NodeTypeTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests editing a node type using the UI.
+   * Test editing a node type using the UI.
    */
   function testNodeTypeEditing() {
     $web_user = $this->drupalCreateUser(array('bypass node access', 'administer content types'));
@@ -1453,7 +1409,7 @@ class NodeTypeTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests that node_types_rebuild() correctly handles the 'disabled' flag.
+   * Test that node_types_rebuild() correctly handles the 'disabled' flag.
    */
   function testNodeTypeStatus() {
     // Enable all core node modules, and all types should be active.
@@ -1514,7 +1470,7 @@ class NodeTypePersistenceTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests that node type customizations persist through disable and uninstall.
+   * Test node type customizations persist through disable and uninstall.
    */
   function testNodeTypeCustomizationPersistence() {
     $web_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer modules'));
@@ -1578,7 +1534,7 @@ class NodeTypePersistenceTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Verifies the rebuild functionality for the node_access table.
+ * Rebuild the node_access table.
  */
 class NodeAccessRebuildTestCase extends DrupalWebTestCase {
   public static function getInfo() {
@@ -1597,9 +1553,6 @@ class NodeAccessRebuildTestCase extends DrupalWebTestCase {
     $this->web_user = $web_user;
   }
 
-  /**
-   * Tests rebuilding the node access permissions table.
-   */
   function testNodeAccessRebuild() {
     $this->drupalGet('admin/reports/status');
     $this->clickLink(t('Rebuild permissions'));
@@ -1609,7 +1562,7 @@ class NodeAccessRebuildTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Tests node administration page functionality.
+ * Test node administration page functionality.
  */
 class NodeAdminTestCase extends DrupalWebTestCase {
   public static function getInfo() {
@@ -1677,7 +1630,6 @@ class NodeAdminTestCase extends DrupalWebTestCase {
    * Tests content overview with different user permissions.
    *
    * Taxonomy filters are tested separately.
-   *
    * @see TaxonomyNodeFilterTestCase
    */
   function testContentAdminPages() {
@@ -1775,7 +1727,7 @@ class NodeAdminTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Tests node title functionality.
+ * Test node title.
  */
 class NodeTitleTestCase extends DrupalWebTestCase {
   protected $admin_user;
@@ -1795,7 +1747,7 @@ class NodeTitleTestCase extends DrupalWebTestCase {
   }
 
   /**
-   *  Creates one node and tests if the node title has the correct value.
+   *  Create one node and test if the node title has the correct value.
    */
   function testNodeTitle() {
     // Create "Basic page" content with title.
@@ -1838,7 +1790,7 @@ class NodeFeedTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Ensures that node_feed() accepts and prints extra channel elements.
+   * Ensure that node_feed accepts and prints extra channel elements.
    */
   function testNodeFeedExtraChannelElements() {
     ob_start();
@@ -1870,7 +1822,7 @@ class NodeBlockFunctionalTest extends DrupalWebTestCase {
   }
 
   /**
-   * Tests the recent comments block.
+   * Test the recent comments block.
    */
   function testRecentNodeBlock() {
     $this->drupalLogin($this->admin_user);
@@ -1983,7 +1935,7 @@ class NodeBlockFunctionalTest extends DrupalWebTestCase {
   }
 }
 /**
- * Tests basic options of multi-step node forms.
+ * Test multistep node forms basic options.
  */
 class MultiStepNodeFormBasicOptionsTest extends DrupalWebTestCase {
   public static function getInfo() {
@@ -2001,7 +1953,7 @@ class MultiStepNodeFormBasicOptionsTest extends DrupalWebTestCase {
   }
 
   /**
-   * Tests changing the default values of basic options to ensure they persist.
+   * Change the default values of basic options to ensure they persist.
    */
   function testMultiStepNodeFormBasicOptions() {
     $edit = array(
@@ -2033,7 +1985,7 @@ class NodeBuildContent extends DrupalWebTestCase {
   }
 
  /**
-  * Ensures that content array is rebuilt on every call to node_build_content().
+  * Test to ensure that a node's content array is rebuilt on every call to node_build_content().
   */
   function testNodeRebuildContent() {
     $node = $this->drupalCreateNode();
@@ -2113,10 +2065,10 @@ class NodeQueryAlter extends DrupalWebTestCase {
   }
 
   /**
-   * Tests 'node_access' query alter, for user with access.
+   * Lower-level test of 'node_access' query alter, for user with access.
    *
-   * Verifies that a non-standard table alias can be used, and that a user with
-   * node access can view the nodes.
+   * Verifies that a non-standard table alias can be used, and that a
+   * user with node access can view the nodes.
    */
   function testNodeQueryAlterLowLevelWithAccess() {
     // User with access should be able to view 4 nodes.
@@ -2136,10 +2088,10 @@ class NodeQueryAlter extends DrupalWebTestCase {
   }
 
   /**
-   * Tests 'node_access' query alter, for user without access.
+   * Lower-level test of 'node_access' query alter, for user without access.
    *
-   * Verifies that a non-standard table alias can be used, and that a user
-   * without node access cannot view the nodes.
+   * Verifies that a non-standard table alias can be used, and that a
+   * user without node access cannot view the nodes.
    */
   function testNodeQueryAlterLowLevelNoAccess() {
     // User without access should be able to view 0 nodes.
@@ -2159,10 +2111,10 @@ class NodeQueryAlter extends DrupalWebTestCase {
   }
 
   /**
-   * Tests 'node_access' query alter, for edit access.
+   * Lower-level test of 'node_access' query alter, for edit access.
    *
-   * Verifies that a non-standard table alias can be used, and that a user with
-   * view-only node access cannot edit the nodes.
+   * Verifies that a non-standard table alias can be used, and that a
+   * user with view-only node access cannot edit the nodes.
    */
   function testNodeQueryAlterLowLevelEditAccess() {
     // User with view-only access should not be able to edit nodes.
@@ -2184,13 +2136,13 @@ class NodeQueryAlter extends DrupalWebTestCase {
   }
 
   /**
-   * Tests 'node_access' query alter override.
+   * Lower-level test of 'node_access' query alter override.
    *
    * Verifies that node_access_view_all_nodes() is called from
-   * node_query_node_access_alter(). We do this by checking that a user who
-   * normally would not have view privileges is able to view the nodes when we
-   * add a record to {node_access} paired with a corresponding privilege in
-   * hook_node_grants().
+   * node_query_node_access_alter().  We do this by checking that
+   * a user which normally would not have view privileges is able
+   * to view the nodes when we add a record to {node_access} paired
+   * with a corresponding privilege in hook_node_grants().
    */
   function testNodeQueryAlterOverride() {
     $record = array(

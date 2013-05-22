@@ -460,15 +460,5 @@ function field_update_7002() {
 }
 
 /**
-<<<<<<< HEAD
-=======
- * Add the FieldInfo class to the class registry.
- */
-function field_update_7003() {
-  // Empty update to force a rebuild of the registry.
-}
-
-/**
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  * @} End of "addtogroup updates-7.x-extra".
  */

@@ -9,15 +9,8 @@ files[] = forum.test
 configure = admin/structure/forum
 stylesheets[all][] = forum.css
 
-<<<<<<< HEAD
 ; Information added by drupal.org packaging script on 2013-03-07
 version = "7.21"
 project = "drupal"
 datestamp = "1362616996"
-=======
-; Information added by drupal.org packaging script on 2013-04-03
-version = "7.22"
-project = "drupal"
-datestamp = "1365027012"
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
 

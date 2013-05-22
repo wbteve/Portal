@@ -1898,18 +1898,8 @@ class DatabaseCondition implements QueryConditionInterface, Countable {
   function __clone() {
     $this->changed = TRUE;
     foreach ($this->conditions as $key => $condition) {
-<<<<<<< HEAD
       if ($key !== '#conjunction' && $condition['field'] instanceOf QueryConditionInterface) {
         $this->conditions[$key]['field'] = clone($condition['field']);
-=======
-      if ($key !== '#conjunction') {
-        if ($condition['field'] instanceOf QueryConditionInterface) {
-          $this->conditions[$key]['field'] = clone($condition['field']);
-        }
-        if ($condition['value'] instanceOf SelectQueryInterface) {
-          $this->conditions[$key]['value'] = clone($condition['value']);
-        }
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
       }
     }
   }

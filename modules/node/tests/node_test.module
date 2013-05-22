@@ -2,10 +2,8 @@
 
 /**
  * @file
- * A dummy module for testing node related hooks.
- *
- * This is a dummy module that implements node related hooks to test API
- * interaction with the Node module.
+ * Dummy module implementing node related hooks to test API interaction with
+ * the Node module.
  */
 
 /**

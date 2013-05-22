@@ -65,7 +65,7 @@ function _drupal_theme_access($theme) {
 }
 
 /**
- * Initializes the theme system by loading the theme.
+ * Initialize the theme system by loading the theme.
  */
 function drupal_theme_initialize() {
   global $theme, $user, $theme_key;
@@ -113,9 +113,8 @@ function drupal_theme_initialize() {
 }
 
 /**
- * Initializes the theme system given already loaded information.
- *
- * This function is useful to initialize a theme when no database is present.
+ * Initialize the theme system given already loaded information. This
+ * function is useful to initialize a theme when no database is present.
  *
  * @param $theme
  *   An object with the following information:
@@ -236,17 +235,7 @@ function _drupal_theme_initialize($theme, $base_theme = array(), $registry_callb
 }
 
 /**
- * Gets the theme registry.
- *
- * @param $complete
- *   Optional boolean to indicate whether to return the complete theme registry
- *   array or an instance of the ThemeRegistry class. If TRUE, the complete
- *   theme registry array will be returned. This is useful if you want to
- *   foreach over the whole registry, use array_* functions or inspect it in a
- *   debugger. If FALSE, an instance of the ThemeRegistry class will be
- *   returned, this provides an ArrayObject which allows it to be accessed
- *   with array syntax and  isset(), and should be more lightweight
- *   than the full registry. Defaults to TRUE.
+ * Get the theme registry.
  *
  * @param $complete
  *   Optional boolean to indicate whether to return the complete theme registry
@@ -269,7 +258,6 @@ function theme_get_registry($complete = TRUE) {
     $drupal_static_fast['registry'] = &drupal_static('theme_get_registry');
   }
   $theme_registry = &$drupal_static_fast['registry'];
-<<<<<<< HEAD
 
   // Initialize the theme, if this is called early in the bootstrap, or after
   // static variables have been reset.
@@ -280,18 +268,6 @@ function theme_get_registry($complete = TRUE) {
 
   $key = (int) $complete;
 
-=======
-
-  // Initialize the theme, if this is called early in the bootstrap, or after
-  // static variables have been reset.
-  if (!is_array($theme_registry)) {
-    drupal_theme_initialize();
-    $theme_registry = array();
-  }
-
-  $key = (int) $complete;
-
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
   if (!isset($theme_registry[$key])) {
     list($callback, $arguments) = _theme_registry_callback();
     if (!$complete) {
@@ -304,7 +280,7 @@ function theme_get_registry($complete = TRUE) {
 }
 
 /**
- * Sets the callback that will be used by theme_get_registry().
+ * Set the callback that will be used by theme_get_registry() to fetch the registry.
  *
  * @param $callback
  *   The name of the callback function.
@@ -320,11 +296,7 @@ function _theme_registry_callback($callback = NULL, array $arguments = array()) 
 }
 
 /**
-<<<<<<< HEAD
  * Get the theme_registry cache; if it doesn't exist, build it.
-=======
- * Gets the theme_registry cache; if it doesn't exist, builds it.
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @param $theme
  *   The loaded $theme object as returned by list_themes().
@@ -364,17 +336,16 @@ function _theme_load_registry($theme, $base_theme = NULL, $theme_engine = NULL, 
 }
 
 /**
- * Writes the theme_registry cache into the database.
+ * Write the theme_registry cache into the database.
  */
 function _theme_save_registry($theme, $registry) {
   cache_set("theme_registry:$theme->name", $registry);
 }
 
 /**
- * Forces the system to rebuild the theme registry.
- *
- * This function should be called when modules are added to the system, or when
- * a dynamic system needs to add more theme hooks.
+ * Force the system to rebuild the theme registry; this should be called
+ * when modules are added to the system, or when a dynamic system needs
+ * to add more theme hooks.
  */
 function drupal_theme_rebuild() {
   drupal_static_reset('theme_get_registry');
@@ -664,8 +635,7 @@ function _theme_process_registry(&$cache, $name, $type, $theme, $path) {
     $cache = $result + $cache;
   }
 
-  // Let themes have variable processors even if they didn't register a
-  // template.
+  // Let themes have variable processors even if they didn't register a template.
   if ($type == 'theme' || $type == 'base_theme') {
     foreach ($cache as $hook => $info) {
       // Check only if not registered by the theme or engine.
@@ -692,11 +662,7 @@ function _theme_process_registry(&$cache, $name, $type, $theme, $path) {
 }
 
 /**
-<<<<<<< HEAD
  * Build the theme registry cache.
-=======
- * Builds the theme registry cache.
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @param $theme
  *   The loaded $theme object as returned by list_themes().
@@ -758,7 +724,7 @@ function _theme_build_registry($theme, $base_theme, $theme_engine) {
 }
 
 /**
- * Returns a list of all currently available themes.
+ * Return a list of all currently available themes.
  *
  * Retrieved from the database, if available and the site is not in maintenance
  * mode; otherwise compiled freshly from the filesystem.
@@ -800,11 +766,7 @@ function _theme_build_registry($theme, $base_theme, $theme_engine) {
  *     their base theme), direct sub-themes of sub-themes, etc. The keys are
  *     the themes' machine names, and the values are the themes' human-readable
  *     names. This element is not set if there are no themes on the system that
-<<<<<<< HEAD
  *     declare this theme as their base theme. 
-=======
- *     declare this theme as their base theme.
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
 */
 function list_themes($refresh = FALSE) {
   $list = &drupal_static(__FUNCTION__, array());
@@ -938,20 +900,15 @@ function drupal_find_base_themes($themes, $key, $used_keys = array()) {
  * executed (if they exist), in the following order (note that in the following
  * list, HOOK indicates the theme hook name, MODULE indicates a module name,
  * THEME indicates a theme name, and ENGINE indicates a theme engine name):
-<<<<<<< HEAD
  * - template_preprocess(&$variables, $hook): Creates a default set of variables
  *   for all theme hooks with template implementations.
-=======
- * - template_preprocess(&$variables, $hook): Creates a default set of
- *   variables for all theme hooks with template implementations.
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  * - template_preprocess_HOOK(&$variables): Should be implemented by the module
  *   that registers the theme hook, to set up default variables.
  * - MODULE_preprocess(&$variables, $hook): hook_preprocess() is invoked on all
  *   implementing modules.
  * - MODULE_preprocess_HOOK(&$variables): hook_preprocess_HOOK() is invoked on
- *   all implementing modules, so that modules that didn't define the theme
- *   hook can alter the variables.
+ *   all implementing modules, so that modules that didn't define the theme hook
+ *   can alter the variables.
  * - ENGINE_engine_preprocess(&$variables, $hook): Allows the theme engine to
  *   set necessary variables for all theme hooks with template implementations.
  * - ENGINE_engine_preprocess_HOOK(&$variables): Allows the theme engine to set
@@ -1006,10 +963,10 @@ function drupal_find_base_themes($themes, $key, $used_keys = array()) {
  * @param $hook
  *   The name of the theme hook to call. If the name contains a
  *   double-underscore ('__') and there isn't an implementation for the full
- *   name, the part before the '__' is checked. This allows a fallback to a
- *   more generic implementation. For example, if theme('links__node', ...) is
- *   called, but there is no implementation of that theme hook, then the
- *   'links' implementation is used. This process is iterative, so if
+ *   name, the part before the '__' is checked. This allows a fallback to a more
+ *   generic implementation. For example, if theme('links__node', ...) is
+ *   called, but there is no implementation of that theme hook, then the 'links'
+ *   implementation is used. This process is iterative, so if
  *   theme('links__contextual__node', ...) is called, theme() checks for the
  *   following implementations, and uses the first one that exists:
  *   - links__contextual__node
@@ -1073,7 +1030,7 @@ function theme($hook, $variables = array()) {
       // Only log a message when not trying theme suggestions ($hook being an
       // array).
       if (!isset($candidate)) {
-        watchdog('theme', 'Theme hook %hook not found.', array('%hook' => $hook), WATCHDOG_WARNING);
+        watchdog('theme', 'Theme key "@key" not found.', array('@key' => $hook), WATCHDOG_WARNING);
       }
       return '';
     }
@@ -1085,8 +1042,7 @@ function theme($hook, $variables = array()) {
   // point path_to_theme() to the currently used theme path:
   $theme_path = $info['theme path'];
 
-  // Include a file if the theme function or variable processor is held
-  // elsewhere.
+  // Include a file if the theme function or variable processor is held elsewhere.
   if (!empty($info['includes'])) {
     foreach ($info['includes'] as $include_file) {
       include_once DRUPAL_ROOT . '/' . $include_file;
@@ -1235,14 +1191,14 @@ function theme($hook, $variables = array()) {
 }
 
 /**
- * Returns the path to the current themed element.
+ * Return the path to the current themed element.
  *
- * It can point to the active theme or the module handling a themed
- * implementation. For example, when invoked within the scope of a theming call
- * it will depend on where the theming function is handled. If implemented from
- * a module, it will point to the module. If implemented from the active theme,
- * it will point to the active theme. When called outside the scope of a
- * theming call, it will always point to the active theme.
+ * It can point to the active theme or the module handling a themed implementation.
+ * For example, when invoked within the scope of a theming call it will depend
+ * on where the theming function is handled. If implemented from a module, it
+ * will point to the module. If implemented from the active theme, it will point
+ * to the active theme. When called outside the scope of a theming call, it will
+ * always point to the active theme.
  */
 function path_to_theme() {
   global $theme_path;
@@ -1255,7 +1211,7 @@ function path_to_theme() {
 }
 
 /**
- * Allows themes and/or theme engines to discover overridden theme functions.
+ * Allow themes and/or theme engines to easily discover overridden theme functions.
  *
  * @param $cache
  *   The existing cache of theme hooks to test against.
@@ -1312,7 +1268,7 @@ function drupal_find_theme_functions($cache, $prefixes) {
 }
 
 /**
- * Allows themes and/or theme engines to easily discover overridden templates.
+ * Allow themes and/or theme engines to easily discover overridden templates.
  *
  * @param $cache
  *   The existing cache of theme hooks to test against.
@@ -1389,8 +1345,7 @@ function drupal_find_theme_templates($cache, $extension, $path) {
       if ($matches) {
         foreach ($matches as $match) {
           $file = substr($match, 0, strpos($match, '.'));
-          // Put the underscores back in for the hook name and register this
-          // pattern.
+          // Put the underscores back in for the hook name and register this pattern.
           $arg_name = isset($info['variables']) ? 'variables' : 'render element';
           $implementations[strtr($file, '-', '_')] = array(
             'template' => $file,
@@ -1406,7 +1361,7 @@ function drupal_find_theme_templates($cache, $extension, $path) {
 }
 
 /**
- * Retrieves a setting for the current theme or for a given theme.
+ * Retrieve a setting for the current theme or for a given theme.
  *
  * The final setting is obtained from the last value found in the following
  * sources:
@@ -1524,7 +1479,7 @@ function theme_get_setting($setting_name, $theme = NULL) {
 }
 
 /**
- * Renders a system default template, which is essentially a PHP template.
+ * Render a system default template, which is essentially a PHP template.
  *
  * @param $template_file
  *   The filename of the template to render.
@@ -1535,21 +1490,14 @@ function theme_get_setting($setting_name, $theme = NULL) {
  *   The output generated by the template.
  */
 function theme_render_template($template_file, $variables) {
-  // Extract the variables to a local namespace
-  extract($variables, EXTR_SKIP);
-
-  // Start output buffering
-  ob_start();
-
-  // Include the template file
-  include DRUPAL_ROOT . '/' . $template_file;
-
-  // End buffering and return its contents
-  return ob_get_clean();
+  extract($variables, EXTR_SKIP);               // Extract the variables to a local namespace
+  ob_start();                                   // Start output buffering
+  include DRUPAL_ROOT . '/' . $template_file;   // Include the template file
+  return ob_get_clean();                        // End buffering and return its contents
 }
 
 /**
- * Enables a given list of themes.
+ * Enable a given list of themes.
  *
  * @param $theme_list
  *   An array of theme names.
@@ -1574,7 +1522,7 @@ function theme_enable($theme_list) {
 }
 
 /**
- * Disables a given list of themes.
+ * Disable a given list of themes.
  *
  * @param $theme_list
  *   An array of theme names.
@@ -1660,13 +1608,13 @@ function theme_status_messages($variables) {
  * theme('link') for rendering the anchor tag.
  *
  * To optimize performance for sites that don't need custom theming of links,
- * the l() function includes an inline copy of this function, and uses that
- * copy if none of the enabled modules or the active theme implement any
- * preprocess or process functions or override this theme implementation.
+ * the l() function includes an inline copy of this function, and uses that copy
+ * if none of the enabled modules or the active theme implement any preprocess
+ * or process functions or override this theme implementation.
  *
  * @param $variables
- *   An associative array containing the keys 'text', 'path', and 'options'.
- *   See the l() function for information about these variables.
+ *   An associative array containing the keys 'text', 'path', and 'options'. See
+ *   the l() function for information about these variables.
  *
  * @see l()
  */
@@ -1687,24 +1635,15 @@ function theme_link($variables) {
  *       item in the links list.
  *     - html: (optional) Whether or not 'title' is HTML. If set, the title
  *       will not be passed through check_plain().
-<<<<<<< HEAD
  *     - attributes: (optional) Attributes for the anchor, or for the <span> tag
  *       used in its place if no 'href' is supplied. If element 'class' is
  *       included, it must be an array of one or more class names.
  *     If the 'href' element is supplied, the entire link array is passed to l()
  *     as its $options parameter.
-=======
- *     - attributes: (optional) Attributes for the anchor, or for the <span>
- *       tag used in its place if no 'href' is supplied. If element 'class' is
- *       included, it must be an array of one or more class names.
- *     If the 'href' element is supplied, the entire link array is passed to
- *     l() as its $options parameter.
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *   - attributes: A keyed array of attributes for the UL containing the
  *     list of links.
- *   - heading: (optional) A heading to precede the links. May be an
- *     associative array or a string. If it's an array, it can have the
- *     following elements:
+ *   - heading: (optional) A heading to precede the links. May be an associative
+ *     array or a string. If it's an array, it can have the following elements:
  *     - text: The heading text.
  *     - level: The heading level (e.g. 'h2', 'h3').
  *     - class: (optional) An array of the CSS classes for the heading.
@@ -1808,8 +1747,8 @@ function theme_links($variables) {
  *     attribute to be omitted in some cases. Therefore, this variable defaults
  *     to an empty string, but can be set to NULL for the attribute to be
  *     omitted. Usually, neither omission nor an empty string satisfies
- *     accessibility requirements, so it is strongly encouraged for code
- *     calling theme('image') to pass a meaningful value for this variable.
+ *     accessibility requirements, so it is strongly encouraged for code calling
+ *     theme('image') to pass a meaningful value for this variable.
  *     - http://www.w3.org/TR/REC-html40/struct/objects.html#h-13.8
  *     - http://www.w3.org/TR/xhtml1/dtds.html
  *     - http://dev.w3.org/html5/spec/Overview.html#alt
@@ -2066,8 +2005,7 @@ function theme_table($variables) {
  *
  * @param $variables
  *   An associative array containing:
- *   - style: Set to either 'asc' or 'desc', this determines which icon to
- *     show.
+ *   - style: Set to either 'asc' or 'desc', this determines which icon to show.
  */
 function theme_tablesort_indicator($variables) {
   if ($variables['style'] == "asc") {
@@ -2210,8 +2148,7 @@ function theme_feed_icon($variables) {
  *       - script: To load JavaScript.
  *     - #attributes: (optional) An array of HTML attributes to apply to the
  *       tag.
- *     - #value: (optional) A string containing tag content, such as inline
- *       CSS.
+ *     - #value: (optional) A string containing tag content, such as inline CSS.
  *     - #value_prefix: (optional) A string to prepend to #value, e.g. a CDATA
  *       wrapper prefix.
  *     - #value_suffix: (optional) A string to append to #value, e.g. a CDATA
@@ -2379,9 +2316,8 @@ function template_preprocess(&$variables, $hook) {
   global $user;
   static $count = array();
 
-  // Track run count for each hook to provide zebra striping. See
-  // "template_preprocess_block()" which provides the same feature specific to
-  // blocks.
+  // Track run count for each hook to provide zebra striping.
+  // See "template_preprocess_block()" which provides the same feature specific to blocks.
   $count[$hook] = isset($count[$hook]) && is_int($count[$hook]) ? $count[$hook] : 1;
   $variables['zebra'] = ($count[$hook] % 2) ? 'odd' : 'even';
   $variables['id'] = $count[$hook]++;
@@ -2452,7 +2388,6 @@ function _template_preprocess_default_variables() {
 
 /**
  * Adds helper variables derived from variables defined during preprocessing.
-<<<<<<< HEAD
  *
  * When preparing variables for a theme hook implementation, all 'preprocess'
  * functions run first, then all 'process' functions (see theme() for details
@@ -2463,18 +2398,6 @@ function _template_preprocess_default_variables() {
  * template_preprocess(), this function does not get called for theme hooks
  * implemented as functions.
  *
-=======
- *
- * When preparing variables for a theme hook implementation, all 'preprocess'
- * functions run first, then all 'process' functions (see theme() for details
- * about the full sequence).
- *
- * This function serializes array variables manipulated during the preprocessing
- * phase into strings for convenient use by templates. As with
- * template_preprocess(), this function does not get called for theme hooks
- * implemented as functions.
- *
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  * @see theme()
  * @see template_preprocess()
  */
@@ -2754,13 +2677,13 @@ function theme_get_suggestions($args, $base, $delimiter = '__') {
 }
 
 /**
- * Process variables for maintenance-page.tpl.php.
+ * The variables array generated here is a mirror of template_preprocess_page().
+ * This preprocessor will run its course when theme_maintenance_page() is
+ * invoked.
  *
- * The variables array generated here is a mirror of
- * template_preprocess_page(). This preprocessor will run its course when
- * theme_maintenance_page() is invoked. An alternate template file of
- * maintenance-page--offline.tpl.php can be used when the database is offline to
- * hide errors and completely replace the content.
+ * An alternate template file of "maintenance-page--offline.tpl.php" can be
+ * used when the database is offline to hide errors and completely replace the
+ * content.
  *
  * The $variables array contains the following arguments:
  * - $content
@@ -2854,13 +2777,10 @@ function template_preprocess_maintenance_page(&$variables) {
 }
 
 /**
- * Theme process function for theme_maintenance_field().
- *
  * The variables array generated here is a mirror of template_process_html().
  * This processor will run its course when theme_maintenance_page() is invoked.
  *
  * @see maintenance-page.tpl.php
- * @see template_process_html()
  */
 function template_process_maintenance_page(&$variables) {
   $variables['head']    = drupal_get_html_head();
@@ -2872,7 +2792,7 @@ function template_process_maintenance_page(&$variables) {
 /**
  * Preprocess variables for region.tpl.php
  *
- * Prepares the values passed to the theme_region function to be passed into a
+ * Prepare the values passed to the theme_region function to be passed into a
  * pluggable template engine. Uses the region name to generate a template file
  * suggestions. If none are found, the default region.tpl.php is used.
  *

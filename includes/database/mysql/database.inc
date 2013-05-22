@@ -13,11 +13,11 @@
 class DatabaseConnection_mysql extends DatabaseConnection {
 
   /**
-   * Flag to indicate if the cleanup function in __destruct() should run.
+   * Flag to indicate if we have registered the nextID cleanup function.
    *
    * @var boolean
    */
-  protected $needsCleanup = FALSE;
+  protected $shutdownRegistered = FALSE;
 
   public function __construct(array $connection_options = array()) {
     // This driver defaults to transaction support, except if explicitly passed FALSE.
@@ -76,15 +76,6 @@ class DatabaseConnection_mysql extends DatabaseConnection {
     );
     // Set connection options.
     $this->exec(implode('; ', $connection_options['init_commands']));
-<<<<<<< HEAD
-=======
-  }
-
-  public function __destruct() {
-    if ($this->needsCleanup) {
-      $this->nextIdDelete();
-    }
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
   }
 
   public function queryRange($query, $from, $count, array $args = array(), array $options = array()) {
@@ -124,7 +115,12 @@ class DatabaseConnection_mysql extends DatabaseConnection {
       $this->query('INSERT INTO {sequences} (value) VALUES (:value) ON DUPLICATE KEY UPDATE value = value', array(':value' => $existing_id));
       $new_id = $this->query('INSERT INTO {sequences} () VALUES ()', array(), array('return' => Database::RETURN_INSERT_ID));
     }
-    $this->needsCleanup = TRUE;
+    if (!$this->shutdownRegistered) {
+      // Use register_shutdown_function() here to keep the database system
+      // independent of Drupal.
+      register_shutdown_function(array($this, 'nextIdDelete'));
+      $shutdownRegistered = TRUE;
+    }
     return $new_id;
   }
 

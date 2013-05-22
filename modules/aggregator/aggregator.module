@@ -266,17 +266,13 @@ function aggregator_menu() {
 }
 
 /**
-<<<<<<< HEAD
  * Title callback: Returns a title for aggregatory category pages.
-=======
- * Title callback: Returns a title for aggregator category pages.
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @param $category
  *   An aggregator category.
  *
  * @return
- *   A string with the aggregator category title.
+ *   An aggregator category title.
  */
 function _aggregator_category_title($category) {
   return $category['title'];
@@ -727,11 +723,7 @@ function theme_aggregator_block_item($variables) {
 }
 
 /**
-<<<<<<< HEAD
  * Safely renders HTML content, as allowed.
-=======
- * Renders the HTML content safely, as allowed.
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @param $value
  *   The content to be filtered.
@@ -747,11 +739,7 @@ function aggregator_filter_xss($value) {
  * Checks and sanitizes the aggregator configuration.
  *
  * Goes through all fetchers, parsers and processors and checks whether they
-<<<<<<< HEAD
  * are available. If one is missing resets to standard configuration.
-=======
- * are available. If one is missing, resets to standard configuration.
->>>>>>> 25f9219... Update Drupal core to 7.22. refs #1541
  *
  * @return
  *   TRUE if this function resets the configuration; FALSE if not.
@@ -787,7 +775,7 @@ function aggregator_sanitize_configuration() {
  *   Items count.
  *
  * @return
- *   A string that is plural-formatted as "@count items".
+ *   Plural-formatted "@count items"
  */
 function _aggregator_items($count) {
   return format_plural($count, '1 item', '@count items');

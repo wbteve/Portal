@@ -43,7 +43,7 @@ function _password_itoa64() {
 }
 
 /**
- * Encodes bytes into printable base 64 using the *nix standard from crypt().
+ * Encode bytes into printable base 64 using the *nix standard from crypt().
  *
  * @param $input
  *   The string containing bytes to encode.
