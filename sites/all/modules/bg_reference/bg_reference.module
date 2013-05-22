@@ -418,25 +418,6 @@ function bg_reference_field_load($entity_type, $entities, $field, $instances, $l
 }
 
 /**
- * Implement hook_field_presave().
- */
-function bg_reference_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  // Store the text format together with the text content as a serialized array.
-  foreach ($items as $delta => $item) {
-    if ($item['type'] == CONTENT_TYPE_TEXT) {
-      $content_array = array(
-        'text' => $item['wrapper']['ref_'. CONTENT_TYPE_TEXT]['value'],
-        'text_format' => $item['wrapper']['ref_'. CONTENT_TYPE_TEXT]['format'],
-      );
-      $items[$delta]['content'] = serialize($content_array);
-    }
-    else if ($item['type'] == CONTENT_TYPE_VIEW) {
-      $items[$delta]['content'] = $item['wrapper']['ref_' . CONTENT_TYPE_VIEW];
-    }
-  }
-}
-
-/**
  * Implement hook_field_load().
  */
 function bg_reference_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
