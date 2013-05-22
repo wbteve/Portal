@@ -417,24 +417,6 @@ function bg_reference_field_load($entity_type, $entities, $field, $instances, $l
   }
 }
 
-/**
- * Implement hook_field_load().
- */
-function bg_reference_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
-  foreach ($entities as $id => $entity) {
-    foreach ($items[$id] as $delta => $item) {
-      // Unpack serialized arrays of text items to extract the text format.
-      // For backwards compatibility, set the default text format if the content is not a serialized array yet.
-      if ($item['type'] == CONTENT_TYPE_TEXT && ($content_array = @unserialize($item['content'])) !== false) {
-        $items[$id][$delta]['content'] = $content_array['text'];
-        $items[$id][$delta]['text_format'] = $content_array['text_format'];
-      }
-      else {
-        $items[$id][$delta]['text_format'] = 'full_html';
-      }
-    }
-  }
-}
 
 /**
  * Implement hook_field_prepare_view().
