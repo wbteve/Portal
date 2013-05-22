@@ -89,6 +89,14 @@ function globalredirect_init() {
       return;
     }
 
+    $langcode_replacement = '';
+    // Load current langcode from i18n module.
+    if (function_exists('i18n_langcode')) {
+      if ($current_langcode = i18n_langcode()) {
+        $langcode_replacement = $current_langcode;
+      }
+    }
+
     // Redirect if the current request does not refer to the front page in the
     // configured fashion (with or without a prefix)
     if ($request_path != $prefix) {
