@@ -7,15 +7,6 @@
       }
     });
 
-    // Pop-up for museumprijs
-    if (document.cookie.indexOf('visited=true') === -1) {
-      var expires = new Date();
-      expires.setDate(expires.getDate()+30);
-      document.cookie = "visited=true; expires="+expires.toUTCString();
-      var contents = $('#block-bg-blocks-vote-museum-price').html();
-      $.colorbox({html: contents, width: 590, height: 410, scrolling: false });
-    }
-
   });
 
   var dossierWidth = 0;
