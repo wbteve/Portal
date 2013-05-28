@@ -1,41 +1,6 @@
+# Ignore configuration files that may contain sensitive information.
+sites/*/settings*.php
 
-# /
-/.settings
-/.buildpath
-/.project
-
-# /sites/all/modules/bg_user/
-
-# /sites/all/modules/imce/
-
-# /sites/all/modules/imce/css/
-
-# /sites/all/modules/imce/inc/
-
-# /sites/all/modules/imce/js/
-
-# /sites/all/modules/imce/tpl/
-
-# /sites/all/modules/imce_mkdir/
-
-# /sites/all/modules/imce_wysiwyg/
-
-# /sites/all/modules/imce_wysiwyg/js/
-
-# /sites/all/themes/beeldgeluid/images/
-/sites/all/themes/beeldgeluid/images/arrow_collapse_down.png
-/sites/all/themes/beeldgeluid/images/arrow_collapse_up.png
-/sites/all/themes/beeldgeluid/images/arrow_sprite.png
-/sites/all/themes/beeldgeluid/images/bg_collapsHeader.jpg
-
-# /sites/default/
-/sites/default/settings.php
-
-# /sites/default/files/
-/sites/default/files/styles
-/sites/default/files/profile_pictures
-/sites/default/files/pictures
-/sites/default/files/languages
-/sites/default/files/images
-/sites/default/files/banner
-/sites/default/files/xmlsitemap
+# Ignore paths that contain user-generated content.
+sites/*/files
+sites/*/private

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Contains the default summary style plugin, which displays items in an HTML list.
@@ -73,4 +74,3 @@ class views_plugin_style_summary extends views_plugin_style {
     ));
   }
 }
-

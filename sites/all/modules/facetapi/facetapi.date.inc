@@ -111,7 +111,7 @@ function facetapi_get_timestamp_gap($start_time, $end_time) {
     case ($time_diff >= 31536000):
       return FACETAPI_DATE_YEAR;
 
-    case (gmdate('Ym', $start_time) != gmdate('Ym', $end_time)):
+    case ($time_diff >= 86400 * gmdate('t', $start_time)):
       return FACETAPI_DATE_MONTH;
 
     case ($time_diff >= 86400):
@@ -199,13 +199,17 @@ function facetapi_format_timestamp($timestamp, $gap = FACETAPI_DATE_YEAR) {
  * @param $gap
  *   A string containing the gap, see FACETAPI_DATE_* constants for valid
  *   values, defaults to YEAR.
+ * @param $callback
+ *   The formatting callback, defaults to "facetapi_format_timestamp".
  *
  * @return
  *   A gap-appropriate display date used in the facet link.
+ *
+ * @see facetapi_format_timestamp()
  */
-function facetapi_format_date($date, $gap = FACETAPI_DATE_YEAR) {
+function facetapi_format_date($date, $gap = FACETAPI_DATE_YEAR, $callback = 'facetapi_format_timestamp') {
   $timestamp = strtotime($date);
-  return facetapi_format_timestamp($timestamp, $gap);
+  return $callback($timestamp, $gap);
 }
 
 /**

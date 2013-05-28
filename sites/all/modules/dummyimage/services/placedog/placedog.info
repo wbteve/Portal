@@ -1,0 +1,12 @@
+name = Placedog service
+description = Integrates the placedog service with the dummyimage module.
+core = 7.x
+package = Dummy image
+dependencies[] = dummyimage
+
+; Information added by drupal.org packaging script on 2012-03-23
+version = "7.x-1.4"
+core = "7.x"
+project = "dummyimage"
+datestamp = "1332522646"
+

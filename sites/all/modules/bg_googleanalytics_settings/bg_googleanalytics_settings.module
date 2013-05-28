@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Googleanalytics Settings feature.
+ */
+
+include_once 'bg_googleanalytics_settings.features.inc';

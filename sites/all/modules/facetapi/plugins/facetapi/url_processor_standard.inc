@@ -2,18 +2,21 @@
 
 /**
  * @file
- * The standard URL processor.
+ * The standard url processor class.
  */
 
 /**
- * Extension of FacetapiUrlProcessor.
+ * Url processor plugin that retrieves facet data from the query string.
+ *
+ * This plugin retrieves facet data from $_GET, and stored all information in
+ * the "f" query string variable by default.
  */
 class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
 
   /**
    * Implements FacetapiUrlProcessor::fetchParams().
    *
-   * Pulls facet params from the $_GET variable.
+   * Use $_GET as the source for facet data.
    */
   public function fetchParams() {
     return $_GET;
@@ -46,8 +49,9 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
       }
     }
 
-    // Resets array keys, returns query string.
-    $qstring[$this->filterKey] = array_values($qstring[$this->filterKey]);
+    // Removes duplicates, resets array keys and returns query string.
+    // @see http://drupal.org/node/1340528
+    $qstring[$this->filterKey] = array_values(array_unique($qstring[$this->filterKey]));
     return array_filter($qstring);
   }
 
@@ -62,14 +66,6 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
     $active_items = $this->adapter->getAllActiveItems();
 
     $item = menu_get_item();
-    $last_load_func = is_array($item['load_functions']) ? end($item['load_functions']) : NULL;
-    if (!empty($item['title']) && ((!$keys && $active_items) || ($keys && $last_load_func != 'menu_tail_load'))) {
-      $last = end($breadcrumb);
-      $this_page = l($item['title'], $item['href'], $item['localized_options']);
-      if ($last != $this_page) {
-        $breadcrumb[] = $this_page;
-      }
-    }
 
     // Initializes base breadcrumb query.
     $query = $this->params;
@@ -78,13 +74,13 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
     // Adds the current search to the query.
     if ($keys) {
       // The last item should be text, not a link.
-      $breadcrumb[] = $active_items ? l($keys, $_GET['q'], array('query' => $query)) : check_plain($keys);
+      $breadcrumb[] = $active_items ? l($keys, current_path(), array('query' => $query)) : check_plain($keys);
     }
 
     // Adds filters to the breadcrumb trail.
     $last = end($active_items);
     foreach ($active_items as $item) {
-      $query[$this->filterKey][] = $item['field alias'] . ':' . $item['value'];
+      $query[$this->filterKey][] = rawurlencode($item['field alias']) . ':' . $item['value'];
 
       // Replaces with the mapped value.
       $value = $this->adapter->getMappedValue($item['facets'][0], $item['value']);
@@ -95,11 +91,11 @@ class FacetapiUrlProcessorStandard extends FacetapiUrlProcessor {
       }
       else {
         // Appends the filter to the breadcrumb trail.
-        $breadcrumb[] = l($value['#markup'], $_GET['q'], array('query' => $query, 'html' => !empty($value['#html'])));
+        $breadcrumb[] = l($value['#markup'], current_path(), array('query' => $query, 'html' => !empty($value['#html'])));
       }
     }
 
-    // Sets the breadcrumb trail with h keys and filters.
+    // Sets the breadcrumb trail with the keys and filters.
     drupal_set_breadcrumb($breadcrumb);
   }
 }
