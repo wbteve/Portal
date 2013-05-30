@@ -70,6 +70,17 @@
   <meta property="fb:admins" content="100000555095655" /> 
 </head>
 <body class="<?php print $classes; ?>" <?php print $attributes;?>>
+
+  <?php if(drupal_is_front_page()): ?>
+    <script type="text/javascript">var _kiq = _kiq || [];</script> <script type="text/javascript">
+      (function(){
+        setTimeout(function(){ var d = document, f = d.getElementsByTagName('script')[0], s = d.createElement('script');
+          s.type = 'text/javascript'; s.async = true; s.src = '//s3.amazonaws.com/ki.js/49105/acZ.js'; f.parentNode.insertBefore(s,f);
+        }, 1);
+      })();
+    </script> <noscript><a href="https://qualaroo.com/">Survey by Qualaroo</a></noscript>
+  <?php endif; ?>
+
   <div id="skip-link">
     <a href="#main-menu" class="element-invisible element-focusable"><?php print t('Jump to Navigation'); ?></a>
   </div>
