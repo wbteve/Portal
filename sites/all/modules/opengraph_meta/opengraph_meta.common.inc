@@ -14,7 +14,7 @@ define('OPENGRAPH_META_VAR_FALLBACK_IMG', 'opengraph_meta_fallback_img');
 define('OPENGRAPH_META_VAR_OPTIONAL_TAGS', 'opengraph_meta_optional_tags');
 
 
-define('OPENGRAPH_META_DRUPAL_VERSION', intval(substr(DRUPAL_CORE_COMPATIBILITY,0,1)));
+define('OPENGRAPH_META_DRUPAL_VERSION', ('7.x' == DRUPAL_CORE_COMPATIBILITY ? 7 : 6));
 
 
 
@@ -44,7 +44,7 @@ class OpenGraphMeta {
   /** Db field name for optional tags (not to be used by external code) */
   const __OPTIONAL_DB_FIELD = 'optional';
 
-
+  
   /** Singleton instance. */
   private static $instance = NULL;
 
@@ -134,7 +134,7 @@ class OpenGraphMeta {
       // if node given then override defaults
       $ret[self::TITLE] = $full_view ? drupal_get_title() : $node->title;
       $body = OpenGraphMetaDrupalLayer::get_node_body($node);
-      $ret[self::DESCRIPTION] = !empty($body) ? mb_substr(strip_tags($body),0,200) : $node->title;
+      $ret[self::DESCRIPTION] = !empty($body) ? drupal_substr(strip_tags($body),0,200) : $node->title;
       $ret[self::TYPE] = $this->settings_obj->get(OPENGRAPH_META_VAR_CONTENT_TYPE_.$node->type,'');
       $ret[self::IMAGE] = $this->settings_obj->get(OPENGRAPH_META_VAR_FALLBACK_IMG, '');
 
@@ -246,7 +246,7 @@ class OpenGraphMeta {
   }
 
   /** Render the meta tag data for the given node. */
-  public function render_data($node, $opengraph_data) {
+  public function render_data(&$node, $opengraph_data) {
     // fallback values in case no values set.
     $allfields = $this->get_og_tag_defaults($node, TRUE);
     foreach ($allfields as $field => $_d) {
@@ -277,6 +277,10 @@ class OpenGraphMeta {
             $v = floatval($v);
             break;
         }
+
+        // allow other people to alter this value
+        $v = OpenGraphMetaDrupalLayer::invoke_filter('og_tag_render_alter', $v, array($node, $field));
+
         $this->render_obj->add_meta('og:'.$field, $v);
         $this->tags_already_output[$field] = true;
 
@@ -326,7 +330,7 @@ class OpenGraphMeta {
   public function warn($msg) {
     watchdog('opengraph_meta', $msg, array(), WATCHDOG_WARNING);
   }
-
+  
 
   /**
    * FOR TESTING PURPOSES ONLY!
@@ -559,19 +563,6 @@ class OpenGraphMetaDrupalLayer {
           'url' => $url,
         ));
       }
-      else if (!empty($fields['fid']) && is_numeric($fields['fid'])) {
-        $file = file_load($fields['fid']);
-        $preview = media_get_thumbnail_preview($file);
-        if (isset($preview['#path'])) {
-          $url = image_style_url('thumbnail', $preview['#path']);
-  
-          array_push($resultarray, array(
-            'title' => '',
-            'alt' => '',
-            'url' => $url,
-          ));
-        }
-      }
       else {
         foreach ($fields as $cv) {
           self::extract_image_fields($cv, $resultarray);
@@ -635,6 +626,24 @@ class OpenGraphMetaDrupalLayer {
           return FALSE;
         return $result->fetchObject();
     }
+  }
+
+
+  /**
+   * Call given filter on all modules which implement it.
+   *
+   * @params $name filter name.
+   * @param $value initial value.
+   * @param $args additional arguments to pass to each filter.
+   * @return final filtered value.
+   */
+  public static function invoke_filter($name, $value, $args = array()) {
+    array_push($args, $value);
+    $valueIndex = count($args) - 1;
+    foreach (module_implements($name) as $module) {
+       $args[$valueIndex] = call_user_func_array($module . '_' . $name, $args);
+    }
+    return $args[$valueIndex];
   }
 
 

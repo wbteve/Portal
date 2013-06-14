@@ -1,0 +1,874 @@
+<?php
+define('CONTENT_TYPE_MEDIA', 'media');
+define('CONTENT_TYPE_TEXT', 'text');
+define('CONTENT_TYPE_SEARCH_RESULT', 'search_result');
+define('CONTENT_TYPE_BANNER', 'banner');
+define('CONTENT_TYPE_EVENT', 'agenda');
+define('CONTENT_TYPE_DOSSIER', 'dossier');
+define('CONTENT_TYPE_FACEBOOK', 'facebook_page');
+define('CONTENT_TYPE_VIEW' , 'view');
+
+define('UNIT_SIZE_WIDTH', 120);
+define('UNIT_SIZE_HEIGHT', 80);
+
+function bg_reference_init() {
+  drupal_add_js(array('bg_reference' => array('unitSizeWidth' => UNIT_SIZE_WIDTH, 'unitSizeHeight' => UNIT_SIZE_HEIGHT)), 'setting');
+}
+
+function bg_reference_menu() {
+  $items = array();
+
+  $items['bg-reference/autocomplete'] = array(
+    'page callback'   => '_bg_reference_autocomplete',
+    'page arguments'  => array(2, 3),
+    'access callback' => TRUE,
+    'type'            => MENU_CALLBACK,
+  );
+  $items['ajax/switch-media/%node/%node/%node/%'] = array(
+    'page callback' => 'bg_reference_ajax_switch_main_media',
+    'page arguments' => array(2, 3, 4, 5),
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+* Implements hook_preprocess_node().
+*/
+function bg_reference_preprocess_node(&$vars) {
+  if($vars['view_mode'] == 'facebook') {
+    $vars['theme_hook_suggestions'][] = 'node__' . $vars['type'] . '__facebook';
+  }
+}
+
+function bg_reference_node_view($node, $view_mode, $langcode) {
+  if($node->type == CONTENT_TYPE_DOSSIER) {
+    drupal_add_js(array('bg_reference' => array('dossierNid' => $node->nid)), 'setting');
+    drupal_add_library('system', 'effects.transfer');
+  }
+}
+
+function bg_reference_theme() {
+  return array(
+    'bg_reference' => array(
+      'render element' => 'element'
+    ),
+  );
+}
+
+function theme_bg_reference($variables) {
+  static $main_player_rendered, $row;
+  extract($variables);
+
+  if(is_null($main_player_rendered)) {
+    $main_player_rendered = FALSE;
+    $row = 0;
+  }
+
+  $classes = array(
+    'dossier-element',
+    'dossier-element-' . $element['#data']['type'],
+    'dossier-element-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+    'dossier-element-' . $element['#data']['type'] . '-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+  );
+
+  $content = '';
+  switch($element['#data']['type']) {
+
+    case CONTENT_TYPE_BANNER:
+      preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
+      if (isset($match['nid']) && $node = node_load($match['nid'])) {
+        $node_array = node_view($node, 'dossier');
+        if (isset($node_array['field_banner'][0])) {
+          $node_array['field_banner'][0]['#image_style'] = 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'];
+        }
+        $content = drupal_render($node_array);
+      }
+      break;
+
+    case CONTENT_TYPE_EVENT:
+      preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
+      if (isset($match['nid']) && $node = node_load($match['nid'])) {
+        $content = drupal_render(node_view($node, 'dossier'));
+      }
+      break;
+
+    case CONTENT_TYPE_MEDIA:
+      $classes[] = 'node-type-media';
+      preg_match('/\[nid:(?P<nid>\d+)\]/', $element['#data']['content'], $match);
+
+      if (is_numeric($match['nid'])) {
+        $classes[] = 'node-id-' . $match['nid'];
+        if (isset($match['nid']) && $node = node_load($match['nid'])) {
+
+          // Render media as player for Facebook
+          if($element['#display_type'] == 'bg_reference_facebook') {
+            $node_array = node_view($node, 'facebook');
+
+            $content = drupal_render($node_array);
+          }
+          // Else render default
+          else {
+            $node_array = node_view($node, 'full');
+
+            // Render main media player
+            if ($element['#data']['width'] == 4 && $element['#data']['height'] == 4 && !$main_player_rendered) {
+              $content = drupal_render($node_array);
+              $classes[] = 'main-media-player';
+              $classes[] = 'main-media-player-type-' . $node->field_media_file[$node->language][0]['file']->type;
+              drupal_add_js(array('bg_reference' => array('mainMediaNid' => $node->nid)), 'setting');
+              $main_player_rendered = TRUE;
+            }
+            // Render media thumbnail
+            else {
+              $node_array['field_media_file'] = field_view_field('node', $node, 'field_media_file', array(
+                'type' => BG_MEDIA_DISPLAY_TYPE_THUMBNAIL,
+                'label' => 'hidden',
+                'settings' => array(
+                  'style_name' => 'grid-' . $element['#data']['width'] . 'x' . $element['#data']['height'],
+                ),
+              ));
+
+              $classes[] = 'media-type-' . $node->field_media_file[$node->language][0]['file']->type;
+
+              $row = isset($element['#data']['delta']) ? $element['#data']['delta'] : $row;
+              $link = bg_reference_ajax_text_button('', "node/{$node->nid}", t('View @title', array('@title' => $node->title)), "{$node->nid}|{$row}");
+              $link_close_length = strlen('</a>');
+
+              $node_array['field_media_file'][0]['#prefix'] = substr($link, 0, -$link_close_length);
+              $node_array['field_media_file'][0]['#suffix'] = substr($link, -$link_close_length);
+
+              $content = drupal_render($node_array['field_media_file']);
+            }
+          }
+        }
+      }
+      break;
+
+    case CONTENT_TYPE_SEARCH_RESULT:
+      $value = _bg_reference_search_parse_value($element['#data']['content']);
+
+      $searchterm = check_plain($value['query']);
+      $search_title = '<h2>' . l(t('Search results for "@searchterm"', array('@searchterm' => $searchterm)), 'zoek/' . $searchterm) . '</h2>';
+
+      // Check if Solr server is available, eg. for development environments.
+      module_load_install('apachesolr');
+      foreach (apachesolr_requirements('runtime') as $requirement) {
+        $status = $requirement['severity'] == REQUIREMENT_ERROR ? 'error' : 'status';
+        if ($status == 'error') {
+          $content = '<div class="dossier-element-search_result-inner">' . $search_title . '<p>Solr server unavailable.</p></div>';
+          break 2;
+        }
+      }
+
+      $search = apachesolr_search_run('dossier_search', array('q' => $searchterm, 'rows' => $value['limit']));
+      $list['items'] = array();
+      foreach ($search as $result) {
+        $list['items'][] = l($result['title'], $result['link']);
+      }
+      $content = '<div class="dossier-element-search_result-inner">' . $search_title . theme('item_list', $list) . '</div>';
+      break;
+
+    case CONTENT_TYPE_TEXT:
+      // Add class when color is white or yellow so text turns black for contrast
+      if(in_array($element['#data']['color_back'], array('#ffffff', '#fce300'))) {
+        $classes[] = 'dossier-element-black';
+      }
+
+      // If element contains media
+      if(strpos($element['#data']['content'], '[[{"type":"media"') !== FALSE) {
+        $classes[] = 'dossier-element-media';
+      }
+
+      // Filter content and wrap in a div.
+      $content = '<div class="dossier-element-text-inner">' . check_markup($element['#data']['content'], $element['#data']['text_format']) . '</div>';
+
+      break;
+    case CONTENT_TYPE_VIEW:
+      // Add class when color is white or yellow so text turns black for contrast
+      if(in_array($element['#data']['color_back'], array('#ffffff', '#fce300'))) {
+        $classes[] = 'dossier-element-black';
+      }
+      //Construct the view
+      $view_array = explode('-', $element['#data']['content']);
+      //Load the view
+      $view = views_get_view($view_array[0]);
+      if ($view) {
+        //Only execute if we have a view
+        $view_result = $view->execute_display($view_array[1]);
+      }
+      // Filter content and wrap in a div.
+      $content = '<div class="dossier-element-view-inner">' . $view_result['content'] . '</div>';
+      break;
+  }
+
+  // Set style
+  $left_position   = $element['#data']['pos_x'] * UNIT_SIZE_WIDTH;
+  $top_position    = $element['#data']['pos_y'] * UNIT_SIZE_HEIGHT;
+  $width           = $element['#data']['width'] * UNIT_SIZE_WIDTH;
+  $height          = $element['#data']['height'] * UNIT_SIZE_HEIGHT;
+  $background_color = $element['#data']['type'] == CONTENT_TYPE_MEDIA ? 'transparent' : $element['#data']['color_back'];
+  $style           = "position: absolute; left: {$left_position}px; top: {$top_position}px; width: {$width}px; height: {$height}px; background-color: {$background_color};";
+
+  $row++;
+
+  return '<div class="' . implode(' ', $classes) . '" style="' . $style . '">' . $content . '</div>';
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ * Add a view mode for nodes placed in a dossier.
+ */
+function bg_reference_entity_info_alter(&$entity_info) {
+  $entity_info['node']['view modes']['dossier'] = array(
+    'label' => t('In dossier'),
+    'custom settings' => TRUE,
+  );
+  $entity_info['node']['view modes']['facebook'] = array(
+    'label' => t('In Facebook'),
+    'custom settings' => TRUE,
+  );
+}
+
+/***************************************************************
+ * Field Type API hooks
+ ***************************************************************/
+
+/**
+ * Implement hook_field_info().
+ */
+function bg_reference_field_info() {
+  return array(
+    'bg_reference' => array(
+      'label'             => t('Referenced content'),
+      'description'       => t('Stores a reference to content.'),
+      'default_widget'    => 'bg_referencefield',
+      'default_formatter' => 'bg_referenceformat',
+    ),
+  );
+}
+
+/**
+ * Implement hook_field_schema().
+ */
+function bg_reference_field_schema($field) {
+  $columns = array(
+    'type' => array(
+      'type'      => 'varchar',
+      'length'    => 32,
+      'not null'  => TRUE
+    ),
+    'content' => array(
+      'type'      => 'text',
+      'not null'  => TRUE
+    ),
+    'pos_x' => array(
+      'type' => 'int',
+      'unsigned' => FALSE,
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'pos_y' => array(
+      'type' => 'int',
+      'unsigned' => FALSE,
+      'not null' => TRUE,
+      'default' => 0,
+    ),
+    'width' => array(
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 1,
+    ),
+    'height' => array(
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 1,
+    ),
+    'color_back' => array(
+      'type'      => 'varchar',
+      'length'    => 32,
+      'not null'  => FALSE,
+      'default'   => '',
+    ),
+  );
+
+  return array('columns' => $columns);
+}
+
+/**
+ * Implement hook_field_validate().
+ */
+function bg_reference_field_validate($obj_type, $object, $field, $instance, $langcode, &$items, &$errors) {
+
+}
+
+/**
+ * Implement hoo_field_is_empty().
+ */
+function bg_reference_field_is_empty($item, $field) {
+  // Field is empty when content is empty
+  return empty($item['content']);
+}
+
+/**
+ * Implement hook_field_presave().
+ */
+function bg_reference_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  // Store the text format together with the text content as a serialized array.
+  foreach ($items as $delta => $item) {
+    if ($item['type'] == CONTENT_TYPE_TEXT) {
+      $content_array = array(
+        'text' => $item['wrapper']['ref_'. CONTENT_TYPE_TEXT]['value'],
+        'text_format' => $item['wrapper']['ref_'. CONTENT_TYPE_TEXT]['format'],
+      );
+      $items[$delta]['content'] = serialize($content_array);
+    }
+    else if ($item['type'] == CONTENT_TYPE_VIEW) {
+      $items[$delta]['content'] = $item['wrapper']['ref_' . CONTENT_TYPE_VIEW];
+    }
+  }
+}
+
+/**
+ * Implement hook_field_load().
+ */
+function bg_reference_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  foreach ($entities as $id => $entity) {
+    foreach ($items[$id] as $delta => $item) {
+      // Unpack serialized arrays of text items to extract the text format.
+      // For backwards compatibility, set the default text format if the content is not a serialized array yet.
+      if ($item['type'] == CONTENT_TYPE_TEXT && ($content_array = @unserialize($item['content'])) !== false) {
+        $items[$id][$delta]['content'] = $content_array['text'];
+        $items[$id][$delta]['text_format'] = $content_array['text_format'];
+      }
+      else {
+        $items[$id][$delta]['text_format'] = 'full_html';
+      }
+    }
+  }
+}
+
+/**
+ * Implement hook_field_prepare_view().
+ */
+/*function bg_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
+  dpm(get_defined_vars());
+}*/
+
+/***********************************************************************
+ *  Field Type API: Formatter
+ **********************************************************************/
+
+/**
+ * Implement hook_field_formatter_info().
+ */
+function bg_reference_field_formatter_info() {
+  return array(
+    'bg_reference_default' => array(
+      'label' => t('Default display'),
+      'field types' => array('bg_reference'),
+    ),
+    'bg_reference_facebook' => array(
+      'label' => t('Facebook display'),
+      'field types' => array('bg_reference'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function bg_reference_field_formatter_view($object_type, $object, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $height = 0;
+  switch($display['type']) {
+    case 'bg_reference_facebook':
+    case 'bg_reference_default':
+      // We want to center the dossier.
+      $x_high = 1;
+      foreach ($items as $delta => $item) {
+        $item_x_high = $item['pos_x']+$item['width']-1;
+        if ($item_x_high > $x_high) {
+          $x_high = $item_x_high;
+        }
+
+        $item_height = $item['pos_y'] + $item['height'];
+        $height = $item_height > $height ? $item_height : $height;
+
+        $element[$delta] = array(
+          '#theme'        => 'bg_reference',
+          '#data'         => $item,
+          '#display_type' => $display['type'],
+        );
+      }
+      break;
+  }
+
+  $height = $height * UNIT_SIZE_HEIGHT;
+
+  $width = ($x_high) * UNIT_SIZE_WIDTH;
+  $element['#type'] = 'container';
+  // Set styling for non-js browsers.
+  $element['#attributes'] = array('id' => 'dossier-container', 'style' => 'width: ' . $width . 'px; height: ' . $height . 'px; margin: 0 auto');
+
+  return $element;
+}
+/**************************************************************************
+ * Field Type API: Widget
+ **************************************************************************/
+
+/**
+ * Implement hook_field_widget_info().
+ */
+function bg_reference_field_widget_info() {
+  return array(
+    'bg_referencefield' => array(
+      'label'       => t('Referenced content'),
+      'field types' => array('bg_reference'),
+    )
+  );
+}
+
+/**
+ * Implement hook_field_widget().
+ */
+function bg_reference_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0) {
+  $wrapper_id = 'bg-reference-field-wrapper-' . $langcode . '-' . $delta;
+  $module_path = drupal_get_path('module', 'bg_reference');
+
+  $text_format = NULL;
+  // Get type value from form values
+  if(isset($form_state['values']) && isset($form_state['values']['field_referenced_content'][$langcode][$delta])) {
+    $type   = $form_state['values']['field_referenced_content'][$langcode][$delta]['type'];
+    $value  = $form_state['values']['field_referenced_content'][$langcode][$delta]['content'];
+    if ($type == CONTENT_TYPE_TEXT) {
+      $text_format = $form_state['values']['field_referenced_content'][$langcode][$delta]['wrapper']['ref_'. CONTENT_TYPE_TEXT]['format'];
+    }
+  }
+  // Get type and value from stored data
+  else if(isset($items[$delta])) {
+    $type   = $items[$delta]['type'];
+    $value  = $items[$delta]['content'];
+    if ($type == CONTENT_TYPE_TEXT) {
+      $text_format = $items[$delta]['text_format'];
+    }
+  }
+  // Set defaults
+  else {
+    $type   = CONTENT_TYPE_TEXT;
+    $value  = '';
+  }
+
+  $ajax_settings = array(
+    'event'     => 'change',
+    'method'    => 'html',
+    'callback'  => 'bg_reference_ajax_callback',
+    'wrapper'   => $wrapper_id,
+  );
+
+  $element = array(
+    '#type' => 'fieldset',
+    // Convert during validation.
+    '#element_validate' => array('_bg_reference_validate'),
+    // TODO: This should not be necessary.
+    '#langcode' => $langcode,
+    '#attached' => array(
+      'js'  => array(
+        $module_path . '/js/bg_reference.js',
+      )
+    ),
+    'type' => array(
+      '#type'       => 'select',
+      '#title'      => t('Content type'),
+      '#ajax'       => $ajax_settings,
+      '#attributes' => array('class' => array('bg_reference_type')),
+      '#options'    => array(
+        CONTENT_TYPE_MEDIA          => t('Media'),
+        CONTENT_TYPE_TEXT           => t('Text'),
+        CONTENT_TYPE_SEARCH_RESULT  => t('Search result'),
+        CONTENT_TYPE_BANNER         => t('Banner'),
+        CONTENT_TYPE_EVENT          => t('Event'),
+        CONTENT_TYPE_VIEW           => t('Views block')
+      ),
+      '#default_value' => $type,
+    ),
+    'wrapper' => array(
+      '#prefix' => '<div id="' . $wrapper_id . '" class="input-wrapper">',
+      '#suffix' => '</div>',
+    ),
+    'content' => array(
+      '#type'       => 'hidden',
+      '#attributes' => array('class' => array('bg_reference_content')),
+      '#default_value' => $value,
+    ),
+    'pos_x' => array(
+      '#type'       => 'textfield',
+      '#title'      => t('X position'),
+      '#attributes' => array('class' => array('bg_reference_pos_x')),
+      '#default_value' => isset($items[$delta]['pos_x']) ? $items[$delta]['pos_x'] : 0,
+    ),
+    'pos_y' => array(
+      '#type'       => 'textfield',
+      '#title'      => t('Y position'),
+      '#attributes' => array('class' => array('bg_reference_pos_y')),
+      '#default_value' => isset($items[$delta]['pos_y']) ? $items[$delta]['pos_y'] : 0,
+    ),
+    'width' => array(
+      '#type'       => 'textfield',
+      '#title'      => t('Width'),
+      '#attributes' => array('class' => array('bg_reference_width')),
+      '#default_value' => isset($items[$delta]['width']) ? $items[$delta]['width'] : 1,
+    ),
+    'height' => array(
+      '#type'       => 'textfield',
+      '#title'      => t('Height'),
+      '#attributes' => array('class' => array('bg_reference_height')),
+      '#default_value' => isset($items[$delta]['height']) ? $items[$delta]['height'] : 1,
+    ),
+   'color_back' => array(
+      '#type'          => 'select',
+      '#title'         => t('Background color'),
+      '#attributes'    => array('class' => array('bg_reference_color_back')),
+      '#default_value' => isset($items[$delta]['color_back']) ? $items[$delta]['color_back'] : '#8b8784',
+      '#options'       => array(
+        '#ffffff' => '#ffffff',
+        '#8b8784' => '#8b8784',
+        '#e00034' => '#e00034',
+        '#009fda' => '#009fda',
+        '#fce300' => '#fce300',
+        '#c7c2ba' => '#c7c2ba',
+        '#ff5800' => '#ff5800',
+        '#92d400' => '#92d400',
+      ),
+    ),
+  );
+
+  $element['wrapper'] = array_merge($element['wrapper'], _bg_reference_get_form($type, $value, $text_format));
+
+  asort($element['type']['#options']);
+
+  return $element;
+}
+
+/**
+ * Get form element depending on type of element
+ * @param $type
+ * @param $value
+ */
+function _bg_reference_get_form($type, $value, $text_format = NULL) {
+  $element = array();
+  switch($type) {
+    case CONTENT_TYPE_BANNER:
+      $element['ref_' .CONTENT_TYPE_BANNER] = array(
+        '#type'               => 'textfield',
+        '#title'              => t('Banner'),
+        '#attributes'         => array('class' => array('bg_reference_banner')),
+        '#autocomplete_path'  => 'bg-reference/autocomplete/' . CONTENT_TYPE_BANNER,
+        '#default_value'      => check_plain($value),
+      );
+      break;
+
+    case CONTENT_TYPE_EVENT:
+      $element['ref_' . CONTENT_TYPE_EVENT] = array(
+        '#type'               => 'textfield',
+        '#title'              => t('Event'),
+        '#attributes'         => array('class' => array('bg_reference_event')),
+        '#autocomplete_path'  => 'bg-reference/autocomplete/' . CONTENT_TYPE_EVENT,
+        '#default_value'      => check_plain($value),
+      );
+      break;
+
+    case CONTENT_TYPE_MEDIA:
+      $element['ref_' . CONTENT_TYPE_MEDIA] = array(
+        '#type'               => 'textfield',
+        '#title'              => t('Media'),
+        '#attributes'         => array('class' => array('bg_reference_media')),
+        '#autocomplete_path'  => 'bg-reference/autocomplete/' . CONTENT_TYPE_MEDIA,
+        '#default_value'      => $value,
+      );
+      break;
+
+    case CONTENT_TYPE_SEARCH_RESULT:
+      $value = _bg_reference_search_parse_value($value);
+
+      $element['ref_' . CONTENT_TYPE_SEARCH_RESULT] = array(
+        'ref_' . CONTENT_TYPE_SEARCH_RESULT . '_query' => array(
+          '#type'               => 'textfield',
+          '#title'              => t('Search query'),
+          '#attributes'         => array('class' => array('bg_reference_search_result_query', 'bg_reference_search_result_input')),
+          '#default_value'      => check_plain($value['query']),
+        ),
+        'ref_' . CONTENT_TYPE_SEARCH_RESULT . '_limit' => array(
+          '#type'               => 'textfield',
+          '#title'              => t('Amount of results'),
+          '#attributes'         => array('class' => array('bg_reference_search_result_limit', 'bg_reference_search_result_input')),
+          '#default_value'      => check_plain($value['limit']),
+        ),
+      );
+      break;
+
+    case CONTENT_TYPE_TEXT:
+      $element['ref_' . CONTENT_TYPE_TEXT] = array(
+        '#type'               => 'text_format',
+        '#title'              => t('Text'),
+        '#attributes'         => array('class' => array('bg_reference_text')),
+        '#format'             => $text_format,
+        '#default_value'      => $value,
+      );
+      break;
+    case CONTENT_TYPE_VIEW:
+      //Get all the views that have block from this template
+      $result = db_query("SELECT delta FROM {block} WHERE module = 'views' AND theme = 'beeldgeluid'");
+      foreach ($result as $block ){
+        $options[$block->delta] = $block->delta;
+      }
+      $element['ref_' . CONTENT_TYPE_VIEW] = array(
+        '#type'               => 'select',
+        '#title'              => t('Views block'),
+        '#attributes'         => array('class' => array('bg_reference_' . CONTENT_TYPE_VIEW)),
+        '#options'            => $options,
+        '#default_value'      => $value,
+      );
+      break;
+  }
+
+  return $element;
+}
+
+function _bg_reference_search_parse_value($value) {
+  $return_value = array(
+    'query' => $value,
+    'limit' => 5
+  );
+
+  // If the search data is stored as a JSON object
+  if( ($obj = json_decode($value)) !== NULL ) {
+    $return_value['query'] = $obj->query;
+    $return_value['limit'] = $obj->limit;
+  }
+
+  return $return_value;
+}
+
+/**
+ * Do validation and set form values
+ */
+function _bg_reference_validate($element, &$form_state) {
+  if(preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]/', $element['type']['#name'], $field)) {
+    if (isset($form_state['values'][$field['name']][$field['langcode']][$field['delta']])) {
+      $values = $form_state['values'][$field['name']][$field['langcode']][$field['delta']];
+
+      if(!empty($values['content'])) {
+
+        // Validate referenced node
+        if (preg_match('/\[nid:(?P<nid>\d+)\]/', $values['content'], $match)) {
+          if (db_query("SELECT nid FROM node WHERE nid = :nid", array(':nid' => $match['nid']))->rowCount() == 0) {
+            form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][wrapper][ref_{$values['type']}", t('The referenced node in Item #!number does not exist.', array('!number' => $field['delta'] + 1)));
+          }
+        }
+
+        // Validate x position
+        if (!_bg_reference_is_int($values['pos_x'])) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_x", t('X position should be an integer value'));
+        }
+
+        // Validate y position
+        if (!_bg_reference_is_int($values['pos_y'])) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][pos_y", t('Y position should be an integer value'));
+        }
+
+        // Validate width
+        if (!_bg_reference_is_int($values['width']) || (_bg_reference_is_int($values['width']) && ($values['width'] <= 0 || $values['width'] > 4))) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][width", t('Width should be a value between 1 and 4'));
+        }
+
+        // Validate height
+        if (!_bg_reference_is_int($values['height']) || (_bg_reference_is_int($values['height']) && ($values['height'] <= 0 || $values['height'] > 4))) {
+          form_set_error("{$field['name']}][{$field['langcode']}][{$field['delta']}][height", t('Height should be a value between 1 and 4'));
+        }
+
+      }
+
+      form_set_value($element, $values, $form_state);
+    }
+  }
+}
+
+/**************************************************************************
+ * Utilities
+ **************************************************************************/
+function _bg_reference_is_int($value) {
+  return ((string) $value) === ((string)(int) $value);
+}
+
+function bg_reference_ajax_text_button($text, $dest, $alt, $rel = '', $class = '', $type = 'use-ajax') {
+  drupal_add_js('misc/ajax.js');
+  return l($text, $dest, array('html' => TRUE, 'attributes' => array('class' => array($type, $class), 'title' => $alt, 'rel' => $rel)));
+}
+
+function _bg_reference_get_element($dossier_node, $delta = NULL) {
+  // Get main media element
+  if(is_null($delta)) {
+    foreach($dossier_node->field_referenced_content[$dossier_node->language] as $element) {
+      if($element['type'] == CONTENT_TYPE_MEDIA && $element['width'] == 4 && $element['height'] == 4) {
+        return $element;
+      }
+    }
+  }
+  // Get specified element
+  else {
+    return $dossier_node->field_referenced_content[$dossier_node->language][$delta];
+  }
+}
+
+/**************************************************************************
+ * AJAX callbacks
+ **************************************************************************/
+function bg_reference_ajax_callback($form, $form_state) {
+  if (!empty($form_state['triggering_element']) && preg_match('/(?P<name>\w+)\[(?P<langcode>\w+)\]\[(?P<delta>\d+)\]\[(?P<subfield>\w+)\]/', $form_state['triggering_element']['#name'], $field)) {
+    $type     = $form_state['values'][$field['name']][$field['langcode']][$field['delta']][$field['subfield']];
+
+    $value    = $form_state['values'][$field['name']][$field['langcode']][$field['delta']]['content'];
+    $wrapper  = &$form[$field['name']][$field['langcode']][$field['delta']]['wrapper'];
+
+    foreach($wrapper as $key => $value) {
+      if(preg_match('/^ref_.*/', $key)) {
+        unset($wrapper[$key]);
+      }
+    }
+
+    $wrapper = array_merge($wrapper, _bg_reference_get_form($type, ''));
+
+    // Rebuild form
+    form_builder($form['#form_id'], $form, $form_state);
+
+    // Return element
+    return $wrapper['ref_' . $type];
+  }
+}
+
+function _bg_reference_autocomplete($bundle, $string = '') {
+  $matches = array();
+  if ($string) {
+    $result = db_select('node')
+      ->fields('node', array('nid', 'title'))
+      ->condition('type', $bundle)
+      ->condition('status', 1)
+      ->condition('title', '%' . db_like($string) . '%', 'LIKE')
+      ->range(0, 10)
+      ->execute();
+    foreach ($result as $node) {
+      $matches["{$node->title} [nid:{$node->nid}]"] = check_plain($node->title);
+    }
+  }
+
+  drupal_json_output($matches);
+}
+
+/**
+ * AJAX callback for dossiers switching media
+ * Enter description here ...
+ * @param unknown_type $dossier_node
+ * @param unknown_type $old_main_media_node
+ * @param unknown_type $new_main_media_node
+ */
+function bg_reference_ajax_switch_main_media($dossier_node, $old_main_media_node, $new_main_media_node, $delta) {
+  $commands = array();
+
+  if($dossier_node->type == CONTENT_TYPE_DOSSIER && $old_main_media_node->type == CONTENT_TYPE_MEDIA && $new_main_media_node->type == CONTENT_TYPE_MEDIA) {
+    // Set seen ID's to prevent ID renaming
+    drupal_static('drupal_html_id', array());
+
+    // Get settings of main media element
+    $main_media_element  = _bg_reference_get_element($dossier_node);
+    // Get settings of media elements position which is clicked
+    $media_element       = _bg_reference_get_element($dossier_node, $delta);
+
+    $new_main_media_player = theme('bg_reference', array(
+      'element' => array(
+        '#data' => array(
+          'type'    => CONTENT_TYPE_MEDIA,
+          'pos_x'   => $main_media_element['pos_x'],
+          'pos_y'   => $main_media_element['pos_y'],
+          'width'   => $main_media_element['width'],
+          'height'  => $main_media_element['height'],
+          'content' => "[nid:{$new_main_media_node->nid}]"
+        )
+      )
+    ));
+
+    $old_main_media_player = theme('bg_reference', array(
+      'element' => array(
+        '#data' => array(
+          'type'    => CONTENT_TYPE_MEDIA,
+          'pos_x'   => $media_element['pos_x'],
+          'pos_y'   => $media_element['pos_y'],
+          'width'   => $media_element['width'],
+          'height'  => $media_element['height'],
+          'content' => "[nid:{$old_main_media_node->nid}]",
+          'delta'   => $delta
+        )
+      )
+    ));
+
+    // Replace old thumb with new one
+    $commands[] = ajax_command_replace(".dossier-element.node-id-{$new_main_media_node->nid}:not(.main-media-player)", $old_main_media_player);
+    // Replace old main media player with new one
+    $commands[] = ajax_command_replace('.dossier-element.main-media-player', $new_main_media_player);
+    // Invoke change command for animation
+    $commands[] = ajax_command_invoke(NULL, 'bgDossierMediaChange', array(".dossier-element.node-id-{$old_main_media_node->nid}"));
+  }
+
+  print ajax_render($commands);
+  exit;
+}
+
+/*
+ * Implements hook_form_alter().
+ */
+function bg_reference_form_alter(&$form, &$form_state, $form_id) {
+
+  /*
+   * Warns the user when deleting a node that is referenced by a bg_reference field.
+   */
+  if ($form_id == 'node_delete_confirm' || ($form_id == 'node_admin_content' && isset($form['operation']['#value']) && $form['operation']['#value'] == 'delete')) {
+    // First, put the available data in a uniform array format.
+    // Get the node info from the single node confirmation form.
+    if ($form_id == 'node_delete_confirm') {
+      $parent_nodes[$form['#node']->nid] = $form['#node']->title;
+    }
+    // Get the node info from the multiple delete confirmation form.
+    else {
+      foreach ($form['nodes'] as $nodes_nid => $nodes_node) {
+        if (is_int($nodes_nid)) {
+          $parent_nodes[$nodes_nid] = strip_tags($nodes_node['#suffix']);
+        }
+      }
+      // Make sure the list of nodes stays on top of the form.
+      $form['nodes']['#weight'] = -10;
+    }
+
+    // Loop over the nodes and display which nodes are referencing them.
+    $warning = '';
+    foreach ($parent_nodes as $parent_nid => $parent_title) {
+      $result = db_query("SELECT rc.entity_id, n.title FROM {field_data_field_referenced_content} rc JOIN {node} n ON rc.entity_id = n.nid  WHERE rc.entity_type = 'node' AND field_referenced_content_content LIKE :like", array(':like' => '%[nid:'. $parent_nid .']%'));
+      if ($result->rowCount() > 0) {
+        $warning .= '<p>' . t("The following nodes reference %title:", array('%title' => $parent_title)) . '</p><ul>';
+        foreach($result as $record) {
+          $warning .= '<li>' . l($record->title, 'node/' . $record->entity_id) . '</li>';
+        }
+        $warning .= '</ul>';
+      }
+    }
+
+    // Add the warning to the form.
+    $form['warning'] = array(
+      '#markup' => $warning,
+      '#weight' => -1,
+    );
+  }
+
+}
