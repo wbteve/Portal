@@ -109,6 +109,25 @@ function beeldgeluid_preprocess_html(&$variables, $hook) {
       $variables['seo_code_body'] = $node->field_seo_code_body[$node->language][0]['value'];
     }
   }
+  
+  $pattern = '/^\/?(levenmetoranje|oranjebioscoop|inhuldiging)/';
+  
+  if (preg_match($pattern, current_path()) || preg_match($pattern, $_SERVER['REDIRECT_URL'])) {
+    $path = drupal_get_path('theme', 'beeldgeluid') . '/js/tb-youtube.js';
+    drupal_add_js($path, 'file');
+  }
+}
+
+/**
+ * Hook to detect if youtube video is loaded by media_youtube module
+ * @todo: put this code at a place that better identifies youtube at this page
+ * 
+ * @param type $variables
+ */
+function beeldengeluid_preprocess_media_youtube_video(&$variables) {
+  // but... it is not getting here...
+  // then put it in the beeldgeluid_preprocess_html function.
+  drupal_add_js(drupal_get_path('theme', 'beeldgeluid') . '/js/tb-youtube.js');
 }
 
 /**

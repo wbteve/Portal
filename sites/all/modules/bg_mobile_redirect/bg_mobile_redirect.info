@@ -1,0 +1,4 @@
+name = Beeld en Geluid Mobile redirect
+description = Mobile redirect from frontpage to mobile site (configurable)
+package = "Beeld en Geluid"
+core = 7.x

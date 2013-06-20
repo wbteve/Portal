@@ -1,3 +1,8 @@
+Changes 2011-12-18
+------------------
+Issue #1283234,#1250326, #1294920 by hiddentao: Added "og_tag_render_alter hook" for modifying OG meta tag values just before they get output to the page.
+
+
 Changes 2011-12-05
 ------------------
 Issue #1333554 by hiddentao, toleiollo: Patch to ensure correct language representatio of body field is used.
