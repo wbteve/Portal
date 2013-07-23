@@ -5,6 +5,38 @@
  */
 
 /**
+ * Create a form to edit multiple file entities.
+ *
+ * @param $fids Array with file id's.
+ */
+function media_browser_plus_edit_multiple_form($fids) {
+  $ids = explode(' ', $fids);
+  $variables = array('ids' => $ids, 'paging' => FALSE, 'apply_filter' => FALSE);
+  $media_items = media_browser_plus_load_multiple($variables)->results;
+
+  // Produce form via multiform.
+  module_load_include('inc', 'media', 'includes/media.pages');
+  $form = media_page_multiedit($media_items);
+
+  // @TODO: change to normale redirect once this works with multiform
+  if (isset($_POST['op'])) {
+    if (isset($_GET['destination'])) {
+      $destination = drupal_get_destination();
+      unset($_GET['destination']);
+    }
+    $destination = isset($destination['destination']) ? $destination['destination'] : 'admin/content/media';
+    if ($_POST['op'] === 'Save' && !form_get_errors()) {
+      drupal_set_message(t('Media items changed successfully'));
+      drupal_goto($destination);
+    }
+    if ($_POST['op'] === 'Cancel') {
+      drupal_goto($destination);
+    }
+  }
+  return $form;
+}
+
+/**
  * Provide a form to confirm the deletion of multiple file entites.
  *
  * @param $form
