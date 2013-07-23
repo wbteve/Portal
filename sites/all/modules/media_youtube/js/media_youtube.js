@@ -52,7 +52,7 @@ Drupal.media_youtube.insertEmbed = function (embed_id) {
   // Replace the object embed with YouTube's iframe. This isn't done by the
   // theme function because YouTube doesn't have a no-JS or no-Flash fallback.
   var video = $('<iframe class="youtube-player" type="text/html" frameborder="0"></iframe>');
-  var src = location.protocol + '//www.youtube.com/embed/' + settings.video_id;
+  var src = 'http://www.youtube.com/embed/' + settings.video_id;
 
   // Allow other modules to modify the video settings.
   settings.options = settings.options || {};
