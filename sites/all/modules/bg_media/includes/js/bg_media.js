@@ -8,7 +8,7 @@
 
       // Check if video tag is supported
       if(videotagsupport) {
-        VideoJS.setup();
+        //VideoJS.autoSetup();
       }
 
       // RVW: Removed $('#media-video').bind('play', function(){Drupal.BGMediaPlayerPlayHandler();});
@@ -19,11 +19,19 @@
   }
 
   Drupal.BGMediaPlayerPlayHandler = function() {
+    trackVideoEvent('play', this.getConfig().title);
+
     // RVW: Removed $('.video-titlebar, .group_verbreding').fadeOut('fast');
   }
 
   Drupal.BGMediaPlayerStopHandler = function() {
+    trackVideoEvent('stop', this.getConfig().title);
+
     // RVW: Removed $('.video-titlebar, .group_verbreding').fadeIn('fast');
+  }
+
+  Drupal.BGMediaPlayerFinishHandler = function() {
+    trackVideoEvent('volledig afgespeeld', this.getConfig().title);
   }
 
   Drupal.behaviors.bgDossierMediaBehavior = {
@@ -66,6 +74,10 @@
         }
       }
     }
+  }
+
+  function trackVideoEvent(event, title) {
+    _gaq.push([ '_trackEvent', 'videos', event, title ]);
   }
 
   $.fn.bgDossierMediaChange = function(newThumb) {
