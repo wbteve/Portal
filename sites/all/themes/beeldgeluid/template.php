@@ -258,8 +258,10 @@ function beeldgeluid_preprocess_node(&$variables, $hook) {
     unset($variables['content']['links']['comment']);
   }
   if ($variables['node']->type == 'article') {
+    // Get field values
+    $view_values = field_get_items('node', $variables['node'], 'field_artikel_view');
     //Construct the view
-    $view_array = explode('-', $variables['node']->field_artikel_view['und'][0]['value']);
+    $view_array = explode('-', $view_values[0]['value']);
     //Load the view
     $view = views_get_view($view_array[0]);
     if ($view) {
