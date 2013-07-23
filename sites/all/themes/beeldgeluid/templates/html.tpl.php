@@ -99,7 +99,7 @@
 
       // this resizes the the i-frame
       // on an interval of 100ms
-      FB.Canvas.setAutoResize(100);
+      FB.Canvas.setAutoGrow(100);
     };
     (function() {
       var e = document.createElement('script');
