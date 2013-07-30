@@ -27,7 +27,7 @@ function videojs_preprocess_videojs(&$vars) {
   );
 
   $vars['width'] = !empty($vars['attributes']['width']) ? $vars['attributes']['width'] : variable_get('videojs_width', 640);
-  $vars['height'] = !empty($vars['attributes']['height']) ? $vars['attributes']['height'] : variable_get('videojs_height', 264);
+  $vars['height'] = !empty($vars['attributes']['height']) ? $vars['attributes']['height'] : variable_get('videojs_height', 360);
   $vars['autoplay'] = !!variable_get('videojs_autoplay', FALSE);
   $vars['items'] = array();
   $vars['poster'] = NULL;
@@ -40,7 +40,7 @@ function videojs_preprocess_videojs(&$vars) {
     if (!isset($codecs[$item['filemime']])) {
       // check for image file and add in it as poster
       if (strncmp($item['filemime'], 'image/', 6) === 0) {
-        $vars['poster'] = file_create_url($item['uri']);
+        $vars['poster'] = $item['uri'];
       }
 
       // Skip unplayable items.
@@ -50,6 +50,16 @@ function videojs_preprocess_videojs(&$vars) {
     $item['videotype'] = $codecs[$item['filemime']];
 
     $vars['items'][] = $item;
+  }
+
+  // Turn the poster image URI into a URL
+  if (!empty($vars['poster'])) {
+    if (empty($vars['posterimage_style'])) {
+      $vars['poster'] = file_create_url($vars['poster']);
+    }
+    else {
+      $vars['poster'] = image_style_url($vars['posterimage_style'], $vars['poster']);
+    }
   }
 }
 

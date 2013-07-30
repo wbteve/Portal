@@ -41,6 +41,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
           'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
           'onStop'	  => 'Drupal.BGMediaPlayerStopHandler',
           'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
+          'onFinish'  => 'Drupal.BGMediaPlayerFinishHandler',
         ),
       ),
       'plugins'   => array(
@@ -49,6 +50,7 @@ function bg_media_preprocess_bg_media_video(&$vars) {
           'netConnectionUrl'  => $wrapper->getBaseUrl(),
         )
       ),
+      'title' => $vars['title'],
     ));
   }
   // Theming of Open Images items
@@ -76,9 +78,11 @@ function bg_media_preprocess_bg_media_video(&$vars) {
           'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
           'onStop'	  => 'Drupal.BGMediaPlayerStopHandler',
           'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
+          'onFinish'  => 'Drupal.BGMediaPlayerFinishHandler',
         ),
       ),
       'onBeforeLoad'  => 'Drupal.BGMediaPlayerLoadHandler',
+      'title' => $vars['title'],
     ));
   }
   else if($wrapper instanceof DrupalPublicStreamWrapper) {
@@ -103,15 +107,19 @@ function bg_media_preprocess_bg_media_video(&$vars) {
           // Replace single quote in URL for IE compatibility
           'url'       => str_replace("'", '%2527', $fallback_video_url),
           'autoPlay'  => false,
-          'onStart'	  => 'Drupal.BGMediaPlayerPlayHandler',
+          'onStart'   => 'Drupal.BGMediaPlayerPlayHandler',
           'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
-          'onStop'	  => 'Drupal.BGMediaPlayerStopHandler',
+          'onStop'    => 'Drupal.BGMediaPlayerStopHandler',
           'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
+          'onFinish'  => 'Drupal.BGMediaPlayerFinishHandler',
         ),
       ),
       'onBeforeLoad'  => 'Drupal.BGMediaPlayerLoadHandler',
+      'title' => $vars['title'],
     ));
   }
+
+  $vars['title'] = check_plain($vars['title']);
 }
 
 /**
@@ -149,6 +157,7 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
           'onResume'    => 'Drupal.BGMediaPlayerPlayHandler',
           'onStop'	    => 'Drupal.BGMediaPlayerStopHandler',
           'onPause'     => 'Drupal.BGMediaPlayerStopHandler',
+          'onFinish'    => 'Drupal.BGMediaPlayerFinishHandler',
         ),
       ),
       'play'      => NULL,
@@ -163,6 +172,7 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
           'fullscreen' => FALSE,
         ),
       ),
+      'title' => $vars['title'],
     ));
   }
   else {
@@ -175,10 +185,11 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
         array(
           'url'       => base_path() . $wrapper->getDirectoryPath() . '/' . $vars['file']->filename,
           'autoPlay'  => false,
-          'onStart'	=> 'Drupal.BGMediaPlayerPlayHandler',
+          'onStart'   => 'Drupal.BGMediaPlayerPlayHandler',
           'onResume'  => 'Drupal.BGMediaPlayerPlayHandler',
-          'onStop'	=> 'Drupal.BGMediaPlayerStopHandler',
+          'onStop'    => 'Drupal.BGMediaPlayerStopHandler',
           'onPause'   => 'Drupal.BGMediaPlayerStopHandler',
+          'onFinish'  => 'Drupal.BGMediaPlayerFinishHandler',
         ),media_variable_get('icon_set')
       ),
       'play'      => NULL,
@@ -192,6 +203,7 @@ function bg_media_preprocess_bg_media_audio(&$vars) {
           'fullscreen' => FALSE,
         ),
       ),
+      'title' => $vars['title'],
     ));
   }
 }
@@ -230,7 +242,7 @@ function bg_media_load_videojs() {
     return;
   }
 
-  $videojs_file_types = videojs_add(FALSE);
+  $videojs_file_types = videojs_add();
   foreach($videojs_file_types as $type => $file_type) {
     $function = "drupal_add_$type";
 
