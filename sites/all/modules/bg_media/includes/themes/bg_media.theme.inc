@@ -118,6 +118,8 @@ function bg_media_preprocess_bg_media_video(&$vars) {
       'title' => $vars['title'],
     ));
   }
+
+  $vars['title'] = check_plain($vars['title']);
 }
 
 /**
@@ -240,7 +242,7 @@ function bg_media_load_videojs() {
     return;
   }
 
-  $videojs_file_types = videojs_add(FALSE);
+  $videojs_file_types = videojs_add();
   foreach($videojs_file_types as $type => $file_type) {
     $function = "drupal_add_$type";
 

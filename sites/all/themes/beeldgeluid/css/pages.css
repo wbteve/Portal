@@ -676,3 +676,7 @@ ul.links li {
 #content .region-content .node ul {
   margin-top: 0;
 }
+
+.vjs-remaining-time-display {
+    display: none;
+}

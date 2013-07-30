@@ -8,30 +8,49 @@
 
       // Check if video tag is supported
       if(videotagsupport) {
-        //VideoJS.autoSetup();
+        VideoJS.autoSetup();
       }
 
-      // RVW: Removed $('#media-video').bind('play', function(){Drupal.BGMediaPlayerPlayHandler();});
-      // RVW: Removed $('#media-video').bind('pause', function(){Drupal.BGMediaPlayerStopHandler();});
+      $('.video-js').each(function() {
+        var player = VideoJS(this);
+        player.addEvent('play', function() { Drupal.BGMediaPlayerPlayHandler.call(this); });
+        player.addEvent('pause', function() { Drupal.BGMediaPlayerStopHandler.call(this); });
+        player.addEvent('ended', function() { Drupal.BGMediaPlayerFinishHandler.call(this); });
+      });
     }
 
     initializedVideoPlayer = true;
   }
 
   Drupal.BGMediaPlayerPlayHandler = function() {
-    trackVideoEvent('play', this.getConfig().title);
+    if (typeof this.getConfig == 'function') {
+      trackVideoEvent('play', this.getConfig().title);
+    }
+    else {
+      trackVideoEvent('play', $(this.tech.el).data('title'));
+    }
 
     // RVW: Removed $('.video-titlebar, .group_verbreding').fadeOut('fast');
   }
 
   Drupal.BGMediaPlayerStopHandler = function() {
-    trackVideoEvent('stop', this.getConfig().title);
+    if (typeof this.getConfig == 'function') {
+      trackVideoEvent('stop', this.getConfig().title);
+    }
+    else {
+      trackVideoEvent('stop', $(this.tech.el).data('title'));
+    }
 
     // RVW: Removed $('.video-titlebar, .group_verbreding').fadeIn('fast');
   }
 
   Drupal.BGMediaPlayerFinishHandler = function() {
-    trackVideoEvent('volledig afgespeeld', this.getConfig().title);
+    if (typeof this.getConfig == 'function') {
+      trackVideoEvent('volledig afgespeeld', this.getConfig().title);
+    }
+    else {
+      trackVideoEvent('volledig afgespeeld', $(this.tech.el).data('title'));
+    }
   }
 
   Drupal.behaviors.bgDossierMediaBehavior = {
